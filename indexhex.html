@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Langtons Ant</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
+  <meta name="description" content="Langton's Ant">
+
+  <link rel="stylesheet" type="text/css" href="style.css" />
+
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript">google.load("jquery", "1.3.2");</script>
+  <script type="text/javascript" src="ant.js"></script>
+
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var ant = makeAnt();
+      var c = document.getElementById("antBoard");
+      var ctx = c.getContext("2d");
+
+      var translateCoord = function(coord){
+        return [coord[0] + 250, coord[1] + 250]
+      }
+
+      var fillCoord = function(coord, style){
+        var ncoord = translateCoord(coord);
+        var x = ncoord[0] ;
+        var y = ncoord[1] ;
+        ctx.fillStyle = style;
+        ctx.fillRect(x,y,1,1);
+      };
+
+      var antMove = function(){
+        ant.move();
+        if (ant.isBlack()) {
+          fillCoord(ant.getCoord(), "#000");
+        } else {
+          fillCoord(ant.getCoord(), "#fff");
+        }
+
+      };
+
+      //antMove();
+
+      //for (var i=0; i < 18000; i++){ 
+      //  antMove();
+      //}
+
+      setInterval(antMove, 1);
+
+    });
+
+
+
+
+  </script>
+
+</head>
+
+
+<body class="home">
+
+
+<canvas id="antBoard" width="500" height="500">
+</canvas>
+
+</body>
