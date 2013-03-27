@@ -42,12 +42,10 @@
 
       };
 
-      //antMove();
-
-      //for (var i=0; i < 18000; i++){ 
-      //  antMove();
-      //}
-
+      var progress = 8000 + Math.floor(Math.random() * 10000) // slight difference.
+      for (var i=0; i < progress; i++){ 
+        antMove();
+      }
       setInterval(antMove, 1);
 
     });
