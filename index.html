@@ -33,20 +33,17 @@
       };
 
       var antMove = function(){
-        ant.move();
-        if (ant.isBlack()) {
-          fillCoord(ant.getCoord(), "#000");
-        } else {
-          fillCoord(ant.getCoord(), "#fff");
-        }
-
+        var m = ant.move();
+        fillCoord(m.coord, m.color);
       };
 
       var progress = 8000 + Math.floor(Math.random() * 10000) // slight difference.
       for (var i=0; i < progress; i++){ 
         antMove();
       }
-      setInterval(antMove, 1);
+      //setInterval(antMove, 1);
+
+      //antMove();
 
     });
 
