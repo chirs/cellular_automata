@@ -35,7 +35,10 @@
       };
 
       var antMove = function(){
-        for (var i=0; i < 100; i++){
+        var speed = parseInt($("#speed").val());
+        speed = speed || 1;
+
+        for (var i=0; i < speed; i++){
           var m = ant.move();
           fillCoord(m.coord, m.color);
         }
@@ -59,6 +62,7 @@
 
         var generation = parseInt($("#generation").val());
         generation = generation || 0;
+
         for (var i=0; i<generation; i++){
           antMove();
         }
@@ -66,10 +70,6 @@
         play();
       };
 
-
-
-        
-        
       
       $("#pause").click(pause);
       $("#play").click(play);
@@ -96,7 +96,12 @@
 <input id="play" type="submit" value="play">
 <input id="description" type="input" value="LLRR">
 <input id="generation" type="input" value="0">
+
 <input id="restart" type="submit" value="restart">
+</div>
+
+<div>
+<label>speed</label><input id="speed" type="input" value="100">
 </div>
 
 <canvas id="antBoard" width="500" height="500">
