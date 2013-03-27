@@ -20,16 +20,34 @@
       var c = document.getElementById("antBoard");
       var ctx = c.getContext("2d");
 
+
+      var drawHexagon = function(coord, r, style){
+        var numberOfSides = 6;
+        var Xcenter = coord[0];
+        var Ycenter = coord[0];
+
+        ctx.beginPath();
+        ctx.moveTo (Xcenter +  r * Math.cos(0), Ycenter +  r *  Math.sin(0));          
+        for (var i = 1; i <= numberOfSides;i += 1) {
+          ctx.lineTo (Xcenter + r * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + r * Math.sin(i * 2 * Math.PI / numberOfSides));
+      }
+        ctx.strokeStyle = style;
+        ctx.fill();
+      }
+
+
       var translateCoord = function(coord){
-        return [coord[0] + 250, coord[1] + 250]
+        return [coord[0] + 50, coord[1] + 50]
       }
 
       var fillCoord = function(coord, style){
         var ncoord = translateCoord(coord);
-        var x = ncoord[0] ;
-        var y = ncoord[1] ;
+        var x = ncoord[0] *5 ;
+        var y = ncoord[1] *5 ;
         ctx.fillStyle = style;
-        ctx.fillRect(x,y,1,1);
+        //ctx.fillRect(x,y,5,5);
+        drawHexagon([x,y], 5, style)
+        
       };
 
       var antMove = function(){
@@ -49,6 +67,7 @@
       //}
 
       setInterval(antMove, 1);
+      //drawHexagon([200,200], 50)
 
     });
 
