@@ -17,6 +17,7 @@
   <script type="text/javascript">
     $(document).ready(function() {
       var intervalID, ant;
+      var paused = true;
 
       var canvas = document.getElementById("antBoard");
       var ctx = canvas.getContext("2d");
@@ -34,9 +35,8 @@
         ctx.fillRect(x,y,2,2);
       };
 
-      var antMove = function(){
-        var speed = parseInt($("#speed").val());
-        speed = speed || 1;
+      var antMove = function(speed){
+        speed = speed || parseInt($("#speed").val()) || 1;
 
         for (var i=0; i < speed; i++){
           var m = ant.move();
@@ -49,30 +49,35 @@
       };
 
 
-      var play = function(){ 
-        intervalID = setInterval(antMove, 1); 
-      }
-      var pause = function() {clearInterval(intervalID);};
-
+      var pauseUnpause = function() {
+        if (paused) {
+          intervalID = setInterval(antMove, 1);
+          paused = false;
+          $("#pause").val("pause");
+        } else {
+          clearInterval(intervalID);
+          paused = true;
+          $("#pause").val("unpause");
+        }
+      };
 
 
       var start = function(generation) { 
         clearCanvas();
+        paused = true;
         ant = makeAnt($("#description").val());
 
         var generation = parseInt($("#generation").val());
         generation = generation || 0;
 
         for (var i=0; i<generation; i++){
-          antMove();
+          antMove(1);
         }
-
-        play();
+        pauseUnpause();
       };
 
       
-      $("#pause").click(pause);
-      $("#play").click(play);
+      $("#pause").click(pauseUnpause);
       $("#restart").click(start);
 
 
@@ -92,19 +97,24 @@
 <body class="home">
 
 <div>
-<input id="pause" type="submit" value="pause">
-<input id="play" type="submit" value="play">
-<input id="description" type="input" value="LLRR">
-<input id="generation" type="input" value="0">
-
-<input id="restart" type="submit" value="restart">
-</div>
 
 <div>
-<label>speed</label><input id="speed" type="input" value="100">
+
+</div>
+
+<div><label>pattern</label><input id="description" type="input" value="LLRR"></div>
+<!--<div><label>generation</label><input id="generation" type="input" value="0"></div>-->
+<div><label>speed</label><input id="speed" type="input" value="100"></div>
+<div>
+  <input id="restart" type="submit" value="restart">
+  <input id="pause" type="submit" value="pause">
+</div>
+
+
 </div>
 
 <canvas id="antBoard" width="500" height="500">
+
 </canvas>
 
 
