@@ -21,15 +21,15 @@
       var ctx = c.getContext("2d");
 
       var translateCoord = function(coord){
-        return [coord[0] + 250, coord[1] + 250]
+        return [coord[0] + 50, coord[1] + 50]
       }
 
       var fillCoord = function(coord, style){
         var ncoord = translateCoord(coord);
-        var x = ncoord[0] ;
-        var y = ncoord[1] ;
+        var x = ncoord[0] * 5 ;
+        var y = ncoord[1] * 5 ;
         ctx.fillStyle = style;
-        ctx.fillRect(x,y,1,1);
+        ctx.fillRect(x,y,5,5);
       };
 
       var antMove = function(){
@@ -37,13 +37,14 @@
         fillCoord(m.coord, m.color);
       };
 
-      var progress = 8000 + Math.floor(Math.random() * 10000) // slight difference.
+      //var progress = 8000 + Math.floor(Math.random() * 10000) // slight difference.
+      var progress = 100000;
       for (var i=0; i < progress; i++){ 
         antMove();
       }
-      //setInterval(antMove, 1);
 
-      //antMove();
+      setInterval(antMove, 1);
+
 
     });
 

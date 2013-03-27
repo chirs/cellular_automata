@@ -3,13 +3,59 @@
 // 
 
 
-var makeAnt = function(){
-  var totalColors = 2;
+
+var turnRight = function(o){
+  return {
+    'up': 'right',
+    'right': 'down',
+    'down': 'left',
+    'left': 'up',
+  }[o];
+};
+
+var turnLeft = function(o){
+  return {
+    'up': 'left',
+    'left': 'down',
+    'down': 'right',
+    'right': 'up',
+  }[o]
+};
+
+var reverse = function(o){
+  return {
+    'up': 'down',
+    'down': 'up',
+    'left': 'right',
+    'right': 'left',
+  }[o];
+};
+
+var straight = function(o){ return o; }
+
+
+var makeAnt = function(description){
+  description = description || "LLRR"
+  var totalColors = description.length
+
+  actionMap = {
+    'L': turnLeft,
+    'R': turnRight,
+    'V': reverse,
+    'S': straight,
+  }
+
+  // Build action list.
+  actionList = []
+  for (var i=0; i < description.length; i++){
+    var character = description[i];
+    actionList.push(actionMap[character]);
+  };
 
 
   // This manages cell state.
-  var cellColor = function(){
-    var cellMap = {}
+  var cellState = function(){
+    var cellMap = {};
 
     var g = function(key){
       if (key in cellMap){
@@ -27,6 +73,9 @@ var makeAnt = function(){
       return [
         "#000",
         "#fff",
+        "#ff0000",
+        "#00ff00",
+        "#0000ff",
       ][g(key)]
     };
 
@@ -37,23 +86,6 @@ var makeAnt = function(){
   var coord = [0,0]; 
   var orientation = 'up'; // Need to improve this.
 
-  var turnRight = function(o){
-    orientation = {
-      'up': 'right',
-      'right': 'down',
-      'down': 'left',
-      'left': 'up',
-    }[orientation];
-  };
-
-  var turnLeft = function(o){
-    orientation =  {
-      'up': 'left',
-      'left': 'down',
-      'down': 'right',
-      'right': 'up',
-    }[orientation];
-  };
 
   // get the next coord we'll be visiting.
   var getNewCoord = function(){
@@ -71,26 +103,22 @@ var makeAnt = function(){
     return [coord[0] + d[0], coord[1] + d[1]]
   };
 
-  var actionMap = [
-    turnRight,
-    turnLeft,
-  ]
 
 
   // Just return the function?
   return {
 
     move: function(){
-      var color = cellColor.get(coord);
+      var state = cellState.get(coord);
       //console.log(color);
-      var action = actionMap[color];
-      cellColor.set(coord);
-      action();
+      var action = actionList[state];
+      cellState.set(coord);
+      orientation = action(orientation);
       coord = getNewCoord();
 
       return {
         coord: coord,
-        color: cellColor.getColor(coord),
+        color: cellState.getColor(coord),
       }
     }
   };
