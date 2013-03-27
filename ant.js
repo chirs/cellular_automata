@@ -35,7 +35,8 @@ var straight = function(o){ return o; }
 
 
 var makeAnt = function(description){
-  description = description || "LLRR"
+  description = description || "LR"
+
   var totalColors = description.length
 
   actionMap = {
@@ -73,11 +74,23 @@ var makeAnt = function(description){
       return [
         "#000",
         "#fff",
+        "#ccc",
+        "#999",
+        "#555",
+      ][g(key)]
+    };
+
+
+    var c = function(key){
+      return [
+        "#000",
+        "#fff",
         "#ff0000",
         "#00ff00",
         "#0000ff",
       ][g(key)]
     };
+
 
       return { get: g, set: s, getColor: c }
   }();
@@ -110,7 +123,6 @@ var makeAnt = function(description){
 
     move: function(){
       var state = cellState.get(coord);
-      //console.log(color);
       var action = actionList[state];
       cellState.set(coord);
       orientation = action(orientation);

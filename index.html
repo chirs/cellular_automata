@@ -16,34 +16,67 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      var ant = makeAnt();
-      var c = document.getElementById("antBoard");
-      var ctx = c.getContext("2d");
+      var intervalID, ant;
+
+      var canvas = document.getElementById("antBoard");
+      var ctx = canvas.getContext("2d");
+
 
       var translateCoord = function(coord){
-        return [coord[0] + 50, coord[1] + 50]
+        return [coord[0] + 125, coord[1] + 125]
       }
 
       var fillCoord = function(coord, style){
         var ncoord = translateCoord(coord);
-        var x = ncoord[0] * 5 ;
-        var y = ncoord[1] * 5 ;
+        var x = ncoord[0] * 2 ;
+        var y = ncoord[1] * 2 ;
         ctx.fillStyle = style;
-        ctx.fillRect(x,y,5,5);
+        ctx.fillRect(x,y,2,2);
       };
 
       var antMove = function(){
-        var m = ant.move();
-        fillCoord(m.coord, m.color);
+        for (var i=0; i < 100; i++){
+          var m = ant.move();
+          fillCoord(m.coord, m.color);
+        }
       };
 
-      //var progress = 8000 + Math.floor(Math.random() * 10000) // slight difference.
-      var progress = 100000;
-      for (var i=0; i < progress; i++){ 
-        antMove();
-      }
+      var clearCanvas = function(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+      };
 
-      setInterval(antMove, 1);
+
+      var play = function(){ 
+        intervalID = setInterval(antMove, 1); 
+      }
+      var pause = function() {clearInterval(intervalID);};
+
+
+
+      var start = function(generation) { 
+        clearCanvas();
+        ant = makeAnt($("#description").val());
+
+        var generation = parseInt($("#generation").val());
+        generation = generation || 0;
+        for (var i=0; i<generation; i++){
+          antMove();
+        }
+
+        play();
+      };
+
+
+
+        
+        
+      
+      $("#pause").click(pause);
+      $("#play").click(play);
+      $("#restart").click(start);
+
+
+      start();
 
 
     });
@@ -58,8 +91,16 @@
 
 <body class="home">
 
+<div>
+<input id="pause" type="submit" value="pause">
+<input id="play" type="submit" value="play">
+<input id="description" type="input" value="LLRR">
+<input id="generation" type="input" value="0">
+<input id="restart" type="submit" value="restart">
+</div>
 
 <canvas id="antBoard" width="500" height="500">
 </canvas>
+
 
 </body>
