@@ -5,9 +5,8 @@
 
 
 
-var getURLPattern = function(w, deflt){
+var getURLHash = function(w, deflt){
   var wlh = w.location.hash
-  console.log(wlh);
   if (wlh) {
     return wlh.slice(1, wlh.length)
   } else  {

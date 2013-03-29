@@ -51,20 +51,64 @@
       }
 
 
-      var reset = function(){
+      var getNum = function(){
+        return parseInt($("#eid").html());
+      };
+
+      var getRandom = function(){
+        return $("#randomCheckbox").is(":checked")
+      };
+
+      var getPopulation = function(){
+        return $("#populationSlider").slider("value")
+      }
+
+        
+        
+
+
+      var reset = function(n){
+        getRandom();
+        n = n || Math.floor(Math.random() * 256);
+
         if (iID){ clearInterval(iID); }
         clearCanvas(elemCanvas, ctx);
         ROW = 0;
         active = true;
-        var n = Math.floor(Math.random() * 256);
-        var g = generator(1080, n)
+
+        var g = generator(1080, n, getRandom(), getPopulation())
         iID = setInterval(function(){ drawRows(g)}, 20);
         $("#eid").html(n);
       }
-          
 
-      reset();
-      $("#eid").click(reset);
+
+      $('html').keydown(function (e) {
+        var keyCode = e.keyCode || e.which,
+        arrow = {left: 37, up: 38, right: 39, down: 40 };
+
+        switch (keyCode) {
+        case arrow.left: reset(getNum()-1); break;
+        case arrow.right: reset(getNum()+1); break;
+        }
+      });
+
+      $("#populationSlider").slider({
+        max: 1, min: 0, value: .5, step: .01,
+        change: function(){ 
+          if (getRandom()){ reset(getNum()) }
+          }
+      });
+
+
+
+      $("#eid").click(function(){ reset() });
+      $("#randomCheckbox").change(function(){ reset(getNum()) });
+      
+      var hash = getURLHash(window, null)
+      if (hash) { reset(parseInt(hash)); }
+      else { reset(); }
+
+
 
     });
   </script>
@@ -74,7 +118,11 @@
 
 <body class="home">
 
+<div id="controls">
 <div id="eid"></div>
+<div>random <input id="randomCheckbox" type="checkbox" /></div>
+<div id="populationSlider"></div>
+</div>
 
 <canvas id="elemBoard" width="1080" height="1800"></canvas>
 

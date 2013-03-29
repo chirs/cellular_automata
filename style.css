@@ -5,13 +5,16 @@
 
 
 #eid { 
+    font-size: 3em;
+}
+
+
+
+#controls {
     position: fixed;
     right: 6%;
     top: 4%;
     background: white;
-    font-size: 3em;
     padding: 1%;
     cursor: pointer;
 }
-
-
