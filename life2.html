@@ -13,13 +13,13 @@
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="life.js"></script>
+  <script type="text/javascript" src="life2.js"></script>
   <script type="text/javascript" src="draw.js"></script>
 
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 120
+      SCALE = 20
 
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
@@ -53,12 +53,18 @@
 
 
       //draw(randomStart(3, 3, .5));
+      //draw(canonicalStart(3, 3));
       //draw([[1,0],[0,1]])
 
-
-      //var g = generator(3, 3, 50, true)
+        
+      var g = generator(20, 20, randomRule(), true, .1)
+      //console.log(g.state())
       //draw(g.state())
-      //draw(g.next())
+      //console.log(g.next())
+      draw(g.next())
+      setTimeout(function() {draw(g.next())}, 300)
+      setTimeout(function() {draw(g.next())}, 1000)
+      console.log(g.next())
 
       //var intervalID = setInterval(function() { draw(g.next()) }, 500)
 
