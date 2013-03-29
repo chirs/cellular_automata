@@ -1,7 +1,5 @@
 // An implementation of Langton's ant.
 // http://en.wikipedia.org/wiki/Langton's_ant
-// 
-
 
 
 var turnRight = function(o){

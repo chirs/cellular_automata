@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Langtons Ant</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
+  <meta name="description" content="Langton's Ant">
+
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+
+  <script type="text/javascript" src="elementary.js"></script>
+  <script type="text/javascript" src="draw.js"></script>
+
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      ROW = 0
+      active = true
+      iID = null
+
+      var elemCanvas = document.getElementById("elemBoard");
+      var ctx = elemCanvas.getContext("2d");
+
+      var drawRow = function(arr){
+        for (var i=0; i < arr.length; i++){
+          if (arr[i] == 1){
+            drawPoint(i, ROW);
+          };
+        }
+        ROW += 1;
+        if (ROW > 2000){
+          active = false;
+        }
+      }
+
+      var drawPoint = function(x,y){
+        ctx.fillRect(x,y,1,1);
+      }
+
+      var drawRows = function(generator) {
+        if (active){
+          for (var i=0; i < 10; i++){ 
+            drawRow(generator.next()) 
+          } 
+        }
+      }
+
+
+      var reset = function(){
+        if (iID){ clearInterval(iID); }
+        clearCanvas(elemCanvas, ctx);
+        ROW = 0;
+        active = true;
+        var n = Math.floor(Math.random() * 256);
+        var g = generator(1080, n)
+        iID = setInterval(function(){ drawRows(g)}, 20);
+        $("#eid").html(n);
+      }
+          
+
+      reset();
+      $("#eid").click(reset);
+
+    });
+  </script>
+
+</head>
+
+
+<body class="home">
+
+<div id="eid"></div>
+
+<canvas id="elemBoard" width="1080" height="1800"></canvas>
+
+</body>

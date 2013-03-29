@@ -1,4 +1,17 @@
 
-#antBoard {
+#antBoard, #elemBoard {
     border: 1px solid black;
 }
+
+
+#eid { 
+    position: fixed;
+    right: 6%;
+    top: 4%;
+    background: white;
+    font-size: 3em;
+    padding: 1%;
+    cursor: pointer;
+}
+
+
