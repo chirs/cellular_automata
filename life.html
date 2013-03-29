@@ -19,7 +19,7 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 25
+      SCALE = 10
 
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
@@ -52,7 +52,7 @@
       }
 
         
-      var g = generator(20, 20, 30, false)
+      var g = generator(50, 50, 30, false)
       //draw(g.next())
 
       var intervalID = setInterval(function() { draw(g.next()) }, 500)
