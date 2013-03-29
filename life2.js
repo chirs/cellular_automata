@@ -2,7 +2,7 @@
 
 
 NEIGHBORS = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
-
+LIFE_NEIGHBORS = [[0,0], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1]]
 
 CELL_POSITIONS = Math.pow(2, NEIGHBORS.length)
 RULE_SETS = Math.pow(2, CELL_POSITIONS)
@@ -12,6 +12,9 @@ var randomRule = function(){
   //return Math.floor(Math.random() * Math.pow(2, Math.pow(2, 5)))
   return Math.floor(Math.random() * RULE_SETS)
 }
+
+
+
 
 
 
@@ -60,7 +63,7 @@ var getState = function(cell, table, rule){
   var rows = table.length;
   var cols = table[0].length
 
-  var getNeighbor = function(p1,p2){ return [(p1[0] + p2[0] + rows) % rows, (p2[0] + p2[1] + cols) % cols] }
+  var getNeighbor = function(p1,p2){ return [(p1[0] + p2[0] + rows) % rows, (p1[1] + p2[1] + cols) % cols] }
   var getValue = function(p){ return table[p[0]][p[1]] }
 
   var states = []

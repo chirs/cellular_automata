@@ -19,7 +19,7 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 20
+      SCALE = 5
 
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
@@ -51,22 +51,37 @@
         }
       }
 
+      intervalID = null
 
       //draw(randomStart(3, 3, .5));
       //draw(canonicalStart(3, 3));
       //draw([[1,0],[0,1]])
 
+      var reset = function(n){
+        if (intervalID){ clearInterval(intervalID); }
+        clearCanvas(lifeCanvas, ctx);
+
+        var rule = randomRule();
+        //var g = generator(100, 100, rule, true, .1)
+        var g = generator(100, 100, rule, false)
+        intervalID = setInterval(function() { draw(g.next()) }, 100)
+        $("#rule").html(rule);
         
-      var g = generator(20, 20, randomRule(), true, .1)
+      }
+
+
+      $("#rule").click(reset);
+      reset()
+
       //console.log(g.state())
       //draw(g.state())
       //console.log(g.next())
-      draw(g.next())
-      setTimeout(function() {draw(g.next())}, 300)
-      setTimeout(function() {draw(g.next())}, 1000)
-      console.log(g.next())
+      //draw(g.next())
+      //setTimeout(function() {draw(g.next())}, 300)
+      //setTimeout(function() {draw(g.next())}, 1000)
+      //console.log(g.next())
 
-      //var intervalID = setInterval(function() { draw(g.next()) }, 500)
+
 
     });
   </script>
@@ -84,5 +99,9 @@
 </div>-->
 
 <canvas id="lifeBoard" width="1080" height="1800"></canvas>
+
+<div id="controls">
+<div id="rule"></div>
+</div>
 
 </body>
