@@ -79,17 +79,15 @@
       var setZoom = function(){
         var z = $("#slider").slider("value")
         if ( z ) {
-          unPause()
+          ZOOM = z;
           clearCanvas();
           redrawBoard();
-          ZOOM = z;
-          pause();
         }
       };
 
 
       var intervalID, ant;
-      var paused = true;
+      var running = false;
 
 
       // Move 0,0 from upper-left to center of screen.
@@ -114,7 +112,6 @@
 
         for (var i=0; i < speed; i++){
           var m = ant.move();
-          //console.log(m);
           fillCoord(m.coord, m.color);
         }
       };
@@ -123,26 +120,23 @@
         ctx.clearRect(0,0,canvas.width,canvas.height);
       };
 
-      var pause = function(){
-          intervalID = setInterval(antMove, 1);
-          paused = false;
-          $("#pause").val("pause");
-      };
-
       var unPause = function(){
-          clearInterval(intervalID);
-          paused = true;
-          $("#pause").val("unpause");
+        intervalID = setInterval(antMove, 1);
+        running = true;
+        $("#pause").val("pause");
       };
 
-      var pauseUnpause = function() { if (paused) { pause() } else { unPause() } };
+      var pause = function(){
+        clearInterval(intervalID);
+        running = false;
+        $("#pause").val("unpause");
+      };
+
+      var pauseUnpause = function() { if (running) { pause() } else { unPause() } };
 
 
       var start = function(generation) { 
         clearCanvas();
-
-        paused = true;
-
 
         var pattern = $("#description").val()
         ant = makeAnt(pattern, generateColors(pattern.length));
@@ -154,7 +148,8 @@
         for (var i=0; i<generation; i++){
           antMove(1);
         }
-        pauseUnpause();
+        pause(); // need to balance with unpause to maintain intervalID...fix.
+        unPause();
       };
 
       
@@ -195,11 +190,9 @@
 
 <body class="home">
 
-<div>
+<h2><a href="http://en.wikipedia.org/wiki/Langton's_ant">Langton's Ant</a>: a two-dimensional Turing machine</h2>
 
 <div>
-
-</div>
 
 <div><label>pattern</label><input id="description" type="input" value="LLRR"></div>
 <!--<div><label>generation</label><input id="generation" type="input" value="0"></div>-->
