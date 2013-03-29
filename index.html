@@ -8,31 +8,105 @@
   <meta name="description" content="Langton's Ant">
 
   <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 
-  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-  <script type="text/javascript">google.load("jquery", "1.3.2");</script>
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+
   <script type="text/javascript" src="ant.js"></script>
 
 
   <script type="text/javascript">
     $(document).ready(function() {
-      var intervalID, ant;
-      var paused = true;
+
+      // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
+      var hsv2rgb = function(h, s, v){
+        var h_i = h * 6;
+        var f = h * 6 - h_i
+        var p = v * (1 - s)
+        var q = v * (1 - f * s)
+        var t = v * (1 - (1 - f * s))
+        var r, g, b;
+        switch(Math.floor(h_i)){
+        case 0: r=v, g=t, b=p; break;
+        case 1: r=q, g=v, b=p; break;
+        case 2: r=p, g=v, b=t; break;
+        case 3: r=p, g=q, b=v; break;
+        case 4: r=t, g=p, b=v; break;
+        case 5: r=v, g=p, b=q; break;
+        }
+        return [r*256,g*256,b*256]
+      };
+
+      var generateColors = function(n){
+
+        var h = function(e){ 
+          var s = Math.floor(e).toString(16);
+          if (s.length == 1){ s = "0" + s; }
+          return s
+        }
+        var rgb2css = function(l){ return "#" + h(l[0]) + h(l[1]) + h(l[2]); }
+
+        var goldenRatioConjugate = 0.618033988749895
+        var hue = Math.random();
+        var colors = []
+
+        for (var i=0; i<n; i++){
+          hue += goldenRatioConjugate;
+          if (hue > 1){
+            hue = hue - 1;
+          }
+          var l = hsv2rgb(hue, .5, .95);
+          colors.push(rgb2css(l));
+        }
+        return colors;
+      };
+
+
+      HEIGHT = 500 
+      ZOOM = 3; // Zoom can be modified by the slider.
 
       var canvas = document.getElementById("antBoard");
       var ctx = canvas.getContext("2d");
 
+      var redrawBoard = function(){
+        var cl = ant.allColors()
+        for (var i=0; i < cl.length; i++){
+          fillCoord(cl[i][0], cl[i][1]);
+        };
+      };
 
+      var setZoom = function(){
+        var z = $("#slider").slider("value")
+        if ( z ) {
+          unPause()
+          clearCanvas();
+          redrawBoard();
+          ZOOM = z;
+          pause();
+        }
+      };
+
+
+      var intervalID, ant;
+      var paused = true;
+
+
+      // Move 0,0 from upper-left to center of screen.
       var translateCoord = function(coord){
-        return [coord[0] + 125, coord[1] + 125]
+        var center = HEIGHT / (2 * ZOOM)
+        return [coord[0] + center, coord[1] + center]
       }
 
+      // Color a coordinate.
+      // (make this more sophisticated)
       var fillCoord = function(coord, style){
         var ncoord = translateCoord(coord);
-        var x = ncoord[0] * 2 ;
-        var y = ncoord[1] * 2 ;
+        var x = ncoord[0] * ZOOM ;
+        var y = ncoord[1] * ZOOM ;
         ctx.fillStyle = style;
-        ctx.fillRect(x,y,2,2);
+        ctx.fillRect(x,y,ZOOM,ZOOM);
+
       };
 
       var antMove = function(speed){
@@ -40,6 +114,7 @@
 
         for (var i=0; i < speed; i++){
           var m = ant.move();
+          //console.log(m);
           fillCoord(m.coord, m.color);
         }
       };
@@ -48,24 +123,30 @@
         ctx.clearRect(0,0,canvas.width,canvas.height);
       };
 
-
-      var pauseUnpause = function() {
-        if (paused) {
+      var pause = function(){
           intervalID = setInterval(antMove, 1);
           paused = false;
           $("#pause").val("pause");
-        } else {
+      };
+
+      var unPause = function(){
           clearInterval(intervalID);
           paused = true;
           $("#pause").val("unpause");
-        }
       };
+
+      var pauseUnpause = function() { if (paused) { pause() } else { unPause() } };
 
 
       var start = function(generation) { 
         clearCanvas();
+
         paused = true;
-        ant = makeAnt($("#description").val());
+
+
+        var pattern = $("#description").val()
+        ant = makeAnt(pattern, generateColors(pattern.length));
+        //console.log(generateColors(pattern.length));
 
         var generation = parseInt($("#generation").val());
         generation = generation || 0;
@@ -80,6 +161,24 @@
       $("#pause").click(pauseUnpause);
       $("#restart").click(start);
 
+      $("#slider").slider({
+        orientation: "vertical", max: 10, min: .1, value: 3, step: .1,
+        change: setZoom,
+      });
+      $("#slider").height(480);
+
+
+      var panner = function(){
+        var p;
+
+        setMousePosition = function(){
+          this.mousemove();
+        }
+      }
+          
+      //$("#antBoard").mousedown(function(){alert("hello");})
+      //$("#antBoard")
+      //$("#slider").on( "drag", function( event, ui ) {alert("hi");} );
 
       start();
 
@@ -113,9 +212,8 @@
 
 </div>
 
-<canvas id="antBoard" width="500" height="500">
-
-</canvas>
+<canvas id="antBoard" width="500" height="500"></canvas>
+  <div style="display:inline-block" height="500" id="slider"></div><div id="slider"></div>
 
 
 </body>

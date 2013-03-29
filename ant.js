@@ -34,8 +34,11 @@ var reverse = function(o){
 var straight = function(o){ return o; }
 
 
-var makeAnt = function(description){
+var makeAnt = function(description, colorList){
   description = description || "LR"
+
+  colorList = colorList || ["#000", "#fff", "#ff0000", "#00ff00", "#0000ff",];
+  //console.log(colorList);
 
   var totalColors = description.length
 
@@ -70,29 +73,35 @@ var makeAnt = function(description){
       cellMap[key] = (g(key) + 1) % totalColors;
     };
 
-    var c = function(key){
-      return [
-        "#000",
-        "#fff",
-        "#ccc",
-        "#999",
-        "#555",
-      ][g(key)]
-    };
+    //var c = function(key){
+    //  return [
+    //    "#000",
+    //    "#fff",
+    //    "#ccc",
+    //    "#999",
+    //    "#555",
+    //  ][g(key)]
+    //};
 
 
     var c = function(key){
-      return [
-        "#000",
-        "#fff",
-        "#ff0000",
-        "#00ff00",
-        "#0000ff",
-      ][g(key)]
+      return colorList[g(key)];
+    };
+
+    var a = function(){
+      var l= []
+      for (var k in cellMap){
+        if (cellMap.hasOwnProperty(k)){
+          var key = k.split(',').map(function(s){return parseInt(s) } ) // ugh.
+          l.push([key, c(k)]);
+        };
+      }
+
+      return l;
     };
 
 
-      return { get: g, set: s, getColor: c }
+    return { get: g, set: s, getColor: c, allColors: a, foo: "x" }
   }();
 
 
@@ -121,12 +130,16 @@ var makeAnt = function(description){
   // Just return the function?
   return {
 
+    allColors: cellState.allColors,
+
+
     move: function(){
       var state = cellState.get(coord);
       var action = actionList[state];
       cellState.set(coord);
       orientation = action(orientation);
       coord = getNewCoord();
+
 
       return {
         coord: coord,
