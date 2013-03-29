@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Langtons Ant</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
+  <meta name="description" content="Langton's Ant">
+
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+
+  <script type="text/javascript" src="life.js"></script>
+  <script type="text/javascript" src="draw.js"></script>
+
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      SCALE = 25
+
+      var lifeCanvas = document.getElementById("lifeBoard");
+      var ctx = lifeCanvas.getContext("2d");
+
+      var fillCoord = function(coord, style){
+        var x = coord[0] * SCALE ;
+        var y = coord[1] * SCALE ;
+        ctx.fillStyle = style;
+        ctx.fillRect(x,y,SCALE,SCALE);
+      };
+
+      state2color = function(a) {
+        return ["#fff", "#000"][a]
+      }
+        
+
+
+      var draw = function(table){
+        var rows = table.length
+        if (rows == 0) { return; }
+        
+        var cols = table[0].length;
+
+        for (var i=0; i < rows; i++){
+          for (var j=0; j < cols; j++){
+            var state = table[i][j]
+            var color = state2color(state)
+            fillCoord([i,j], color)
+            
+
+          }
+        }
+      }
+
+      var g = generator(20, 20, 30, false)
+      draw(g.next())
+
+      var intervalID = setInterval(function() { draw(g.next()) }, 500)
+
+
+
+    });
+  </script>
+
+</head>
+
+
+<body class="home">
+
+<!--
+<div id="controls">
+<div id="eid"></div>
+<div>random <input id="randomCheckbox" type="checkbox" /></div>
+<div id="populationSlider"></div>
+</div>-->
+
+<canvas id="lifeBoard" width="1080" height="1800"></canvas>
+
+</body>

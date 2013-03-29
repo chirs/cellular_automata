@@ -22,9 +22,9 @@ var makeArray = function(n, f){
   return arr
 }
 
-var randomStart = function (n, limit) {
+var randomStart = function (n, density) {
   return makeArray(n, function(arr) {
-    if (Math.random() > limit) { arr.push(1); }
+    if (Math.random() > density) { arr.push(1); }
     else { arr.push(0) }
   });
 
@@ -67,11 +67,11 @@ var generateNext = function(row, n){
                           
 
 // n should be a number between 0 and 255.
-var generator = function(length, n, random, limit){
+var generator = function(length, n, random, density){
   if (random) {
-    var rows = [randomStart(length, limit)];
+    var rows = [randomStart(length, density)];
   } else {
-    var rows = [canonicalStart(length)];
+    var rows = [canonicalStart(density)];
   }
 
   return {
