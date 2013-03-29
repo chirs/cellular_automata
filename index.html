@@ -177,8 +177,9 @@
       $("#pause").click(pauseUnpause);
       $("#restart").click(start).click();
       $("li>a").click( function() {
-        setPattern(getURLPattern(window, "LLRR"));
+        setPattern($(this).html());
         start();
+        return;
       })
 
       //cnvs.click(function(){alert("click"); });
@@ -204,7 +205,7 @@
 
 
 
-<div style="position: fixed; right: 10%; top: 10%;">
+<div style="position: fixed; right: 10%; top: 3%;">
 
 <h2><a href="http://en.wikipedia.org/wiki/Langton's_ant">Langton's Ant</a>: a two-dimensional Turing machine</h2>
 
