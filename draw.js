@@ -2,6 +2,23 @@
 
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
+
+
+
+var getURLPattern = function(w, deflt){
+  var wlh = w.location.hash
+  console.log(wlh);
+  if (wlh) {
+    return wlh.slice(1, wlh.length)
+  } else  {
+    return deflt
+  }
+}
+
+var clearCanvas = function(canvas, context){
+  context.clearRect(0,0,canvas.width,canvas.height);
+};
+
 var hsv2rgb = function(h, s, v){
   var h_i = h * 6;
   var f = h * 6 - h_i

@@ -21,26 +21,38 @@
     $(document).ready(function() {
       HEIGHT = 500 
       ZOOM = 3; // Zoom is modified by the zoom slider.
+      SPEED = 100;
 
-      var intervalID, ant;
-
+      var intervalID, ant, pattern;
       var running = false;
-      var canvas = document.getElementById("antBoard");
-      var ctx = canvas.getContext("2d");
+      var antCanvas = document.getElementById("antBoard");
+      var ctx = antCanvas.getContext("2d");
+      ctx.save() // Save original transform.
+
+      //   var pattern = "LLRR";
 
       var redrawBoard = function(){
         var cl = ant.allColors()
         for (var i=0; i < cl.length; i++){
-          fillCoord(cl[i][0], cl[i][1]);
+          var coord = cl[i][0]
+          var color = cl[i][1]
+          fillCoord(coord, color);
         };
       };
 
       var setZoom = function(){
-        var z = $("#slider").slider("value")
-        if ( z ) {
-          ZOOM = z;
-          clearCanvas();
+        var zoom = $("#zoomSlider").slider("value")
+        if ( zoom ) {
+          ZOOM = zoom;
+          clearCanvas(antCanvas, ctx);
           redrawBoard();
+        }
+      };
+
+      var setSpeed = function(){
+        var speed = $("#speedSlider").slider("value")
+        if ( speed ) {
+          SPEED = speed;
         }
       };
 
@@ -61,17 +73,20 @@
 
       };
 
-      var antMove = function(speed){
-        speed = speed || parseInt($("#speed").val()) || 1;
-
-        for (var i=0; i < speed; i++){
+      var antMove = function(){
+        for (var i=0; i < SPEED; i++){
           var m = ant.move();
           fillCoord(m.coord, m.color);
         }
       };
 
-      var clearCanvas = function(){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+
+
+      var pause = function(){
+        clearInterval(intervalID);
+        running = false;
+        $("#pause").val("unpause");
       };
 
       var unPause = function(){
@@ -80,41 +95,94 @@
         $("#pause").val("pause");
       };
 
-      var pause = function(){
-        clearInterval(intervalID);
-        running = false;
-        $("#pause").val("unpause");
-      };
 
       var pauseUnpause = function() { if (running) { pause() } else { unPause() } };
+      var getPattern = function(){ return $("#pattern").val() };
+      var setPattern = function(val) { $("#pattern").val(val); };
 
+      var start = function() {
 
-      var start = function(generation) { 
-        clearCanvas();
-
-        var pattern = $("#description").val()
+        var pattern = getPattern();
         ant = makeAnt(pattern, generateColors(pattern.length));
-        //console.log(generateColors(pattern.length));
 
-        var generation = parseInt($("#generation").val());
-        generation = generation || 0;
-
-        for (var i=0; i<generation; i++){
-          antMove(1);
-        }
+        ctx.restore()
+        clearCanvas(antCanvas, ctx);
         pause(); // need to balance with unpause to maintain intervalID...fix.
         unPause();
       };
-      
-      $("#pause").click(pauseUnpause);
-      $("#restart").click(start);
 
-      $("#slider").slider({
+
+      setPattern(getURLPattern(window, "LLRR"));
+
+
+      // Canvas dragging stuff.
+
+      var isDown = false; // whether mouse is pressed
+      var startCoords = []; // 'grab' coordinates when pressing mouse
+      var last = [0, 0]; // previous coordinates of mouse release
+
+      antCanvas.onmousedown = function(e) {
+        isDown = true;
+        startCoords = [
+          e.offsetX - last[0], // set start coordinates
+          e.offsetY - last[1]
+        ];
+      };
+
+      antCanvas.onmouseup   = function(e) {
+        redrawBoard();
+        isDown = false;
+
+        last = [
+          e.offsetX - startCoords[0], // set last coordinates
+          e.offsetY - startCoords[1]
+        ];
+      };
+
+      antCanvas.onmousemove = function(e)
+      {
+        if(!isDown) return; // don't pan if mouse is not pressed
+
+        var x = e.offsetX;
+        var y = e.offsetY;
+
+        // set the canvas' transformation matrix by setting the amount of movement:
+        // 1  0  dx
+        // 0  1  dy
+        // 0  0  1
+
+        ctx.setTransform(1, 0, 0, 1,
+                         x - startCoords[0], y - startCoords[1]);
+
+        clearCanvas(antCanvas, ctx);
+        //render(); // render to show changes
+
+      }
+
+      
+
+      $("#zoomSlider").slider({
         orientation: "vertical", max: 10, min: .1, value: 3, step: .1,
         change: setZoom,
       });
-      $("#slider").height(480);
-      start();
+      $("#zoomSlider").height(480);
+
+      $("#speedSlider").slider({
+        max: 400, min: 1, value: 100, step: 1,
+        change: setSpeed,
+      });
+      $("#speedSlider").width(480);
+
+
+      $("#pause").click(pauseUnpause);
+      $("#restart").click(start).click();
+      $("li>a").click( function() {
+        setPattern(getURLPattern(window, "LLRR"));
+        start();
+      })
+
+      //cnvs.click(function(){alert("click"); });
+      
 
 
     });
@@ -131,21 +199,32 @@
 
 <h2><a href="http://en.wikipedia.org/wiki/Langton's_ant">Langton's Ant</a>: a two-dimensional Turing machine</h2>
 
-<div>
 
-<div><label>pattern</label><input id="description" type="input" value="LLRR"></div>
-<!--<div><label>generation</label><input id="generation" type="input" value="0"></div>-->
-<div><label>speed</label><input id="speed" type="input" value="100"></div>
 <div>
-  <input id="restart" type="submit" value="restart">
-  <input id="pause" type="submit" value="pause">
+  <div><label>pattern</label><input id="pattern" type="input" value="" /></div>
+<!--<div><label>speed</label><input id="speed" type="input" value="100" /></div>-->
+  <div>
+    <input id="restart" type="submit" value="restart" />
+    <input id="pause" type="submit" value="pause" />
+  </div>
 </div>
 
-
-</div>
-
+<div id="speedSlider"></div>
 <canvas id="antBoard" width="500" height="500"></canvas>
-  <div style="display:inline-block" height="500" id="slider"></div><div id="slider"></div>
+<div style="display:inline-block" height="500" id="zoomSlider"></div><div id="slider"></div>
+
+<ul>
+  <li><a href="http://ant.edgemon.org/#LR">LR</a> - the canonical ant, creates a highway.</li>
+  <li><a href="http://ant.edgemon.org/#LLRR">LLRR</a> - grows symmetrically</li>
+  <li><a href="http://ant.edgemon.org/#LRRRRRLLR">LRRRRRLLR</a> - fills space</li>
+  <li><a href="http://ant.edgemon.org/#LLRRR">RRLLLRLLLRRR</a> - sprouts a limb.</li>
+</ul>
+
+<ul>
+  <li>L - turn left 90 degrees.</li>
+  <li>R - turn right 90 degrees.</li>
+  <li>S - continue going straight</li>
+  <li>V - reverse direction</li>
 
 
 </body>
