@@ -19,7 +19,7 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      HEIGHT = 500 
+      HEIGHT = 680 
       ZOOM = 3; // Zoom is modified by the zoom slider.
       SPEED = 100;
 
@@ -105,7 +105,7 @@
         var pattern = getPattern();
         ant = makeAnt(pattern, generateColors(pattern.length));
 
-        ctx.restore()
+        //ctx.restore()
         clearCanvas(antCanvas, ctx);
         pause(); // need to balance with unpause to maintain intervalID...fix.
         unPause();
@@ -165,13 +165,13 @@
         orientation: "vertical", max: 10, min: .1, value: 3, step: .1,
         change: setZoom,
       });
-      $("#zoomSlider").height(480);
+      $("#zoomSlider").height(600);
 
       $("#speedSlider").slider({
-        max: 400, min: 1, value: 100, step: 1,
+        max: 600, min: 1, value: 100, step: 1,
         change: setSpeed,
       });
-      $("#speedSlider").width(480);
+      $("#speedSlider").width(600);
 
 
       $("#pause").click(pauseUnpause);
@@ -197,8 +197,16 @@
 
 <body class="home">
 
-<h2><a href="http://en.wikipedia.org/wiki/Langton's_ant">Langton's Ant</a>: a two-dimensional Turing machine</h2>
 
+<div id="speedSlider"></div>
+<canvas id="antBoard" width="680" height="680"></canvas>
+<div style="display:inline-block" height="680" id="zoomSlider"></div><div id="slider"></div>
+
+
+
+<div style="position: fixed; right: 10%; top: 10%;">
+
+<h2><a href="http://en.wikipedia.org/wiki/Langton's_ant">Langton's Ant</a>: a two-dimensional Turing machine</h2>
 
 <div>
   <div><label>pattern</label><input id="pattern" type="input" value="" /></div>
@@ -208,10 +216,6 @@
     <input id="pause" type="submit" value="pause" />
   </div>
 </div>
-
-<div id="speedSlider"></div>
-<canvas id="antBoard" width="500" height="500"></canvas>
-<div style="display:inline-block" height="500" id="zoomSlider"></div><div id="slider"></div>
 
 <ul>
   <li><a href="http://ant.edgemon.org/#LR">LR</a> - the canonical ant, creates a highway.</li>
@@ -225,6 +229,9 @@
   <li>R - turn right 90 degrees.</li>
   <li>S - continue going straight</li>
   <li>V - reverse direction</li>
+</ul>
+</div>
+
 
 
 </body>
