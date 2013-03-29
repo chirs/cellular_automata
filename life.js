@@ -9,6 +9,9 @@
 // that makes 2^(2^5) = 4294967296 possible states.
 // (Moore neighborhood give 2^(2^9)= 1.3407807929942597e+154 states)
 
+// A rule is represented by a 32-digit binary number in the range [0, 2^(2^5)-1],
+// equivalent to [ 0, 1111 1111 1111 1111 1111 1111 1111 1111 ]
+// each digit in the number represents a transformation from 
 
 // e.g. Rule 14 = 0000 1110
 // maps to this state ordering:
@@ -68,8 +71,63 @@ var getNext = function(l, m, r, rule){
   return rule[i];
 };
 
+
+// Mirror a cell around the board.
+
+
+
 var getState = function(i, j, table, rule){
-  if (Math.random() > .5){
+  var rows = table.length;
+  var cols = table[0].length
+
+  var gt = function(c, table){ return table[c[0]][c[1]] }
+  var getBounds = function(x,y){ return [x % rows, y % cols] }
+
+  var t = getBounds(i-1, i)
+  var r = getBounds(i, i+1)
+  var b = getBounds(i+1, i)
+  var l = getBounds(i, i-1)
+
+
+  //console.log(t[0])
+
+  //console.log(table[15])
+
+
+  //console.log(t);
+  gt(t, table);
+  //console.log(gt(t))
+  //console.log(gt(r))
+  //console.log(gt(b))
+  //console.log(gt(l))
+
+  
+  //console.log(table[i][j])
+
+  return 0
+  
+  state = [table[i][j], gt(t), gt(r), gt(b), gt(l)]
+  index = parseInt([1,1,0,1,0].join(""), 2)
+
+  return [0,0,0,1,
+          0,1,1,1,
+          0,1,0,1,
+          0,1,1,1,
+          1,0,1,1,
+          0,0,1,0,
+          0,0,0,1,
+          1,1,1,0
+          ][index]
+  
+  
+
+
+}
+
+
+
+var getState = function(i, j, table, rule){
+  if (Math.random() > .2){
     return 1;
   } else {
     return 0;
@@ -87,6 +145,9 @@ var generateNext = function(table, n){
   for (var i=0; i < rows; i++){
     var m = []
     for (var j=0; j < cols; j++){
+      //console.log("GNEXT ->") 
+      //console.log(table);
+
       var state = getState(i, j, table, rule);
       m.push(state);
     }

@@ -31,10 +31,9 @@
         ctx.fillRect(x,y,SCALE,SCALE);
       };
 
-      state2color = function(a) {
+      var state2color = function(a) {
         return ["#fff", "#000"][a]
       }
-        
 
 
       var draw = function(table){
@@ -48,18 +47,15 @@
             var state = table[i][j]
             var color = state2color(state)
             fillCoord([i,j], color)
-            
-
           }
         }
       }
 
+        
       var g = generator(20, 20, 30, false)
-      draw(g.next())
+      //draw(g.next())
 
       var intervalID = setInterval(function() { draw(g.next()) }, 500)
-
-
 
     });
   </script>
