@@ -26,11 +26,8 @@
       var elemCanvas = document.getElementById("elemBoard");
       var elemContext = elemCanvas.getContext("2d");
 
-
-
       var lifeCanvas = document.getElementById("lifeBoard");
       var lifeContext = lifeCanvas.getContext("2d");
-
 
       var state2color = function(a) {
         return ["#fff", "#000"][a]
@@ -49,7 +46,7 @@
             var state = table[i][j]
             var color = state2color(state)
             //fillCoord([i,j], color)
-            fillSquare(context, [i,j], 100, color);
+            fillSquare(context, [i,j], 15, color);
           }
         }
       }
@@ -62,19 +59,13 @@
         context.fillRect(x,y,scale,scale);
       };
 
-      var rule = randomRule();
-      var g = generator(3, 3, rule, true, .9)
-      //console.log(g.next())
-      drawTable(lifeContext, g.next())
+      var g1 = generator(20, 20, randomRule(), true, .9)
+      var g2 = generator(20, 20, randomRule(), true, .9)
+      var g3 = generator(20, 20, randomRule(), true, .9)
 
-
-      //antContext.fillStyle = "#000";
-      fillSquare(antContext, [1,2], 100, "#000")
-      fillSquare(antContext, [1,1], 100, "#ccc")
-
-      //fillSquare(lifeContext, [1,1], 100, "#ccc")
-      fillSquare(elemContext, [1,2], 100, "#999")
-
+      setInterval(function(){ drawTable(antContext, g1.next()) }, 500);
+      setInterval(function(){ drawTable(elemContext, g2.next()) }, 500);
+      setInterval(function(){ drawTable(lifeContext, g3.next()) }, 500);
 
 
     });
