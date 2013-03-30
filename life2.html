@@ -19,7 +19,7 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 5
+      SCALE = 10
 
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
@@ -62,11 +62,12 @@
         clearCanvas(lifeCanvas, ctx);
 
         var rule = randomRule();
-        //var g = generator(100, 100, rule, true, .1)
-        var g = generator(100, 100, rule, false)
+        //var rule = 10491;
+        var g = generator(200, 96, rule, true, .9)
+        //var g = generator(200, 96, rule, false)
         intervalID = setInterval(function() { draw(g.next()) }, 100)
         $("#rule").html(rule);
-        
+        //draw(g.state());
       }
 
 
@@ -74,7 +75,7 @@
       reset()
 
       //console.log(g.state())
-      //draw(g.state())
+
       //console.log(g.next())
       //draw(g.next())
       //setTimeout(function() {draw(g.next())}, 300)
@@ -98,7 +99,7 @@
 <div id="populationSlider"></div>
 </div>-->
 
-<canvas id="lifeBoard" width="1080" height="1800"></canvas>
+<canvas id="lifeBoard" width="1800" height="800"></canvas>
 
 <div id="controls">
 <div id="rule"></div>
