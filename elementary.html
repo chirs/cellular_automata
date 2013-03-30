@@ -13,7 +13,7 @@
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="elementary.js"></script>
+  <script type="text/javascript" src="life.js"></script>
   <script type="text/javascript" src="draw.js"></script>
 
 
@@ -63,22 +63,23 @@
         return $("#populationSlider").slider("value")
       }
 
-        
-        
 
 
-      var reset = function(n){
-        getRandom();
-        n = n || Math.floor(Math.random() * 256);
+      var reset = function(rule){
+        rule = rule || Math.floor(Math.random() * 256);
 
         if (iID){ clearInterval(iID); }
         clearCanvas(elemCanvas, ctx);
         ROW = 0;
         active = true;
 
-        var g = generator(1080, n, getRandom(), getPopulation())
-        iID = setInterval(function(){ drawRows(g)}, 20);
-        $("#eid").html(n);
+        var g = generator(1080, rule, getRandom(), getPopulation())
+        //console.log(g.next())
+        //console.log(g.next())
+        //console.log(g.next())
+
+        //iID = setInterval(function(){ drawRows(g)}, 20);
+        $("#eid").html(rule);
       }
 
 
@@ -104,9 +105,11 @@
       $("#eid").click(function(){ reset() });
       $("#randomCheckbox").change(function(){ reset(getNum()) });
       
-      var hash = getURLHash(window, null)
-      if (hash) { reset(parseInt(hash)); }
-      else { reset(); }
+      //var hash = getURLHash(window, null)
+      //if (hash) { reset(parseInt(hash)); }
+      //else { reset(); }
+
+      reset()
 
 
 
