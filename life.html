@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>Langtons Ant</title>
+  <title>Game of Life</title>
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
@@ -19,7 +19,7 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 120
+      SCALE = 10
 
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
@@ -51,16 +51,24 @@
         }
       }
 
+      intervalID = null
 
-      //draw(randomStart(3, 3, .5));
-      //draw([[1,0],[0,1]])
+      var reset = function(n){
+        if (intervalID){ clearInterval(intervalID); }
+        clearCanvas(lifeCanvas, ctx);
+
+        var rule = randomRule();
+        //var rule = 10491;
+        var g = generator(200, 96, rule, true, .9)
+        //var g = generator(200, 96, rule, false)
+        intervalID = setInterval(function() { draw(g.next()) }, 100)
+        $("#rule").html(rule);
+        //draw(g.state());
+      }
 
 
-      //var g = generator(3, 3, 50, true)
-      //draw(g.state())
-      //draw(g.next())
-
-      //var intervalID = setInterval(function() { draw(g.next()) }, 500)
+      $("#rule").click(reset);
+      reset()
 
     });
   </script>
@@ -77,6 +85,10 @@
 <div id="populationSlider"></div>
 </div>-->
 
-<canvas id="lifeBoard" width="1080" height="1800"></canvas>
+<canvas id="lifeBoard" width="1800" height="800"></canvas>
+
+<div id="controls">
+<div id="rule"></div>
+</div>
 
 </body>
