@@ -1,6 +1,4 @@
 
-
-
 // Common neighborhoods
 ELEMENTARY_NEIGHBORHOOD = [[-1], [0], [1]] 
 VON_NEUMANN_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
@@ -8,7 +6,6 @@ MOORE_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-
 // MARGOLUS NEIGHBORHOOD...
 
 STATES = 2 // The number of possible states. Not currently used.
-
 
 var sum = function(xs){
   var r = 0
@@ -117,18 +114,12 @@ var makeAnt = function(position, rule, board){
   var move = function(){
       var cellState = getValue(position, board.state())
       setInternalState(cellState)
-
       board.updateValue(position)
-      //console.log(position)
-      //console.log(board)
       var move = rule(cellState, internalState)
       position = getNeighbor(board.dimensions, position, move)
       return position
   }
 
-
-
-  
   return {
 
     getPosition: function() { return position },
@@ -145,8 +136,6 @@ var makeAnt = function(position, rule, board){
 }
 
   
-
-
 var generator = function(dimensions, neighbors, random, density){
   var rule, ruleNumber;
 
@@ -198,6 +187,29 @@ var generator = function(dimensions, neighbors, random, density){
     return ruleNumber;
   }
 
+  // Need to iterate over whole table regardless of dimensions.
+  var generateNextState = function(table){
+
+    var indexes = getIndexes(dimensions);
+    var newTable = canonicalStart(dimensions);
+
+    for (var i=0; i < indexes.length; i++){
+      var newVal = getState(indexes[i], table)
+      setValue(indexes[i], newVal, newTable);
+    }
+    return newTable;
+  }  
+
+  var getState = function(cell, table){
+    var states = []
+    for (i=0; i < neighbors.length; i++){
+      var n = getNeighbor(dimensions, cell, neighbors[i])
+      var v = getValue(n, table);
+      states.push(v)
+    }
+    return rule(states)
+  }
+
   return {
     state: state, 
     getRuleNumber: getRuleNumber,
@@ -216,7 +228,7 @@ var generator = function(dimensions, neighbors, random, density){
     
 
     next: function(){
-      var newState = generateNextState(dimensions, neighbors, state(), rule)
+      var newState = generateNextState(state())
       history = []
       history.push(newState)
       return newState
@@ -313,42 +325,6 @@ var setValue = function(p, value, table){
   }
 }
 
-
-var getState = function(dimensions, neighbors, cell, table, rule){
-
-  //var rows = table.length;
-  //var cols = table[0].length
-
-  //var getNeighbor = function(p1,p2){ return [(p1[0] + p2[0] + rows) % rows, (p1[1] + p2[1] + cols) % cols] }
-  //var getValue = function(p){ return table[p[0]][p[1]] }
-
-  var states = []
-  for (i=0; i < neighbors.length; i++){
-    var n = getNeighbor(dimensions, cell, neighbors[i])
-    var v = getValue(n, table);
-    states.push(v)
-  }
-
-  return rule(states)
-
-
-}
-
-
-// Need to iterate over whole table regardless of dimensions.
-var generateNextState = function(dimensions, neighbors, table, rule){
-
-  var indexes = getIndexes(dimensions);
-  var newTable = canonicalStart(dimensions);
-
-
-  for (var i=0; i < indexes.length; i++){
-    var newVal = getState(dimensions, neighbors, indexes[i], table,rule)
-    setValue(indexes[i], newVal, newTable);
-  }
-  return newTable;
-}  
-                          
 
 
 
