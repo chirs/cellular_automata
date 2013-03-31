@@ -34,6 +34,7 @@
 
 
       SCALE = 4
+      ANT_SCALE = 10
 
       var g1 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
       g1.setRule(dayAndNightRule)
@@ -42,19 +43,27 @@
       var g3 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
       g3.setRule(forgotRule)
 
-      var g4 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
-      g4.setRule(highLifeRule)
+      var g4 = generator([40, 40], MOORE_NEIGHBORHOOD, false)
+      var ant = makeAnt([20,20], adderAntRule, g4)
 
 
       drawTable(antContext, g1.state(), SCALE)
       drawTable(elemContext, g2.state(), SCALE)
       drawTable(lifeContext, g3.state(), SCALE)
-      drawTable(g4Context, g4.state(), SCALE)
+      drawTable(g4Context, g4.state(), ANT_SCALE)
+
+      var antMove= function(ant, board, context){
+        return function(){
+          ant.move()
+          drawTable(context, board.state(), ANT_SCALE);
+          fillCoord(context, ant.getPosition(), ANT_SCALE, "red")
+        }
+      }
 
       setInterval(function(){ drawTable(antContext, g1.next(), SCALE)}, 750);
       setInterval(function(){ drawTable(elemContext, g2.next(), SCALE)}, 750);
       setInterval(function(){ drawTable(lifeContext, g3.next(), SCALE)}, 750);
-      setInterval(function(){ drawTable(g4Context, g4.next(), SCALE)}, 750);
+      setInterval(antMove(ant, g4, g4Context), 75)
 
 
     });

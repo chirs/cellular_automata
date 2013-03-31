@@ -86,22 +86,46 @@ var staticRule = function(state){
   return [[0,-1,], [1, 0]][state]
 }
 
+var langtonsAntRule = function(boardState, internalState){
+  var moves = [[0,1],[1,0],[0,-1],[-1,0]]
+  return moves[internalState];
+}
+
+var adderAntRule = function(boardState, internalState){
+  var moves = [[0,1],[1,0],[0,-1],[-1,0]]
+  return moves[internalState];
+}
+
 
 
 var makeAnt = function(position, rule, board){
   //var moves = [[0,1],[1,0],[-1,0],[0,-1]]
+
+  var internalState = 0
+
+
+  var setInternalState = function(cellState){
+    if (cellState == 0){
+      return (internalState + 1) % 4
+    } else {
+      internalState = (internalState + 3) % 4
+    }
+  }
+
+    
+
   
   return {
 
     getPosition: function() { return position },
 
     move: function(){
-      var state = getValue(position, board.state())
+      var cellState = getValue(position, board.state())
+      setInternalState(cellState)
       board.updateValue(position)
       //console.log(position)
       //console.log(board)
-      var move = rule(state)
-      //var move = randomChoice(moves)
+      var move = rule(cellState, internalState)
       position = getNeighbor(board.dimensions, position, move)
       return position
     },
