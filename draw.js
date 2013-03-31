@@ -2,7 +2,21 @@
 
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
+      var drawRow = function(context, arr){
+        for (var i=0; i < arr.length; i++){
+          if (arr[i] == 1){
+            drawPoint(context, i, ROW);
+          };
+        }
+        ROW += 1;
+        if (ROW > 2000){
+          active = false;
+        }
+      }
 
+      var drawPoint = function(context, x,y){
+        context.fillRect(x,y,1,1);
+      }
 
 
 var getURLHash = function(w, deflt){

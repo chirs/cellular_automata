@@ -26,26 +26,12 @@
       var elemCanvas = document.getElementById("elemBoard");
       var ctx = elemCanvas.getContext("2d");
 
-      var drawRow = function(arr){
-        for (var i=0; i < arr.length; i++){
-          if (arr[i] == 1){
-            drawPoint(i, ROW);
-          };
-        }
-        ROW += 1;
-        if (ROW > 2000){
-          active = false;
-        }
-      }
 
-      var drawPoint = function(x,y){
-        ctx.fillRect(x,y,1,1);
-      }
 
-      var drawRows = function(generator) {
+      var drawRows = function(context,generator) {
         if (active){
           for (var i=0; i < 10; i++){ 
-            drawRow(generator.next()) 
+            drawRow(context, generator.next()) 
           } 
         }
       }
@@ -65,21 +51,26 @@
 
 
 
-      var reset = function(rule){
-        rule = rule || Math.floor(Math.random() * 256);
+      var reset = function(ruleNumber){
+        ruleNumber = ruleNumber || Math.floor(Math.random() * 256);
+
 
         if (iID){ clearInterval(iID); }
         clearCanvas(elemCanvas, ctx);
         ROW = 0;
         active = true;
 
-        var g = generator(1080, rule, getRandom(), getPopulation())
-        //console.log(g.next())
-        //console.log(g.next())
-        //console.log(g.next())
+        var rule = generateRule(ruleNumber)
+        //var g = generator([1080], rule, getRandom(), getPopulation())
+        var g = generator([1080], rule, true, getPopulation())
 
-        //iID = setInterval(function(){ drawRows(g)}, 20);
-        $("#eid").html(rule);
+        //console.log(g.state())
+        //console.log(g.next())
+        //console.log(g.next())
+        drawRow(ctx, g.state())
+
+        iID = setInterval(function(){ drawRows(ctx, g)}, 20);
+        $("#eid").html(ruleNumber);
       }
 
 
