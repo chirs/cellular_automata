@@ -91,10 +91,12 @@ var langtonsAntRule = function(boardState, internalState){
   return moves[internalState];
 }
 
-var adderAntRule = function(boardState, internalState){
-  var moves = [[0,1],[1,0],[0,-1],[-1,0]]
-  return moves[internalState];
-}
+// Adder ant was actually caused by a bug in the state rule funcion.
+// Action on cellState 0 was nothing; only changed state (left 90 degrees) on seeing a 1.
+//var adderAntRule = function(boardState, internalState){
+//  var moves = [[0,1],[1,0],[0,-1],[-1,0]]
+//  return moves[internalState];
+//}
 
 
 
