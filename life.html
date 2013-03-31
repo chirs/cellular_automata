@@ -57,13 +57,13 @@
         if (intervalID){ clearInterval(intervalID); }
         clearCanvas(lifeCanvas, ctx);
 
-        var ruleNumber = randomRule()
-        var rule = generateRule(ruleNumber);
         //var rule = 10491;
-        var g = generator([200, 96], rule, true, .9)
-        //var g = generator(200, 96, rule, false)
+        var neighbors = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
+        var g = generator([200, 96], neighbors, true, .9)
+        g.setRule()
+        //var g = generator(200, 96, neighbors, false)
         intervalID = setInterval(function() { draw(g.next()) }, 100)
-        $("#rule").html(ruleNumber);
+        $("#rule").html(g.getRuleNumber());
         //draw(g.state());
         //setTimeout(function(){ draw(g.next()); }, 1000)
       }

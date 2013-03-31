@@ -20,21 +20,10 @@
   <script type="text/javascript">
     $(document).ready(function() {
       ROW = 0
-      active = true
       iID = null
 
       var elemCanvas = document.getElementById("elemBoard");
       var ctx = elemCanvas.getContext("2d");
-
-
-
-      var drawRows = function(context,generator) {
-        if (active){
-          for (var i=0; i < 10; i++){ 
-            drawRow(context, generator.next()) 
-          } 
-        }
-      }
 
 
       var getNum = function(){
@@ -51,18 +40,20 @@
 
 
 
+      // reset not accepting numbers for the time being.
       var reset = function(ruleNumber){
-        ruleNumber = ruleNumber || Math.floor(Math.random() * 256);
+        //ruleNumber = ruleNumber || Math.floor(Math.random() * 256);
 
 
         if (iID){ clearInterval(iID); }
         clearCanvas(elemCanvas, ctx);
         ROW = 0;
-        active = true;
 
-        var rule = generateRule(ruleNumber)
+        //var rule = generateRule(ruleNumber)
         //var g = generator([1080], rule, getRandom(), getPopulation())
-        var g = generator([1080], rule, true, getPopulation())
+        var g = generator([1080], [[-1], [0], [1]], true, getPopulation())
+        g.setRule()
+        ruleNumber = g.getRuleNumber()
 
         //console.log(g.state())
         //console.log(g.next())

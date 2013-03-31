@@ -59,12 +59,19 @@
         context.fillRect(x,y,scale,scale);
       };
 
-      var g1 = generator([60, 60], generateRule(randomRule()), true, .9)
-      var g2 = generator([60, 60], generateRule(randomRule()), true, .9)
-      var g3 = generator([60, 60], generateRule(randomRule()), true, .9)
+      var neighbors = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
+      var g1 = generator([60, 60], neighbors, true, .9)
+      g1.setRule()
+      var g2 = generator([300], [[-1],[0],[1]], true, .5)
+      g2.setRule()
+      var g3 = generator([60, 60], neighbors, true, .3)
+      g3.setRule()
+
+      drawTable(antContext, g1.state())
+      drawTable(lifeContext, g3.state())
 
       setInterval(function(){ drawTable(antContext, g1.next()) }, 500);
-      setInterval(function(){ drawTable(elemContext, g2.next()) }, 500);
+      setInterval(function(){ drawRows(elemContext, g2)}, 20);
       setInterval(function(){ drawTable(lifeContext, g3.next()) }, 500);
 
 

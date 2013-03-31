@@ -2,6 +2,15 @@
 
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
+      ROW = 0
+
+
+      var drawRows = function(context,generator) {
+        for (var i=0; i < 10; i++){ 
+          drawRow(context, generator.next()) 
+
+        }
+      }
       var drawRow = function(context, arr){
         for (var i=0; i < arr.length; i++){
           if (arr[i] == 1){
@@ -9,9 +18,6 @@
           };
         }
         ROW += 1;
-        if (ROW > 2000){
-          active = false;
-        }
       }
 
       var drawPoint = function(context, x,y){
