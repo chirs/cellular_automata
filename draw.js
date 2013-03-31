@@ -15,6 +15,15 @@ var drawRow = function(context, arr){
   }
 }
 
+
+
+var fillCoord = function(context, coord, scale, style){
+  var x = coord[0] * scale ;
+  var y = coord[1] * scale ;
+  context.fillStyle = style;
+  context.fillRect(x,y,scale,scale);
+};
+
 var drawPoint = function(context, x,y){
   context.fillRect(x,y,1,1);
 }

@@ -24,16 +24,12 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var fillCoord = function(coord, style){
-        var x = coord[0] * SCALE ;
-        var y = coord[1] * SCALE ;
-        ctx.fillStyle = style;
-        ctx.fillRect(x,y,SCALE,SCALE);
-      };
 
       var state2color = function(a) {
         return ["#fff", "#000"][a]
       }
+
+
 
 
       var draw = function(table){
@@ -46,12 +42,13 @@
           for (var j=0; j < cols; j++){
             var state = table[i][j]
             var color = state2color(state)
-            fillCoord([i,j], color)
+              fillCoord(ctx, [i,j], SCALE, color)
           }
         }
       }
 
       intervalID = null
+
 
       var reset = function(n){
         if (intervalID){ clearInterval(intervalID); }
@@ -60,24 +57,37 @@
         //var rule = 10491;
         var vonNeumannNeighborhood = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
         var mooreNeighborhood = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
-        var g = generator([200, 96], mooreNeighborhood, true, .9)
+        //var g = generator([200, 96], mooreNeighborhood, true, .9)
+        var g = generator([200, 96], mooreNeighborhood, false, .9)
         //g.setRule(dayAndNightRule)
         //g.setRule(gameOfLifeRule)
         g.setRule(twoByTwoRule)
+
         //var g = generator(200, 96, neighbors, false)
         //intervalID = setInterval(function() { draw(g.next()) }, 100)
         $("#rule").html(g.getRuleNumber());
         draw(g.state());
         //setTimeout(function(){ draw(g.next()); }, 1000)
+        $("#nextButton").click(function(){ draw(g.next()) })
+        $("#lifeBoard").click(clickSquare(g))
       }
 
+      var clickSquare = function(gen){
+        return function(event){
+          console.log([Math.floor(event.offsetX / SCALE), Math.floor(event.offsetY / SCALE)])
+          var x = [Math.floor(event.offsetX / SCALE), Math.floor(event.offsetY / SCALE)]
+          var state = getValue(x, gen.state())
+          console.log(state)
+          var nstate = Math.abs(state - 1)
+          setValue(x, nstate, gen.state())
+          fillCoord(ctx, x, SCALE, state2color(nstate));
+        }
+      }
 
-      $("#rule").click(reset);
       reset()
 
-      $("#lifeBoard").click(function(e){ 
-        alert(e.offsetX) 
-      })
+
+
 
     });
   </script>
@@ -87,17 +97,11 @@
 
 <body class="home">
 
-<!--
-<div id="controls">
-<div id="eid"></div>
-<div>random <input id="randomCheckbox" type="checkbox" /></div>
-<div id="populationSlider"></div>
-</div>-->
 
 <canvas id="lifeBoard" width="1800" height="800"></canvas>
 
 <div id="controls">
-<div id="rule"></div>
+<div><input id="nextButton" type="submit" value="next" /></div>
 </div>
 
 </body>

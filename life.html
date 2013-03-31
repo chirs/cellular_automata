@@ -24,12 +24,6 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var fillCoord = function(coord, style){
-        var x = coord[0] * SCALE ;
-        var y = coord[1] * SCALE ;
-        ctx.fillStyle = style;
-        ctx.fillRect(x,y,SCALE,SCALE);
-      };
 
       var state2color = function(a) {
         return ["#fff", "#000"][a]
@@ -46,7 +40,7 @@
           for (var j=0; j < cols; j++){
             var state = table[i][j]
             var color = state2color(state)
-            fillCoord([i,j], color)
+            fillCoord(context, [i,j], SCALE, color)
           }
         }
       }

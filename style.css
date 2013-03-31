@@ -14,7 +14,13 @@
     position: fixed;
     right: 6%;
     top: 4%;
-    background: white;
     padding: 1%;
     cursor: pointer;
+    height: 5%;
+    width: 4%;
+    border: 1px solid black;
+    background: white;
+    opacity: 30%;
+    opacity: .4;
 }
+
