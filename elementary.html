@@ -38,20 +38,11 @@
         return $("#populationSlider").slider("value")
       }
 
+      ROW = 0;
+      STEP = 10;
 
-
-      // reset not accepting numbers for the time being.
-      var reset = function(ruleNumber){
-        //ruleNumber = ruleNumber || Math.floor(Math.random() * 256);
-
-
-        if (iID){ clearInterval(iID); }
-        clearCanvas(elemCanvas, ctx);
-        ROW = 0;
-
-        //var rule = generateRule(ruleNumber)
-        //var g = generator([1080], rule, getRandom(), getPopulation())
-        var g = generator([1080], [[-1], [0], [1]], true, getPopulation())
+        //var g = generator([1080], ELEMENTARY_NEIGHBORHOD, getRandom(), getPopulation())
+        var g = generator([1080], ELEMENTARY_NEIGHBORHOOD, true, getPopulation())
         g.setRule()
         ruleNumber = g.getRuleNumber()
 
@@ -60,7 +51,10 @@
         //console.log(g.next())
         drawRow(ctx, g.state())
 
-        iID = setInterval(function(){ drawRows(ctx, g)}, 20);
+        iID = setInterval(function(){ 
+          drawRows(ctx, g, ROW, STEP)
+          ROW += STEP
+        }, 20);
         $("#eid").html(ruleNumber);
       }
 
@@ -92,8 +86,6 @@
       //else { reset(); }
 
       reset()
-
-
 
     });
   </script>

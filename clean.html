@@ -24,9 +24,21 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var g = generator([200, 96], MOORE_NEIGHBORHOOD, false, .9)
+      var g = generator([180, 80], MOORE_NEIGHBORHOOD, false, .9)
       g.setRule(twoByTwoRule)
       drawTable(ctx, g.state(), SCALE);
+
+
+      var antMove = function(ant, steps){
+        for (var i=0; i < steps; i++){
+          fillCoord(ctx, ant.move(), SCALE, "red")
+        }
+      }
+      var a1 = makeAnt([90,40], g)
+      antMove(a1, 100)
+      antMove(makeAnt([20,40], g), 100)
+      antMove(makeAnt([70,60], g), 100)
+
 
       $("#next").click(function(){ drawTable(ctx, g.next(), SCALE) })
       $("#reset").click(function(){g.reset(); drawTable(ctx, g.state(), SCALE) })

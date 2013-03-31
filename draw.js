@@ -16,8 +16,8 @@ var getGenerator = function(){
 
 };
 
-var drawRows = function(context,generator) {
-  for (var i=0; i < 10; i++){ 
+var drawRows = function(context,generator, start, count) {
+  for (var i=0; i < count; i++){ 
     drawRow(context, generator.next()) 
   }
       }

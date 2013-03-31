@@ -2,6 +2,7 @@
 
 
 // Common neighborhoods
+ELEMENTARY_NEIGHBORHOOD = [[-1], [0], [1]] 
 VON_NEUMANN_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
 MOORE_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
 // MARGOLUS NEIGHBORHOOD...
@@ -18,6 +19,22 @@ var sum = function(xs){
 }
 
 
+
+// This is actually summing two vectors.
+// Used to identify node neighbors.
+var getNeighbor = function(dimensions, p1, p2){
+  var d = getDimensions(p1)
+  var l = []
+  for (var i=0; i<d; i++){
+    var dimension = dimensions[i]
+    var v = (p1[i] + p2[i] + dimension) % dimension
+    l.push(v)
+  }
+  return l;
+}
+
+
+// Family: Life
 var makeLifeStyleRule = function(deadStates, liveStates){
 
   return function(states){
@@ -47,17 +64,29 @@ var serviettesRule = makeLifeStyleRule([], [2,3,4])
 var walledCitiesRule = makeLifeStyleRule([2,3,4,5], [4,5,6,7,8])
 
 
+var randomChoice = function(arr){
+  var i = Math.floor(Math.random() * arr.length)
+  return arr[i]
+}
 
 
+var makeAnt = function(position, boardGenerator){
+  var moves = [[0,1],[1,0],[-1,0],[0,-1]]
+  
+  return {
 
+    position: position,
+
+    move: function(){
+      var m = randomChoice(moves)
+      position = getNeighbor(boardGenerator.dimensions, position, m)
+      return position
+    },
+    
+  }
+}
 
   
-
-var reverseRule = 5
-
-
-// n should be a number between 0 and 4294967296
-// random -> randomly seeded board
 
 
 var generator = function(dimensions, neighbors, random, density){
@@ -115,6 +144,7 @@ var generator = function(dimensions, neighbors, random, density){
     state: state, 
     getRuleNumber: getRuleNumber,
     setRule: setRule,
+    dimensions: dimensions,
 
     reset: function() { history = [startFunc()] },
     
@@ -196,18 +226,7 @@ var getDimensions = function(matrix){
   }
 }
 
-// This is actually summing two vectors.
-// Used to identify node neighbors.
-var getNeighbor = function(dimensions, p1, p2){
-  var d = getDimensions(p1)
-  var l = []
-  for (var i=0; i<d; i++){
-    var dimension = dimensions[i]
-    var v = (p1[i] + p2[i] + dimension) % dimension
-    l.push(v)
-  }
-  return l;
-}
+
 
 
 // Given a value like [1,4,7], pull those indexes from a nested array.
