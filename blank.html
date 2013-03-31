@@ -21,14 +21,20 @@
     $(document).ready(function() {
       SCALE = 10
 
-      var lifeCanvas = document.getElementById("lifeBoard");
-      var ctx = lifeCanvas.getContext("2d");
+      var blankCanvas = document.getElementById("blankBoard");
+      var context = blankCanvas.getContext("2d");
 
       var board = makeBoard([180, 80], MOORE_NEIGHBORHOOD, false, .9)
       board.setRule(twoByTwoRule)
 
-
-    });
+      var drawer = tableDrawer(context, board, SCALE)
+    
+      $("canvas").click(changeSquare(context, board, SCALE))
+      $("#next").click(function(){ drawer.draw(board) })
+      $("#play").click(function(){ 
+        setInterval(function(){ drawer.draw(board) }, 1000)
+      })
+      });
   </script>
 
 </head>
@@ -37,10 +43,11 @@
 <body class="home">
 
 
-<canvas id="lifeBoard" width="1800" height="800"></canvas>
+<canvas id="blankBoard" width="1800" height="800"></canvas>
 
 <div id="controls">
 <div id="next">next</div>
+<div id="play">play</div>
 <div id="reset">reset</div>
 </div>
 

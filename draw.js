@@ -37,8 +37,8 @@ var clearCanvas = function(canvas, context){
 var tableDrawer = function(context, board, scale){
   return {
     draw: function(){
-      drawTable(context, board.state(), scale)
       board.next()
+      drawTable(context, board.state(), scale)
     }
   }
 }

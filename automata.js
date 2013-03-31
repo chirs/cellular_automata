@@ -1,6 +1,7 @@
 
 // Common neighborhoods
 ELEMENTARY_NEIGHBORHOOD = [[-1], [0], [1]] 
+//ELEMENTARY_NEIGHBORHOOD = [[-3], [-2], [-1], [0], [1], [2], [3]] 
 VON_NEUMANN_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
 MOORE_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
 // MARGOLUS NEIGHBORHOOD...
@@ -139,30 +140,11 @@ var makeBoard = function(dimensions, neighbors, random, density){
   var rule, ruleNumber;
 
   // Join states [0,1,0,0...], turn into a decimal number, e.g. 32000.
-  var states2number =  function(states) { return parseInt(states.join(""), 2)}
+  //var states2number =  function(states) { return parseInt(states.join(""), 2)}
 
-  var number2states = function(n){ 
-    var arr = n.toString(2).split("").map( function(s){ return parseInt(s) } )
-    while (arr.length < cell_positions){ arr.unshift(0); } // left-fill with zeros.
-    return length
-  }
-  
-  var cell_positions = Math.pow(STATES, neighbors.length)
-  var rule_sets = Math.pow(2, cell_positions)
+  var cell_states = Math.pow(STATES, neighbors.length) // Number of possible cell arrangements.
+  var rule_sets = Math.pow(2, cell_states)
 
-  var randomRule = function(){ return Math.floor(Math.random() * rule_sets) }
-
-
-
-  var generateRule = function(states){
-    // Returns an array of the form [0,0,1,1,0,1...]
-    var n = states2number(states)
-    return  function(n) { return arr[n] }
-  };
-  var generateRandomRule = function(){
-    return generateRule(number2states(randomRule()))
-  }
-  
 
   if (random) {
     var startFunc = function() { return randomStart(dimensions, density) }
@@ -175,15 +157,27 @@ var makeBoard = function(dimensions, neighbors, random, density){
   var state = function(){ return history[history.length-1] }
 
   var setRule = function(r){
-    if (r == undefined){
-      rule = generateRandomRule()
-    } else {
-      rule = r
-    }
+    rule = r
+  }
+  
+  var setRuleByNumber = function(n){
+    var r = createRule(n);
+    setRule(r);
   }
 
-  var getRuleNumber = function(){
-    return ruleNumber;
+  var setRandomRule = function(){
+    var ruleNumber = Math.floor(Math.random() * rule_sets)
+    var rule = createRule(ruleNumber)
+    setRule(rule);
+  }
+    
+
+
+  var createRule = function(n){
+    
+    var arr = n.toString(2).split("").map( function(s){ return parseInt(s) } )          
+    while (arr.length < cell_states){ arr.unshift(0); } // left-fill with zeros.
+    return function(states){ return arr[parseInt(states.join(""), 2)] }
   }
 
   // Need to iterate over whole table regardless of dimensions.
@@ -211,8 +205,9 @@ var makeBoard = function(dimensions, neighbors, random, density){
 
   return {
     state: state, 
-    getRuleNumber: getRuleNumber,
     setRule: setRule,
+    setRandomRule: setRandomRule,
+    setRuleByNumber: setRuleByNumber,
     dimensions: dimensions,
 
     reset: function() { history = [startFunc()] },

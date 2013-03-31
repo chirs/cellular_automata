@@ -41,15 +41,16 @@
 
       var reset = function(){
 
-        SCALE = 16
-        
-        var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
+        SCALE = 2
+        var points = elemCanvas.width / SCALE 
 
-        //var g = makeBoard([1080], ELEMENTARY_NEIGHBORHOD, getRandom(), getPopulation())
-        var g = makeBoard([(elemCanvas.width) / SCALE], ELEMENTARY_NEIGHBORHOOD, true, getPopulation())
-        g.setRule(rule62)
-        var rd = rowDrawer(ctx, g, SCALE, (elemCanvas.height / SCALE))
-        setInterval(function(){ rd.draw(5) }, 1000 / 60)
+        var board = makeBoard([points], ELEMENTARY_NEIGHBORHOOD, false)
+        //var board = makeBoard([points], ELEMENTARY_NEIGHBORHOOD, true, getPopulation())
+        //board.setRuleByNumber(110)
+        board.updateValue([points/2])
+        board.setRandomRule()
+        var rd = rowDrawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
+        setInterval(function(){ rd.draw(1) }, 1000 / 60)
 
         //$("#eid").html(ruleNumber);
       }
