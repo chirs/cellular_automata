@@ -35,9 +35,24 @@
         }
       }
       var a1 = makeAnt([90,40], g)
-      antMove(a1, 100)
-      antMove(makeAnt([20,40], g), 100)
-      antMove(makeAnt([70,60], g), 100)
+      var a2 = makeAnt([70,20], g)
+      var a3 = makeAnt([60,30], g)
+
+      setInterval(function(){
+        a1.move()
+        a2.move()
+        a3.move()
+        drawTable(ctx, g.state(), SCALE);
+        fillCoord(ctx, a1.getPosition(), SCALE, "red")
+        fillCoord(ctx, a2.getPosition(), SCALE, "red")
+        fillCoord(ctx, a3.getPosition(), SCALE, "red")
+      }, 100)
+
+
+
+      //antMove(a1, 100)
+      //antMove(makeAnt([20,40], g), 100)
+      //antMove(makeAnt([70,60], g), 100)
 
 
       $("#next").click(function(){ drawTable(ctx, g.next(), SCALE) })

@@ -76,9 +76,10 @@ var makeAnt = function(position, boardGenerator){
   
   return {
 
-    position: position,
+    getPosition: function() { return position },
 
     move: function(){
+      boardGenerator.updateValue(position)
       var m = randomChoice(moves)
       position = getNeighbor(boardGenerator.dimensions, position, m)
       return position
