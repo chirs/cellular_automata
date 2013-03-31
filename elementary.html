@@ -19,7 +19,6 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      ROW = 0
       iID = null
 
       var elemCanvas = document.getElementById("elemBoard");
@@ -41,24 +40,18 @@
 
 
       var reset = function(){
-        
-        ROW = 0
-        STEP = 20
 
+        SCALE = 16
+        
         var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
 
         //var g = generator([1080], ELEMENTARY_NEIGHBORHOD, getRandom(), getPopulation())
-        var g = generator([1080], ELEMENTARY_NEIGHBORHOOD, true, getPopulation())
+        var g = generator([(elemCanvas.width) / SCALE], ELEMENTARY_NEIGHBORHOOD, true, getPopulation())
         g.setRule(rule62)
-
-        var rd = rowDrawer(ctx, g)
-        //rd.draw(1000)
-
-        setInterval(function(){ rd.draw(5) }, 10)
-
+        var rd = rowDrawer(ctx, g, SCALE, (elemCanvas.height / SCALE))
+        setInterval(function(){ rd.draw(5) }, 1000 / 60)
 
         //$("#eid").html(ruleNumber);
-
       }
       
 
@@ -78,8 +71,6 @@
           if (getRandom()){ reset(getNum()) }
           }
       });
-
-
 
       $("#eid").click(function(){ reset() });
       $("#randomCheckbox").change(function(){ reset(getNum()) });
@@ -104,6 +95,6 @@
 <div id="populationSlider"></div>
 </div>
 
-<canvas id="elemBoard" width="1080" height="1800"></canvas>
+<canvas id="elemBoard" width="1600" height="800"></canvas>
 
 </body>
