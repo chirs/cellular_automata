@@ -148,6 +148,14 @@ var generator = function(dimensions, neighbors, random, density){
     dimensions: dimensions,
 
     reset: function() { history = [startFunc()] },
+
+    updateValue: function(point){
+      var s = getValue(point, state())
+      var ns = (s + 1) % STATES
+      setValue(point, ns, state())
+      return ns
+
+    },
     
 
     next: function(){

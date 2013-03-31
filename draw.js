@@ -38,9 +38,10 @@ var state2color = function(a) {
 var changeSquare = function(context, gen, scale){
   return function(event){
     var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)]
-    var state = getValue(point, gen.state())
-    var nstate = Math.abs(state - 1)
-    setValue(point, nstate, gen.state())
+    var nstate = gen.updateValue(point)
+    //var state = getValue(point, gen.state())
+    //var nstate = Math.abs(state - 1)
+    //setValue(point, nstate, gen.state())
     fillCoord(context, point, scale, state2color(nstate));
   }
 }
