@@ -34,9 +34,11 @@
           fillCoord(ctx, ant.move(), SCALE, "red")
         }
       }
-      var a1 = makeAnt([90,40], g)
-      var a2 = makeAnt([70,20], g)
-      var a3 = makeAnt([60,30], g)
+      var a1 = makeAnt([90,40], randomWalkRule, g)
+      var a2 = makeAnt([70,20], randomWalkRule, g)
+      var a3 = makeAnt([60,30], randomWalkRule, g)
+
+      //a1.move()
 
       setInterval(function(){
         a1.move()

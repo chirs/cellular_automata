@@ -70,18 +70,26 @@ var randomChoice = function(arr){
   return arr[i]
 }
 
+var randomWalkRule = function(state){
+  return randomChoice([[0,1],[1,0],[-1,0],[0,-1]])
+}
 
-var makeAnt = function(position, boardGenerator){
-  var moves = [[0,1],[1,0],[-1,0],[0,-1]]
+
+var makeAnt = function(position, rule, board){
+  //var moves = [[0,1],[1,0],[-1,0],[0,-1]]
   
   return {
 
     getPosition: function() { return position },
 
     move: function(){
-      boardGenerator.updateValue(position)
-      var m = randomChoice(moves)
-      position = getNeighbor(boardGenerator.dimensions, position, m)
+      var state = getValue(position, board.state())
+      board.updateValue(position)
+      //console.log(position)
+      //console.log(board)
+      var move = rule(state)
+      //var move = randomChoice(moves)
+      position = getNeighbor(board.dimensions, position, move)
       return position
     },
     
