@@ -54,6 +54,7 @@ var makeLifeStyleRule = function(deadStates, liveStates){
   }
 }
 
+var forgotRule = makeLifeStyleRule([2], [])
 var gameOfLifeRule = makeLifeStyleRule([3], [2,3])
 var morleyRule = makeLifeStyleRule([3,6,8], [2,4,5]) // Named after Stephen Morley; also called Move. Supports very high-period and slow spaceships
 var dayAndNightRule = makeLifeStyleRule([3,6,7,8], [3,4,6,7,8])

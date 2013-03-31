@@ -29,6 +29,10 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var lifeContext = lifeCanvas.getContext("2d");
 
+      var g4Canvas = document.getElementById("g4Board");
+      var g4Context = g4Canvas.getContext("2d");
+
+
       SCALE = 4
 
       var g1 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
@@ -36,15 +40,21 @@
       var g2 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
       g2.setRule(gameOfLifeRule)
       var g3 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
-      g3.setRule(twoByTwoRule)
+      g3.setRule(forgotRule)
+
+      var g4 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
+      g4.setRule(highLifeRule)
+
 
       drawTable(antContext, g1.state(), SCALE)
       drawTable(elemContext, g2.state(), SCALE)
       drawTable(lifeContext, g3.state(), SCALE)
+      drawTable(g4Context, g4.state(), SCALE)
 
       setInterval(function(){ drawTable(antContext, g1.next(), SCALE)}, 750);
       setInterval(function(){ drawTable(elemContext, g2.next(), SCALE)}, 750);
       setInterval(function(){ drawTable(lifeContext, g3.next(), SCALE)}, 750);
+      setInterval(function(){ drawTable(g4Context, g4.next(), SCALE)}, 750);
 
 
     });
@@ -60,6 +70,7 @@
 <canvas id="antBoard" width="300" height="300"></canvas>
 <canvas id="elemBoard" width="300" height="300"></canvas>
 <canvas id="lifeBoard" width="300" height="300"></canvas>
+<canvas id="g4Board" width="300" height="300"></canvas>
 
 
 </body>
