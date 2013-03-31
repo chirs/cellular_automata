@@ -20,8 +20,8 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      var antCanvas = document.getElementById("antBoard");
-      var antContext = antCanvas.getContext("2d");
+      //var g1Canvas = document.getElementById("g1Board");
+      //var g1Context = antCanvas.getContext("2d");
 
       var elemCanvas = document.getElementById("elemBoard");
       var elemContext = elemCanvas.getContext("2d");
@@ -29,28 +29,46 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var lifeContext = lifeCanvas.getContext("2d");
 
-      var g4Canvas = document.getElementById("g4Board");
-      var g4Context = g4Canvas.getContext("2d");
+      var antCanvas = document.getElementById("antBoard");
+      var antContext = antCanvas.getContext("2d");
 
 
       SCALE = 4
       ANT_SCALE = 10
 
+      
+      var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
+
+      // Life-like game.
       var g1 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
       g1.setRule(dayAndNightRule)
-      var g2 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
-      g2.setRule(gameOfLifeRule)
+
       var g3 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
-      g3.setRule(forgotRule)
+      g3.setRule(gameOfLifeRule)
 
-      var g4 = generator([40, 40], MOORE_NEIGHBORHOOD, false)
-      var ant = makeAnt([20,20], adderAntRule, g4)
+      //drawTable(g1Context, g1.state(), SCALE)
+      //drawTable(lifeContext, g3.state(), SCALE)
+
+      //setInterval(function(){ drawTable(g1Context, g1.next(), SCALE)}, 750);
+      setInterval(function(){ drawTable(lifeContext, g3.next(), SCALE)}, 750);
 
 
-      drawTable(antContext, g1.state(), SCALE)
-      drawTable(elemContext, g2.state(), SCALE)
-      drawTable(lifeContext, g3.state(), SCALE)
-      drawTable(g4Context, g4.state(), ANT_SCALE)
+
+      // Elementary cellular automaton
+      var g2 = generator([300], ELEMENTARY_NEIGHBORHOOD, true, .3)
+      g2.setRule(rule62)
+      var rd = rowDrawer(elemContext, g2)
+      setInterval(function(){ rd.draw(5) }, 100)
+
+
+      //drawTable(elemContext, g2.state(), SCALE)
+      //setInterval(function(){ drawTable(elemContext, g2.next(), SCALE)}, 750);
+
+      // Simple ant.
+      var antBoard = generator([40, 40], MOORE_NEIGHBORHOOD, false)
+      var ant = makeAnt([20,20], adderAntRule, antBoard)
+
+      drawTable(antContext, antBoard.state(), ANT_SCALE)
 
       var antMove= function(ant, board, context){
         return function(){
@@ -60,10 +78,9 @@
         }
       }
 
-      setInterval(function(){ drawTable(antContext, g1.next(), SCALE)}, 750);
-      setInterval(function(){ drawTable(elemContext, g2.next(), SCALE)}, 750);
-      setInterval(function(){ drawTable(lifeContext, g3.next(), SCALE)}, 750);
-      setInterval(antMove(ant, g4, g4Context), 75)
+    $("antCanvas")
+    
+    setInterval(antMove(ant, antBoard, antContext), 75)
 
 
     });
@@ -76,10 +93,10 @@
 
 
 
-<canvas id="antBoard" width="300" height="300"></canvas>
+<canvas id="g1Board" width="300" height="300"></canvas>
 <canvas id="elemBoard" width="300" height="300"></canvas>
 <canvas id="lifeBoard" width="300" height="300"></canvas>
-<canvas id="g4Board" width="300" height="300"></canvas>
+<canvas id="antBoard" width="300" height="300"></canvas>
 
 
 </body>

@@ -16,18 +16,35 @@ var getGenerator = function(){
 
 };
 
-var drawRows = function(context,generator, start, count) {
-  for (var i=0; i < count; i++){ 
-    drawRow(context, generator.next()) 
+
+var rowDrawer = function(context, generator, maximum){
+
+  var row = 0
+
+  var dRow = function(arr){
+    for (var i=0; i < arr.length; i++){
+      if (arr[i] == 1){
+        drawPoint(context, i, row);
+      };
+    }
   }
+
+
+  return {
+    draw: function(count){
+      if (row > maximum){ return }
+      if (count == undefined){ count = 1 }
+
+      for (var i=0; i < count; i++){
+        dRow(generator.state());
+        generator.next()
+        row += 1;
       }
-var drawRow = function(context, arr){
-  for (var i=0; i < arr.length; i++){
-    if (arr[i] == 1){
-      drawPoint(context, i, ROW);
-    };
+    },
+
   }
 }
+
 
 var state2color = function(a) {
   return ["#fff", "#000"][a]
