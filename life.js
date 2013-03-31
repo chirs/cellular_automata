@@ -101,11 +101,13 @@ var getDimensions = function(matrix){
 
 // This is actually summing two vectors.
 // Used to identify node neighbors.
-var getNeighbor = function(p1, p2){
+var getNeighbor = function(dimensions, p1, p2){
   var d = getDimensions(p1)
   var l = []
   for (var i=0; i<d; i++){
-    l.push(p1[i] + p2[i])
+    var dimension = dimensions[i]
+    var v = (p1[i] + p2[i] + dimension) % dimension
+    l.push(v)
   }
   return l;
 }
@@ -130,10 +132,7 @@ var setValue = function(p, value, table){
 }
 
 
-
-
-
-var getState = function(cell, table, rule){
+var getState = function(dimensions, cell, table, rule){
 
   //var rows = table.length;
   //var cols = table[0].length
@@ -143,8 +142,8 @@ var getState = function(cell, table, rule){
 
   var states = []
   for (i=0; i < NEIGHBORS.length; i++){
-    var n = getNeighbor(cell, NEIGHBORS[i])
-    var v = getValue(n);
+    var n = getNeighbor(dimensions, cell, NEIGHBORS[i])
+    var v = getValue(n, table);
     states.push(v)
   }
 
@@ -154,30 +153,26 @@ var getState = function(cell, table, rule){
 
 
 // Need to iterate over whole table regardless of dimensions.
-var generateNextState = function(table, n){
-  var rule = generateRule(n);
-  var l = [];
-  var rows = table.length
-  if (rows == 0){ return [] }
-  var cols = table[0].length
+var generateNextState = function(dimensions, table, rule){
 
-  for (var i=0; i < rows; i++){
-    var m = []
-    for (var j=0; j < cols; j++){
+  var indexes = getIndexes(dimensions);
+  var newTable = canonicalStart(dimensions);
 
-      var state = getState([i,j], table, rule);
-      m.push(state);
-    }
-    l.push(m);
-    }
-  return l
+
+  for (var i=0; i < indexes.length; i++){
+    var newVal = getState(dimensions, indexes[i], table,rule)
+    //setValue(indexes[i], newVal, newTable);
   }
-  
+  return newTable;
+}  
                           
 
 // n should be a number between 0 and 4294967296
 // random -> randomly seeded board
-var generator = function(dimensions, rule, random, density){
+var generator = function(dimensions, ruleNumber, random, density){
+  //var rule = generateRule(ruleNumber);
+
+
   if (random) {
     var history = [randomStart(dimensions, density)];
   } else {
@@ -185,13 +180,12 @@ var generator = function(dimensions, rule, random, density){
   }
 
   var state = function(){ return history[history.length-1] }
-  
 
   return {
     state: state, 
 
     next: function(){
-      var newState = generateNextState(state(), rule)
+      var newState = generateNextState(dimensions, state(), rule)
       history.push(newState)
       return newState
     },
