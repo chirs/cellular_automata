@@ -106,29 +106,38 @@ var makeAnt = function(position, rule, board){
 
   var setInternalState = function(cellState){
     if (cellState == 0){
-      return (internalState + 1) % 4
+      internalState = (internalState + 1) % 4
     } else {
       internalState = (internalState + 3) % 4
     }
   }
 
-    
-
-  
-  return {
-
-    getPosition: function() { return position },
-
-    move: function(){
+  var move = function(){
       var cellState = getValue(position, board.state())
       setInternalState(cellState)
+
       board.updateValue(position)
       //console.log(position)
       //console.log(board)
       var move = rule(cellState, internalState)
       position = getNeighbor(board.dimensions, position, move)
       return position
+  }
+
+
+
+  
+  return {
+
+    getPosition: function() { return position },
+
+    moves: function(n){
+      for (var i=0; i<n; i++){
+        move();
+      }
     },
+
+    move: move,
     
   }
 }

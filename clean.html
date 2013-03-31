@@ -35,17 +35,16 @@
         }
       }
       //var a1 = makeAnt([90,40], randomWalkRule, g)
-      var a1 = makeAnt([90,40], adderAntRule, g)
-      //var a2 = makeAnt([70,20], leftAntRule, g)
-      //var a3 = makeAnt([60,30], staticRule, g)
+      var a1 = makeAnt([90,40], langtonsAntRule, g)
+      //var a1 = makeAnt([90,40], adderAntRule, g)
 
       //a1.move()
 
       setInterval(function(){
-        a1.move()
+        a1.moves(100)
         drawTable(ctx, g.state(), SCALE);
         fillCoord(ctx, a1.getPosition(), SCALE, "red")
-      }, 10)
+      }, 100)
 
 
       //antMove(a1, 100)
