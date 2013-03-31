@@ -63,7 +63,7 @@
         var g = generator([200, 96], mooreNeighborhood, true, .6)
         //g.setRule(dayAndNightRule)
         //g.setRule(gameOfLifeRule)
-        g.setRule(gameOfLifeRule)
+        g.setRule(twoByTwoRule)
         //var g = generator(200, 96, neighbors, false)
         intervalID = setInterval(function() { draw(g.next()) }, 100)
         $("#rule").html(g.getRuleNumber());

@@ -25,36 +25,30 @@ var sum = function(xs){
 }
 
 
-var gameOfLifeRule = function(states){
-  var state = states[0]
-  var neighbors = sum(states.slice(1))
-  if (state == 0 && neighbors == 3){
-    return 1;
-  }
+var makeLifeStyleRule = function(deadStates, liveStates){
 
-  if (state == 1 && (neighbors == 2 || neighbors == 3)){
-    return 1;
-  } else {
-    return 0;      
-  }
-}
+  return function(states){
 
+    var state = states[0]
+    var neighbors = sum(states.slice(1))
 
-var dayAndNightRule = function(states){
-  var state = states[0]
-  var neighbors = sum(states.slice(1))
-  if (state == 0 && [3,6,7,8].indexOf(neighbors) > -1){
-    return 1
-  } else {
-    if (state == 1 && [3,4,6,7,8].indexOf(neighbors) > -1){
+    if (state == 0 && deadStates.indexOf(neighbors) > -1){
       return 1
     } else {
-      return 0
+      if (state == 1 && liveStates.indexOf(neighbors) > -1){
+        return 1
+      } else {
+        return 0
+      }
     }
   }
-      
-
 }
+
+var gameOfLifeRule = makeLifeStyleRule([3], [2,3])
+var morleyRule = makeLifeStyleRule([3,6,8], [2,4,5]) // Named after Stephen Morley; also called Move. Supports very high-period and slow spaceships
+var dayAndNightRule = makeLifeStyleRule([3,6,7,8], [3,4,6,7,8])
+var highLifeRule = makeLifeStyleRule([3,6], [2,3])
+var twoByTwoRule = makeLifeStyleRule([3,6], [1,2,5])
 
 
 
