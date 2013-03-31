@@ -25,9 +25,12 @@
       var ctx = lifeCanvas.getContext("2d");
 
       var g = generator([100, 48], MOORE_NEIGHBORHOOD, true, .5)
-      g.setRule(serviettesRule)
+      //g.setRule(serviettesRule)
+      g.setRule(gameOfLifeRule)
 
-      setInterval(function() { drawTable(ctx, g.next(), SCALE) }, 100)
+      var d = tableDrawer(ctx, g, SCALE)
+      setInterval(d.draw, 100)
+
       $("#rule").html(g.getRuleNumber());
       $("#rule").click(g.reset);
 

@@ -20,44 +20,44 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      //var g1Canvas = document.getElementById("g1Board");
-      //var g1Context = antCanvas.getContext("2d");
+
+
+      // Elementary cellular automaton
 
       var elemCanvas = document.getElementById("elemBoard");
       var elemContext = elemCanvas.getContext("2d");
 
-      var lifeCanvas = document.getElementById("lifeBoard");
-      var lifeContext = lifeCanvas.getContext("2d");
+      ELEMENTARY_SCALE = 10
 
-      var antCanvas = document.getElementById("antBoard");
-      var antContext = antCanvas.getContext("2d");
+      var elemBoard = generator([30], ELEMENTARY_NEIGHBORHOOD, true, .3)
+      var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
 
-
-
+      elemBoard.setRule(rule62)
+      var rd = rowDrawer(elemContext, elemBoard, ELEMENTARY_SCALE, 30, true)
+      //rd.draw()
+      setInterval(function(){ rd.draw(1) }, 1000 / 60)
 
 
       // Life-like game.
 
       LIFE_SCALE = 4
+      var lifeCanvas = document.getElementById("lifeBoard");
+      var lifeContext = lifeCanvas.getContext("2d");
+
       var lifeBoard = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
       lifeBoard.setRule(gameOfLifeRule)
-      drawTable(lifeContext, lifeBoard.state(), LIFE_SCALE)
 
-      setInterval(function(){ drawTable(lifeContext, lifeBoard.next(), LIFE_SCALE)}, 750);
+      var d = tableDrawer(lifeContext, lifeBoard, LIFE_SCALE)
+      d.draw()
 
-
-
-      // Elementary cellular automaton
-      // No scale.
-      var elemBoard = generator([300], ELEMENTARY_NEIGHBORHOOD, true, .3)
-      var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
-
-      elemBoard.setRule(rule62)
-      var rd = rowDrawer(elemContext, elemBoard)
-      setInterval(function(){ rd.draw(5) }, 100)
-
-
+      setInterval(d.draw, 750)
+      
       // Simple ant.
+
+      var antCanvas = document.getElementById("antBoard");
+      var antContext = antCanvas.getContext("2d");
+
+
       ANT_SCALE = 5
       var antBoard = generator([60, 60], MOORE_NEIGHBORHOOD, false)
       var ant = makeAnt([30,30], langtonsAntRule, antBoard)

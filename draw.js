@@ -2,66 +2,16 @@
 
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
-
-
-var getGenerator = function(){
-  var g = generator([400, 192], MOORE_NEIGHBORHOOD, true, .5)
-
-  return {
-    next: next,
-    start: start,
-    pause: pause,
-    reset: reset,
-  }
-
-};
-
-
-var rowDrawer = function(context, generator, maximum){
-
-  var row = 0
-
-  var dRow = function(arr){
-    for (var i=0; i < arr.length; i++){
-      if (arr[i] == 1){
-        drawPoint(context, i, row);
-      };
-    }
-  }
-
-
-  return {
-    draw: function(count){
-      if (row > maximum){ return }
-      if (count == undefined){ count = 1 }
-
-      for (var i=0; i < count; i++){
-        dRow(generator.state());
-        generator.next()
-        row += 1;
-      }
-    },
-
-  }
-}
-
-
 var state2color = function(a) {
   return ["#fff", "#000"][a]
 }
 
-
-      // Pull out state2color?
-var changeSquare = function(context, gen, scale){
-  return function(event){
-    var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)]
-    var nstate = gen.updateValue(point)
-    //var state = getValue(point, gen.state())
-    //var nstate = Math.abs(state - 1)
-    //setValue(point, nstate, gen.state())
-    fillCoord(context, point, scale, state2color(nstate));
-  }
-}
+var fillCoord = function(context, coord, scale, style){
+  var x = coord[0] * scale ;
+  var y = coord[1] * scale ;
+  context.fillStyle = style;
+  context.fillRect(x,y,scale,scale);
+};
 
 
 var drawTable = function(context, table, scale){
@@ -79,22 +29,72 @@ var drawTable = function(context, table, scale){
   }
 }
 
-
-
-
-
-
-var fillCoord = function(context, coord, scale, style){
-  var x = coord[0] * scale ;
-  var y = coord[1] * scale ;
-  context.fillStyle = style;
-  context.fillRect(x,y,scale,scale);
+var clearCanvas = function(canvas, context){
+  context.clearRect(0,0,canvas.width,canvas.height);
 };
 
-var drawPoint = function(context, x,y){
-  context.fillRect(x,y,1,1);
+
+
+
+
+var tableDrawer = function(context, generator, scale){
+  return {
+    draw: function(){
+      drawTable(context, generator.state(), scale)
+      generator.next()
+    }
+  }
 }
 
+
+var rowDrawer = function(context, generator, scale, maximum, repeat){
+
+  var row = 0
+
+  var dRow = function(arr){
+    for (var i=0; i < arr.length; i++){
+      var color = state2color(arr[i])
+      fillCoord(context, [i, row], scale, color)
+    }
+  }
+
+
+  return {
+    draw: function(count){
+      if (row > maximum){ 
+        if (repeat){
+          row = 0
+        } else {
+          return 
+        }
+      }
+
+      if (count == undefined){ count = 1 }
+
+      for (var i=0; i < count; i++){
+        dRow(generator.state());
+        generator.next()
+        row += 1;
+      }
+    },
+
+  }
+}
+
+
+
+
+var changeSquare = function(context, gen, scale){
+  return function(event){
+    var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)]
+    var nstate = gen.updateValue(point)
+    fillCoord(context, point, scale, state2color(nstate));
+  }
+}
+
+
+
+// Utilities.
 
 var getURLHash = function(w, deflt){
   var wlh = w.location.hash
@@ -105,9 +105,6 @@ var getURLHash = function(w, deflt){
   }
 }
 
-var clearCanvas = function(canvas, context){
-  context.clearRect(0,0,canvas.width,canvas.height);
-};
 
 var hsv2rgb = function(h, s, v){
   var h_i = h * 6;
@@ -152,8 +149,11 @@ var generateColors = function(n){
   return colors;
 };
 
+var generateShade = function(){
+}
 
 
+// Bonepile.
 
 var panner = function(){
   var p;
@@ -165,6 +165,19 @@ var panner = function(){
 
 
           
+
+var getGenerator = function(){
+  var g = generator([400, 192], MOORE_NEIGHBORHOOD, true, .5)
+
+  return {
+    next: next,
+    start: start,
+    pause: pause,
+    reset: reset,
+  }
+
+};
+
 
 
 
