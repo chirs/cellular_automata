@@ -46,7 +46,7 @@
             var state = table[i][j]
             var color = state2color(state)
             //fillCoord([i,j], color)
-            fillSquare(context, [i,j], 15, color);
+            fillSquare(context, [i,j], 5, color);
           }
         }
       }
@@ -59,9 +59,9 @@
         context.fillRect(x,y,scale,scale);
       };
 
-      var g1 = generator(20, 20, randomRule(), true, .9)
-      var g2 = generator(20, 20, randomRule(), true, .9)
-      var g3 = generator(20, 20, randomRule(), true, .9)
+      var g1 = generator([60, 60], generateRule(randomRule()), true, .9)
+      var g2 = generator([60, 60], generateRule(randomRule()), true, .9)
+      var g3 = generator([60, 60], generateRule(randomRule()), true, .9)
 
       setInterval(function(){ drawTable(antContext, g1.next()) }, 500);
       setInterval(function(){ drawTable(elemContext, g2.next()) }, 500);
