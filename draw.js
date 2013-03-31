@@ -2,6 +2,20 @@
 
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
+
+
+var getGenerator = function(){
+  var g = generator([400, 192], MOORE_NEIGHBORHOOD, true, .5)
+
+  return {
+    next: next,
+    start: start,
+    pause: pause,
+    reset: reset,
+  }
+
+};
+
 var drawRows = function(context,generator) {
   for (var i=0; i < 10; i++){ 
     drawRow(context, generator.next()) 

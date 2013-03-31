@@ -24,33 +24,13 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
+      var g = generator([200, 96], MOORE_NEIGHBORHOOD, false, .9)
+      g.setRule(twoByTwoRule)
+      drawTable(ctx, g.state(), SCALE);
 
-      intervalID = null
-
-
-      var reset = function(n){
-        if (intervalID){ clearInterval(intervalID); }
-        clearCanvas(lifeCanvas, ctx);
-
-        var g = generator([200, 96], MOORE_NEIGHBORHOOD, false, .9)
-        //g.setRule(dayAndNightRule)
-        //g.setRule(gameOfLifeRule)
-        g.setRule(twoByTwoRule)
-
-        //var g = generator(200, 96, neighbors, false)
-        //intervalID = setInterval(function() { draw(g.next()) }, 100)
-        $("#rule").html(g.getRuleNumber());
-        drawTable(ctx, g.state(), SCALE);
-        //setTimeout(function(){ draw(g.next()); }, 1000)
-        $("#nextButton").click(function(){ drawTable(ctx, g.next(), SCALE) })
-        $("#lifeBoard").click(changeSquare(ctx, g, SCALE))
-      }
-
-
-      reset()
-
-
-
+      $("#next").click(function(){ drawTable(ctx, g.next(), SCALE) })
+      $("#reset").click(function(){g.reset(); drawTable(ctx, g.state(), SCALE) })
+      $("#lifeBoard").click(changeSquare(ctx, g, SCALE))
 
     });
   </script>
@@ -64,7 +44,8 @@
 <canvas id="lifeBoard" width="1800" height="800"></canvas>
 
 <div id="controls">
-<div><input id="nextButton" type="submit" value="next" /></div>
+<div id="next">next</div>
+<div id="reset">reset</div>
 </div>
 
 </body>

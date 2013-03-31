@@ -58,6 +58,8 @@ var reverseRule = 5
 
 // n should be a number between 0 and 4294967296
 // random -> randomly seeded board
+
+
 var generator = function(dimensions, neighbors, random, density){
   var rule, ruleNumber;
 
@@ -88,10 +90,12 @@ var generator = function(dimensions, neighbors, random, density){
   
 
   if (random) {
-    var history = [randomStart(dimensions, density)];
+    var startFunc = function() { return randomStart(dimensions, density) }
+
   } else {
-    var history = [canonicalStart(dimensions)];
+    var startFunc = function() { return canonicalStart(dimensions) }
   }
+  var history = [startFunc()];
 
   var state = function(){ return history[history.length-1] }
 
@@ -111,6 +115,8 @@ var generator = function(dimensions, neighbors, random, density){
     state: state, 
     getRuleNumber: getRuleNumber,
     setRule: setRule,
+
+    reset: function() { history = [startFunc()] },
     
 
     next: function(){

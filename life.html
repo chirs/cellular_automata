@@ -19,33 +19,18 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 5
+      SCALE = 20
 
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
+      var g = generator([100, 48], MOORE_NEIGHBORHOOD, true, .5)
+      g.setRule(serviettesRule)
 
-      intervalID = null
+      setInterval(function() { drawTable(ctx, g.next(), SCALE) }, 100)
+      $("#rule").html(g.getRuleNumber());
+      $("#rule").click(g.reset);
 
-      var reset = function(n){
-        if (intervalID){ clearInterval(intervalID); }
-        clearCanvas(lifeCanvas, ctx);
-
-        //var rule = 10491;
-        var g = generator([400, 192], MOORE_NEIGHBORHOOD, true, .5)
-        //g.setRule(dayAndNightRule)
-        //g.setRule(gameOfLifeRule)
-        g.setRule(serviettesRule)
-        //var g = generator(200, 96, neighbors, false)
-        intervalID = setInterval(function() { drawTable(ctx, g.next(), SCALE) }, 100)
-        $("#rule").html(g.getRuleNumber());
-        //draw(g.state());
-        //setTimeout(function(){ draw(g.next()); }, 1000)
-      }
-
-
-      $("#rule").click(reset);
-      reset()
 
     });
   </script>
@@ -55,17 +40,11 @@
 
 <body class="home">
 
-<!--
-<div id="controls">
-<div id="eid"></div>
-<div>random <input id="randomCheckbox" type="checkbox" /></div>
-<div id="populationSlider"></div>
-</div>-->
 
 <canvas id="lifeBoard" width="1800" height="800"></canvas>
 
 <div id="controls">
-<div id="rule"></div>
+<div id="rule">RESET</div>
 </div>
 
 </body>
