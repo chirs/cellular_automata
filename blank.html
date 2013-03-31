@@ -24,9 +24,9 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var g = generator([180, 80], MOORE_NEIGHBORHOOD, false, .9)
-      g.setRule(twoByTwoRule)
-      drawTable(ctx, g.state(), SCALE);
+      var board = makeBoard([180, 80], MOORE_NEIGHBORHOOD, false, .9)
+      board.setRule(twoByTwoRule)
+      drawTable(ctx, board.state(), SCALE);
 
 
       var antMove = function(ant, steps){
@@ -34,23 +34,15 @@
           fillCoord(ctx, ant.move(), SCALE, "red")
         }
       }
-      //var a1 = makeAnt([90,40], randomWalkRule, g)
-      var a1 = makeAnt([90,40], langtonsAntRule, g)
-      //var a1 = makeAnt([90,40], adderAntRule, g)
 
-      //a1.move()
+      var a1 = makeAnt([90,40], langtonsAntRule, board)
 
       setInterval(function(){
         a1.moves(100)
-        drawTable(ctx, g.state(), SCALE);
+        drawTable(ctx, board.state(), SCALE);
         fillCoord(ctx, a1.getPosition(), SCALE, "red")
       }, 100)
 
-
-      //antMove(a1, 100)
-      $("#next").click(function(){ drawTable(ctx, g.next(), SCALE) })
-      $("#reset").click(function(){g.reset(); drawTable(ctx, g.state(), SCALE) })
-      $("#lifeBoard").click(changeSquare(ctx, g, SCALE))
 
     });
   </script>

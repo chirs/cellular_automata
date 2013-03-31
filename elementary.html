@@ -45,8 +45,8 @@
         
         var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
 
-        //var g = generator([1080], ELEMENTARY_NEIGHBORHOD, getRandom(), getPopulation())
-        var g = generator([(elemCanvas.width) / SCALE], ELEMENTARY_NEIGHBORHOOD, true, getPopulation())
+        //var g = makeBoard([1080], ELEMENTARY_NEIGHBORHOD, getRandom(), getPopulation())
+        var g = makeBoard([(elemCanvas.width) / SCALE], ELEMENTARY_NEIGHBORHOOD, true, getPopulation())
         g.setRule(rule62)
         var rd = rowDrawer(ctx, g, SCALE, (elemCanvas.height / SCALE))
         setInterval(function(){ rd.draw(5) }, 1000 / 60)

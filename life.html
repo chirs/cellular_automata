@@ -24,7 +24,7 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var g = generator([100, 48], MOORE_NEIGHBORHOOD, true, .5)
+      var g = makeBoard([100, 48], MOORE_NEIGHBORHOOD, true, .5)
       //g.setRule(serviettesRule)
       g.setRule(gameOfLifeRule)
 

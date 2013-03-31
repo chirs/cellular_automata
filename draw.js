@@ -37,17 +37,17 @@ var clearCanvas = function(canvas, context){
 
 
 
-var tableDrawer = function(context, generator, scale){
+var tableDrawer = function(context, board, scale){
   return {
     draw: function(){
-      drawTable(context, generator.state(), scale)
-      generator.next()
+      drawTable(context, board.state(), scale)
+      board.next()
     }
   }
 }
 
 
-var rowDrawer = function(context, generator, scale, maximum, repeat){
+var rowDrawer = function(context, board, scale, maximum, repeat){
 
   var row = 0
 
@@ -72,8 +72,8 @@ var rowDrawer = function(context, generator, scale, maximum, repeat){
       if (count == undefined){ count = 1 }
 
       for (var i=0; i < count; i++){
-        dRow(generator.state());
-        generator.next()
+        dRow(board.state());
+        board.next()
         row += 1;
       }
     },
@@ -84,10 +84,10 @@ var rowDrawer = function(context, generator, scale, maximum, repeat){
 
 
 
-var changeSquare = function(context, gen, scale){
+var changeSquare = function(context, board, scale){
   return function(event){
     var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)]
-    var nstate = gen.updateValue(point)
+    var nstate = board.updateValue(point)
     fillCoord(context, point, scale, state2color(nstate));
   }
 }
@@ -165,19 +165,3 @@ var panner = function(){
 
 
           
-
-var getGenerator = function(){
-  var g = generator([400, 192], MOORE_NEIGHBORHOOD, true, .5)
-
-  return {
-    next: next,
-    start: start,
-    pause: pause,
-    reset: reset,
-  }
-
-};
-
-
-
-

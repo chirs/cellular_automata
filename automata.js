@@ -16,7 +16,6 @@ var sum = function(xs){
 }
 
 
-
 // This is actually summing two vectors.
 // Used to identify node neighbors.
 var getNeighbor = function(dimensions, p1, p2){
@@ -136,7 +135,7 @@ var makeAnt = function(position, rule, board){
 }
 
   
-var generator = function(dimensions, neighbors, random, density){
+var makeBoard = function(dimensions, neighbors, random, density){
   var rule, ruleNumber;
 
   // Join states [0,1,0,0...], turn into a decimal number, e.g. 32000.
