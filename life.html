@@ -25,26 +25,6 @@
       var ctx = lifeCanvas.getContext("2d");
 
 
-      var state2color = function(a) {
-        return ["#fff", "#000"][a]
-      }
-
-
-      var draw = function(table){
-        var rows = table.length
-        if (rows == 0) { return; }
-        
-        var cols = table[0].length;
-
-        for (var i=0; i < rows; i++){
-          for (var j=0; j < cols; j++){
-            var state = table[i][j]
-            var color = state2color(state)
-            fillCoord(context, [i,j], SCALE, color)
-          }
-        }
-      }
-
       intervalID = null
 
       var reset = function(n){
@@ -57,7 +37,7 @@
         //g.setRule(gameOfLifeRule)
         g.setRule(serviettesRule)
         //var g = generator(200, 96, neighbors, false)
-        intervalID = setInterval(function() { draw(g.next()) }, 100)
+        intervalID = setInterval(function() { drawTable(ctx, g.next(), SCALE) }, 100)
         $("#rule").html(g.getRuleNumber());
         //draw(g.state());
         //setTimeout(function(){ draw(g.next()); }, 1000)

@@ -29,34 +29,7 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var lifeContext = lifeCanvas.getContext("2d");
 
-      var state2color = function(a) {
-        return ["#fff", "#000"][a]
-      }
-
-
-
-      var drawTable = function(context, table){
-        var rows = table.length
-        if (rows == 0) { return; }
-        
-        var cols = table[0].length;
-
-        for (var i=0; i < rows; i++){
-          for (var j=0; j < cols; j++){
-            var state = table[i][j]
-            var color = state2color(state)
-            fillSquare(context, [i,j], 4, color);
-          }
-        }
-      }
-
-
-      var fillSquare = function(context, coord, scale, color){
-        var x = coord[0] * scale ;
-        var y = coord[1] * scale ;
-        context.fillStyle = color;
-        context.fillRect(x,y,scale,scale);
-      };
+      SCALE = 4
 
       var g1 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
       g1.setRule(dayAndNightRule)
@@ -65,13 +38,13 @@
       var g3 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
       g3.setRule(twoByTwoRule)
 
-      drawTable(antContext, g1.state())
-      drawTable(elemContext, g2.state())
-      drawTable(lifeContext, g3.state())
+      drawTable(antContext, g1.state(), SCALE)
+      drawTable(elemContext, g2.state(), SCALE)
+      drawTable(lifeContext, g3.state(), SCALE)
 
-      setInterval(function(){ drawTable(antContext, g1.next()) }, 750);
-      setInterval(function(){ drawTable(elemContext, g2.next()) }, 750);
-      setInterval(function(){ drawTable(lifeContext, g3.next()) }, 750);
+      setInterval(function(){ drawTable(antContext, g1.next(), SCALE)}, 750);
+      setInterval(function(){ drawTable(elemContext, g2.next(), SCALE)}, 750);
+      setInterval(function(){ drawTable(lifeContext, g3.next(), SCALE)}, 750);
 
 
     });

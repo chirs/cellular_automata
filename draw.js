@@ -15,6 +15,41 @@ var drawRow = function(context, arr){
   }
 }
 
+var state2color = function(a) {
+  return ["#fff", "#000"][a]
+}
+
+
+      // Pull out state2color?
+var changeSquare = function(context, gen, scale){
+  return function(event){
+    var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)]
+    var state = getValue(point, gen.state())
+    var nstate = Math.abs(state - 1)
+    setValue(point, nstate, gen.state())
+    fillCoord(context, point, scale, state2color(nstate));
+  }
+}
+
+
+var drawTable = function(context, table, scale){
+  var rows = table.length
+  if (rows == 0) { return; }
+  
+  var cols = table[0].length;
+  
+  for (var i=0; i < rows; i++){
+    for (var j=0; j < cols; j++){
+      var state = table[i][j]
+      var color = state2color(state)
+      fillCoord(context, [i,j], scale, color);
+    }
+  }
+}
+
+
+
+
 
 
 var fillCoord = function(context, coord, scale, style){
