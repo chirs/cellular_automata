@@ -13,8 +13,8 @@
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="ant.js"></script>
-  <script type="text/javascript" src="life.js"></script>
+  <!--<script type="text/javascript" src="ant.js"></script>-->
+  <script type="text/javascript" src="automata.js"></script>
   <script type="text/javascript" src="draw.js"></script>
 
 
@@ -46,7 +46,7 @@
             var state = table[i][j]
             var color = state2color(state)
             //fillCoord([i,j], color)
-            fillSquare(context, [i,j], 5, color);
+            fillSquare(context, [i,j], 4, color);
           }
         }
       }
@@ -59,35 +59,20 @@
         context.fillRect(x,y,scale,scale);
       };
 
-      var neighbors = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
-      var g1 = generator([60, 60], neighbors, true, .9)
-      g1.setRule()
-      var g2 = generator([300], [[-1],[0],[1]], true, .5)
-      g2.setRule()
-      var g3 = generator([60, 60], neighbors, true, .3)
-      g3.setRule()
+      var g1 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
+      g1.setRule(dayAndNightRule)
+      var g2 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
+      g2.setRule(gameOfLifeRule)
+      var g3 = generator([75, 75], MOORE_NEIGHBORHOOD, true, .3)
+      g3.setRule(twoByTwoRule)
 
       drawTable(antContext, g1.state())
+      drawTable(elemContext, g2.state())
       drawTable(lifeContext, g3.state())
 
-      setInterval(function(){ drawTable(antContext, g1.next()) }, 500);
-
-      setInterval(function(){ drawTable(lifeContext, g3.next()) }, 500);
-
-      ROWS  = 0
-      var drawElementary = function(){
-
-        if (ROWS > 300){
-          ROWS = 0
-          clearCanvas(elemCanvas, elemContext);          
-          g2.setRule();
-        }
-        drawRows(elemContext, g2)
-        ROWS = ROWS + 10
-      }
-
-
-      setInterval(drawElementary, 1000/60)
+      setInterval(function(){ drawTable(antContext, g1.next()) }, 750);
+      setInterval(function(){ drawTable(elemContext, g2.next()) }, 750);
+      setInterval(function(){ drawTable(lifeContext, g3.next()) }, 750);
 
 
     });

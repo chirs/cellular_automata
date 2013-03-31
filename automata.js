@@ -1,17 +1,10 @@
 
 
 
-
-//NEIGHBORS = [[0,0], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1]]
-//NEIGHBORS = [[0,0], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1]]
-//NEIGHBORS = [[0,1], [2,0], [1,-3], [3, -1], [2, 2]]
-//NEIGHBORS = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[2,0], [3,0]]
-
-//NEIGHBORS = [[1,0], [0,1], [-1,-1]]
-//NEIGHBORS = [ [0,1], [-1,0], [0,-1], [1,0]]
-
-// NEIGHBORS = [ [0,1], [-1,0], [0,-1], [1,0]], 10491
-
+// Common neighborhoods
+VON_NEUMANN_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
+MOORE_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
+// MARGOLUS NEIGHBORHOOD...
 
 STATES = 2 // The number of possible states. Not currently used.
 
@@ -49,6 +42,11 @@ var morleyRule = makeLifeStyleRule([3,6,8], [2,4,5]) // Named after Stephen Morl
 var dayAndNightRule = makeLifeStyleRule([3,6,7,8], [3,4,6,7,8])
 var highLifeRule = makeLifeStyleRule([3,6], [2,3])
 var twoByTwoRule = makeLifeStyleRule([3,6], [1,2,5])
+var mazeRule = makeLifeStyleRule([1,2,3,4,5], [3])
+var serviettesRule = makeLifeStyleRule([], [2,3,4])
+var walledCitiesRule = makeLifeStyleRule([2,3,4,5], [4,5,6,7,8])
+
+
 
 
 

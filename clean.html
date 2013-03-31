@@ -19,7 +19,7 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 5
+      SCALE = 10
 
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
@@ -58,20 +58,26 @@
         clearCanvas(lifeCanvas, ctx);
 
         //var rule = 10491;
-        var g = generator([400, 192], MOORE_NEIGHBORHOOD, true, .5)
+        var vonNeumannNeighborhood = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
+        var mooreNeighborhood = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
+        var g = generator([200, 96], mooreNeighborhood, true, .9)
         //g.setRule(dayAndNightRule)
         //g.setRule(gameOfLifeRule)
-        g.setRule(serviettesRule)
+        g.setRule(twoByTwoRule)
         //var g = generator(200, 96, neighbors, false)
-        intervalID = setInterval(function() { draw(g.next()) }, 100)
+        //intervalID = setInterval(function() { draw(g.next()) }, 100)
         $("#rule").html(g.getRuleNumber());
-        //draw(g.state());
+        draw(g.state());
         //setTimeout(function(){ draw(g.next()); }, 1000)
       }
 
 
       $("#rule").click(reset);
       reset()
+
+      $("#lifeBoard").click(function(e){ 
+        alert(e.offsetX) 
+      })
 
     });
   </script>
