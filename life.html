@@ -58,9 +58,12 @@
         clearCanvas(lifeCanvas, ctx);
 
         //var rule = 10491;
-        var neighbors = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
-        var g = generator([200, 96], neighbors, true, .9)
-        g.setRule()
+        var vonNeumannNeighborhood = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
+        var mooreNeighborhood = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
+        var g = generator([200, 96], mooreNeighborhood, true, .6)
+        //g.setRule(dayAndNightRule)
+        //g.setRule(gameOfLifeRule)
+        g.setRule(gameOfLifeRule)
         //var g = generator(200, 96, neighbors, false)
         intervalID = setInterval(function() { draw(g.next()) }, 100)
         $("#rule").html(g.getRuleNumber());

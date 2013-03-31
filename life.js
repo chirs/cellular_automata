@@ -16,21 +16,84 @@
 STATES = 2 // The number of possible states. Not currently used.
 
 
+var sum = function(xs){
+  var r = 0
+  for (var i=0; i < xs.length; i++){
+    r += xs[i];
+  }
+  return r;
+}
+
+
+var gameOfLifeRule = function(states){
+  var state = states[0]
+  var neighbors = sum(states.slice(1))
+  if (state == 0 && neighbors == 3){
+    return 1;
+  }
+
+  if (state == 1 && (neighbors == 2 || neighbors == 3)){
+    return 1;
+  } else {
+    return 0;      
+  }
+}
+
+
+var dayAndNightRule = function(states){
+  var state = states[0]
+  var neighbors = sum(states.slice(1))
+  if (state == 0 && [3,6,7,8].indexOf(neighbors) > -1){
+    return 1
+  } else {
+    if (state == 1 && [3,4,6,7,8].indexOf(neighbors) > -1){
+      return 1
+    } else {
+      return 0
+    }
+  }
+      
+
+}
+
+
+
+
+  
+
+var reverseRule = 5
+
+
 // n should be a number between 0 and 4294967296
 // random -> randomly seeded board
 var generator = function(dimensions, neighbors, random, density){
   var rule, ruleNumber;
 
+  // Join states [0,1,0,0...], turn into a decimal number, e.g. 32000.
+  var states2number =  function(states) { return parseInt(states.join(""), 2)}
+
+  var number2states = function(n){ 
+    var arr = n.toString(2).split("").map( function(s){ return parseInt(s) } )
+    while (arr.length < cell_positions){ arr.unshift(0); } // left-fill with zeros.
+    return length
+  }
+  
   var cell_positions = Math.pow(STATES, neighbors.length)
   var rule_sets = Math.pow(2, cell_positions)
 
   var randomRule = function(){ return Math.floor(Math.random() * rule_sets) }
-  var generateRule = function(ruleNumber){
+
+
+
+  var generateRule = function(states){
     // Returns an array of the form [0,0,1,1,0,1...]
-    var arr = ruleNumber.toString(2).split("").map( function(s){ return parseInt(s) } )
-    while (arr.length < cell_positions){ arr.unshift(0); } // left-fill with zeros.
-    return arr
+    var n = states2number(states)
+    return  function(n) { return arr[n] }
   };
+  var generateRandomRule = function(){
+    return generateRule(number2states(randomRule()))
+  }
+  
 
   if (random) {
     var history = [randomStart(dimensions, density)];
@@ -40,9 +103,12 @@ var generator = function(dimensions, neighbors, random, density){
 
   var state = function(){ return history[history.length-1] }
 
-  var setRule = function(){
-    ruleNumber = randomRule()
-    rule = generateRule(ruleNumber)
+  var setRule = function(r){
+    if (r == undefined){
+      rule = generateRandomRule()
+    } else {
+      rule = r
+    }
   }
 
   var getRuleNumber = function(){
@@ -57,6 +123,7 @@ var generator = function(dimensions, neighbors, random, density){
 
     next: function(){
       var newState = generateNextState(dimensions, neighbors, state(), rule)
+      history = []
       history.push(newState)
       return newState
     },
@@ -179,8 +246,9 @@ var getState = function(dimensions, neighbors, cell, table, rule){
     states.push(v)
   }
 
-  var n = parseInt(states.join(""), 2)
-  return rule[n]
+  return rule(states)
+
+
 }
 
 

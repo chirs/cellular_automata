@@ -71,8 +71,23 @@
       drawTable(lifeContext, g3.state())
 
       setInterval(function(){ drawTable(antContext, g1.next()) }, 500);
-      setInterval(function(){ drawRows(elemContext, g2)}, 20);
+
       setInterval(function(){ drawTable(lifeContext, g3.next()) }, 500);
+
+      ROWS  = 0
+      var drawElementary = function(){
+
+        if (ROWS > 300){
+          ROWS = 0
+          clearCanvas(elemCanvas, elemContext);          
+          g2.setRule();
+        }
+        drawRows(elemContext, g2)
+        ROWS = ROWS + 10
+      }
+
+
+      setInterval(drawElementary, 1000/60)
 
 
     });
