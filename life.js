@@ -1,8 +1,8 @@
 
 
 
-//NEIGHBORS = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
-NEIGHBORS = [[0,0], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1]]
+NEIGHBORS = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
+//NEIGHBORS = [[0,0], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1]]
 //NEIGHBORS = [[0,0], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1]]
 //NEIGHBORS = [[0,1], [2,0], [1,-3], [3, -1], [2, 2]]
 //NEIGHBORS = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[2,0], [3,0]]
@@ -12,7 +12,7 @@ NEIGHBORS = [[0,0], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1]
 
 // NEIGHBORS = [ [0,1], [-1,0], [0,-1], [1,0]], 10491
 
-
+//NEIGHBORS = [[-1], [0], [1]]
 
 
 STATES = 2 // The number of possible states. Not currently used.
@@ -161,7 +161,7 @@ var generateNextState = function(dimensions, table, rule){
 
   for (var i=0; i < indexes.length; i++){
     var newVal = getState(dimensions, indexes[i], table,rule)
-    //setValue(indexes[i], newVal, newTable);
+    setValue(indexes[i], newVal, newTable);
   }
   return newTable;
 }  
@@ -169,9 +169,7 @@ var generateNextState = function(dimensions, table, rule){
 
 // n should be a number between 0 and 4294967296
 // random -> randomly seeded board
-var generator = function(dimensions, ruleNumber, random, density){
-  //var rule = generateRule(ruleNumber);
-
+var generator = function(dimensions, rule, random, density){
 
   if (random) {
     var history = [randomStart(dimensions, density)];
