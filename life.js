@@ -68,30 +68,14 @@ var canonicalStart = function(dimensions) {
 
 
 
-// not quite right...
-var makeIndexes = function(dimensions){
-  var arr = []
-  if (dimensions.length > 0){
-    var sub = makeIndexes(dimensions.slice(1))
-    console.log(sub)
 
-    for (var i=0; i < dimensions[0]; i++){
-      var index = sub.slice(0) // copy 
-      index.unshift(i)
-      arr.push(index)
-    }
-  }
-  return arr;
-}
-
-
-var makeIndexes = function(dimensions){
+var getIndexes = function(dimensions){
   if (dimensions.length == 0){
     return [[]]
   } else {
     var arr = []
     for (var i=0; i < dimensions[0]; i++){
-      var sub = makeIndexes(dimensions.slice(1));
+      var sub = getIndexes(dimensions.slice(1));
       for (var j=0; j < sub.length; j++){
         var m = sub[j]
         m.unshift(i)
@@ -132,9 +116,20 @@ var getValue = function(p, table){
   if (p.length == 0){
     return table;
   } else {
-    return getValue(p[0], table[p[0]])
+    return getValue(p.slice(1), table[p[0]])
   }
 }
+
+
+var setValue = function(p, value, table){
+  if (p.length == 1){
+    table[p[0]] = value
+  } else {
+    return setValue(p.slice(1), value, table[p[0]])
+  }
+}
+
+
 
 
 
@@ -203,10 +198,6 @@ var generator = function(dimensions, rule, random, density){
 
   }
 }
-
-
-
-
 
 
 
