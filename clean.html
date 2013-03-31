@@ -35,8 +35,8 @@
         }
       }
       var a1 = makeAnt([90,40], randomWalkRule, g)
-      var a2 = makeAnt([70,20], randomWalkRule, g)
-      var a3 = makeAnt([60,30], randomWalkRule, g)
+      var a2 = makeAnt([70,20], leftAntRule, g)
+      var a3 = makeAnt([60,30], staticRule, g)
 
       //a1.move()
 
@@ -48,15 +48,10 @@
         fillCoord(ctx, a1.getPosition(), SCALE, "red")
         fillCoord(ctx, a2.getPosition(), SCALE, "red")
         fillCoord(ctx, a3.getPosition(), SCALE, "red")
-      }, 100)
-
+      }, 10)
 
 
       //antMove(a1, 100)
-      //antMove(makeAnt([20,40], g), 100)
-      //antMove(makeAnt([70,60], g), 100)
-
-
       $("#next").click(function(){ drawTable(ctx, g.next(), SCALE) })
       $("#reset").click(function(){g.reset(); drawTable(ctx, g.state(), SCALE) })
       $("#lifeBoard").click(changeSquare(ctx, g, SCALE))

@@ -74,6 +74,19 @@ var randomWalkRule = function(state){
   return randomChoice([[0,1],[1,0],[-1,0],[0,-1]])
 }
 
+var upAntRule = function(state){
+  return [0,-1]
+}
+
+var leftAntRule = function(state){
+  return [-1,0,]
+}
+
+var staticRule = function(state){
+  return [[0,-1,], [1, 0]][state]
+}
+
+
 
 var makeAnt = function(position, rule, board){
   //var moves = [[0,1],[1,0],[-1,0],[0,-1]]
