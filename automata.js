@@ -12,6 +12,15 @@ VON_NEUMANN_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
 MOORE_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
 // MARGOLUS NEIGHBORHOOD...
 
+
+// Utility funcitons.
+
+var isArray = function (o) {
+  return (o instanceof Array) ||
+    (Object.prototype.toString.apply(o) === '[object Array]');
+};
+
+
 var sum = function(xs){
   var r = 0
   for (var i=0; i < xs.length; i++){
@@ -19,6 +28,71 @@ var sum = function(xs){
   }
   return r;
 }
+
+var flatten = function(arr){
+  var A = []
+  for (var i=0; i < arr.length; i++){
+    if (isArray(arr[i])){
+      A = A.concat(flatten(arr[i]))
+    } else {
+      A.push(arr[i])
+    }
+
+  }
+  return A
+}
+
+
+var range = function(start, end){
+  if (end === undefined){
+    end = start; 
+    start = 0;
+  }
+
+  var A = []
+  for (var i=start; i < end; i++){
+    A.push(i);
+  }
+  return A
+}
+
+var entropy = function(xs){
+  var total = 0
+  var frequencies = {}
+  for (var i=0; i < xs.length; i++){
+    total += 1
+    if (xs[i] in frequencies){
+      frequencies[xs[i]] += 1
+    } else {
+      frequencies[xs[i]] = 1
+    }
+  }
+  var s = 0
+  //console.log(frequencies)
+  for (var k in frequencies){
+    console.log(k)
+    if (frequencies.hasOwnProperty(k)){ 
+      var freq = frequencies[k] / total
+      console.log(freq)
+      s += freq * (Math.log(freq) / Math.LN2)
+    }
+
+  }
+  return (-1 * s)
+  
+  
+}
+
+
+// from http://pmav.eu/stuff/javascript-hashing-functions/source.html
+var simpleHash = function(s, tableSize) {
+  var i, hash = 0;
+  for (i = 0; i < s.length; i++) {
+    hash += (s[i].charCodeAt() * (i+1));
+  }
+    return Math.abs(hash) % tableSize;
+}
+
 
 
 var hammingDistance = function(xs, ys){
@@ -59,7 +133,7 @@ var hammingNeighbors = function(xs, states){
 
 // This is actually summing two vectors.
 // Used to identify node neighbors.
-var getNeighbor = function(dimensions, p1, p2){
+var addPoints = function(dimensions, p1, p2){
   var l = []
   for (var i=0; i<p1.length; i++){
     var dimension = dimensions[i]
@@ -68,6 +142,9 @@ var getNeighbor = function(dimensions, p1, p2){
   }
   return l;
 }
+
+
+// Used for 
 
 
 // Family: Life
@@ -155,7 +232,7 @@ var makeAnt = function(position, rule, board){
       setInternalState(cellState)
       board.updateValue(position)
       var move = rule(cellState, internalState)
-      position = getNeighbor(board.dimensions, position, move)
+      position = addPoints(board.dimensions, position, move)
       return position
   }
 
@@ -179,33 +256,31 @@ var makeBoard = function(dimensions, states, neighbors, random){
 
   var cellStates = Math.pow(states, neighbors.length) // Number of possible cell arrangements.
   var ruleSets = Math.pow(2, cellStates)
+  var startfunc
 
   // Board state.
-  if (random) {
-    var startFunc = function() { return randomStart(dimensions, states) }
-  } else {
-    var startFunc = function() { return canonicalStart(dimensions) }
-  }
-  var history = [startFunc()];
 
-  var state = function(){ return history[history.length-1] }
+  //var startFunc = random ? function() { return randomStart(dimensions, states) } : function() { return canonicalStart(dimensions) }
+  var startFunc = function() { return (random ? randomStart(dimensions, states) : canonicalStart(dimensions)) }
+  
+
+  var state = startFunc()
 
   // Rule data.
-  var rule, ruleNumber;
+  var rule
 
   var setRule = function(r){
     rule = r
-    ruleNumber = null
   }
   
   var setRuleByNumber = function(n){
     setRule(createRule(n));
-    ruleNumber = n;
+    console.log(rule)
   }
 
+
+
   var setRandomRule = function(){
-    //var ruleNumber = Math.floor(Math.random() * rule_sets)
-    //var rule = createRule(ruleNumber)
     var arr = randomStart([cellStates], states)
     setRule(function(s){ return arr[parseInt(s.join(""), 2)] })
   }
@@ -216,13 +291,24 @@ var makeBoard = function(dimensions, states, neighbors, random){
     return function(s){ return arr[parseInt(s.join(""), 2)] }
   }
 
+  // Create a lookup table from a rule function.
+  // These make sense for typical automata
+  // e.g. a 2-state automaton with 3-neighbor function -> 8 item table. (2^8 -> 255 total functions)
+  // e.g. a 4-state automaton with 9-neighbor function -> 262144 item table. (2^262144 total functions)
+  // 
+
+
+  var createLookupTable = function(func){
+    return rangeCellStates.map(function(e){ return func(e) })
+  }
+
 
   var generateNextState = function(table){
 
     var calculateState = function(cell){
       var a = []
       for (var i=0; i < neighbors.length; i++){
-        var n = getNeighbor(dimensions, cell, neighbors[i])
+        var n = addPoints(dimensions, cell, neighbors[i])
         var v = getValue(n, table);
         a.push(v)
       }
@@ -239,27 +325,25 @@ var makeBoard = function(dimensions, states, neighbors, random){
   }  
 
   return {
-    state: state, 
+    state: function() { return state }, 
     setRule: setRule,
     setRandomRule: setRandomRule,
     setRuleByNumber: setRuleByNumber,
     dimensions: dimensions,
 
-    reset: function() { history = [startFunc()] },
+    reset: function() { state = startFunc() },
 
     updateValue: function(point){
-      var s = getValue(point, state())
+      var s = getValue(point, state)
       var ns = (s + 1) % states
-      setValue(point, ns, state())
+      setValue(point, ns, state)
       return ns
     },
     
 
     next: function(){
-      var newState = generateNextState(state())
-      history = []
-      history.push(newState)
-      return newState
+      state = generateNextState(state)
+      return state
     },
 
   }

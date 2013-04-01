@@ -48,7 +48,12 @@
         var board = makeBoard([points], 3, ELEMENTARY2_NEIGHBORHOOD, true)
         //board.setRuleByNumber(110)
         board.updateValue([points/2])
-        board.setRandomRule()
+        //board.setRandomRule()
+        board.setRuleByNumber(5030)
+        //board.setRandomRule()
+
+
+
         var rd = Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
         setInterval(function(){ rd.drawRows(1) }, 1000 / 60)
 
