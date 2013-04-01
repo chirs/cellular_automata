@@ -3,6 +3,11 @@
 // Conway's Game of Life, Langton's Ant, and more.
 
 
+// Wolfram - 20 Cellular automata problems.
+// http://www.stephenwolfram.com/publications/articles/ca/85-twenty/3/text.html
+// Lyapunov exponent
+
+
 
 // Common neighborhoods
 ELEMENTARY_NEIGHBORHOOD = [[-1], [0], [1]] 
@@ -56,6 +61,9 @@ var range = function(start, end){
   return A
 }
 
+// Entropy of a ca is undecidable: 
+// http://people.unipmn.it/manzini/papers/tcs03.pdf
+
 var entropy = function(xs){
   var total = 0
   var frequencies = {}
@@ -68,12 +76,9 @@ var entropy = function(xs){
     }
   }
   var s = 0
-  //console.log(frequencies)
   for (var k in frequencies){
-    console.log(k)
     if (frequencies.hasOwnProperty(k)){ 
       var freq = frequencies[k] / total
-      console.log(freq)
       s += freq * (Math.log(freq) / Math.LN2)
     }
 
