@@ -11,7 +11,7 @@ VON_NEUMANN_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
 MOORE_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
 // MARGOLUS NEIGHBORHOOD...
 
-STATES = 2 // The number of possible states. Not currently used.
+STATES = 3 // The number of possible states. Not currently used.
 
 var sum = function(xs){
   var r = 0
@@ -142,8 +142,8 @@ var makeAnt = function(position, rule, board){
   
 var makeBoard = function(dimensions, neighbors, random, density){
 
-  var cell_states = Math.pow(STATES, neighbors.length) // Number of possible cell arrangements.
-  var rule_sets = Math.pow(2, cell_states)
+  var cellStates = Math.pow(STATES, neighbors.length) // Number of possible cell arrangements.
+  var ruleSets = Math.pow(2, cellStates)
 
   // Board state.
   if (random) {
@@ -169,14 +169,15 @@ var makeBoard = function(dimensions, neighbors, random, density){
   }
 
   var setRandomRule = function(){
-    var ruleNumber = Math.floor(Math.random() * rule_sets)
-    var rule = createRule(ruleNumber)
-    setRule(rule);
+    //var ruleNumber = Math.floor(Math.random() * rule_sets)
+    //var rule = createRule(ruleNumber)
+    var arr = randomStart([cellStates])
+    setRule(function(states){ return arr[parseInt(states.join(""), 2)] })
   }
     
   var createRule = function(n){
     var arr = n.toString(2).split("").map( function(s){ return parseInt(s) } )          
-    while (arr.length < cell_states){ arr.unshift(0); } // left-fill with zeros.
+    while (arr.length < cellStates){ arr.unshift(0); } // left-fill with zeros.
     return function(states){ return arr[parseInt(states.join(""), 2)] }
   }
 
@@ -252,9 +253,26 @@ var makeArray = function(dimensions, callback){
 
 
 var randomStart = function (dimensions, limit) {
-  var f = function(){ if (Math.random() > limit) { return 1; } else { return 0; } }
+  // Cutoff stops making sense with more than 2 states.
+  // Need a probability distribution.
+
+  var sectorSize = 1 / STATES
+
+  var f = function(){
+    var cutoff = 0
+    var r = Math.random()
+    for (var i=0; i < STATES; i++){
+      cutoff += sectorSize
+      if (r < cutoff) {
+        return i
+      }
+    }
+  }
+
+
+  //var f = function(){ if (Math.random() > limit) { return 1; } else { return 0; } }
   return makeArray(dimensions, f)
-}
+  }
 
 
 var canonicalStart = function(dimensions) {

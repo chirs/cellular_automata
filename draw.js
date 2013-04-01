@@ -8,7 +8,8 @@ var clearCanvas = function(canvas, context){
 
 
 var state2color = function(a) {
-  return ["#fff", "#000", "green"][a]
+  return ["#fff", "#333", "#666","#999", "#000"][a]
+  return ["#fff", "#000", "#333", "#666","#999"][a]
 }
 
 var fillCoord = function(context, coord, scale, style){
@@ -55,8 +56,10 @@ var Drawer = function(context, board, scale, maximum, repeat){
     },
 
     drawTable: function(){
-      board.next()
       drawTable(context, board.state(), scale)
+      board.next()
+
+
     },
 
     drawRows: function(count){

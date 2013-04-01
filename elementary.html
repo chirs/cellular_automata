@@ -41,11 +41,11 @@
 
       var reset = function(){
 
-        SCALE = 2
+        SCALE = 8
         var points = elemCanvas.width / SCALE 
 
-        var board = makeBoard([points], ELEMENTARY_NEIGHBORHOOD, false)
-        //var board = makeBoard([points], ELEMENTARY_NEIGHBORHOOD, true, getPopulation())
+        //var board = makeBoard([points], ELEMENTARY_NEIGHBORHOOD, false)
+        var board = makeBoard([points], ELEMENTARY_NEIGHBORHOOD, true)
         //board.setRuleByNumber(110)
         board.updateValue([points/2])
         board.setRandomRule()
