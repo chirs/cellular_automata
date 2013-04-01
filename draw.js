@@ -2,6 +2,11 @@
 
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
+var clearCanvas = function(canvas, context){
+  context.clearRect(0,0,canvas.width,canvas.height);
+};
+
+
 var state2color = function(a) {
   return ["#fff", "#000"][a]
 }
