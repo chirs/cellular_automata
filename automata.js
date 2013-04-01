@@ -279,20 +279,28 @@ var makeBoard = function(dimensions, states, neighbors, random){
   }
   
   var setRuleByNumber = function(n){
-    setRule(createRule(n));
-    console.log(rule)
+    setTableRule(createRuleTable(n));
   }
 
 
+  var setTableRule = function(t){
+    console.log(t)
+    setRule(function(s){ return t[parseInt(s.join(""), 2)] })
+  }
 
   var setRandomRule = function(){
-    var arr = randomStart([cellStates], states)
-    setRule(function(s){ return arr[parseInt(s.join(""), 2)] })
+    setTableRule(randomStart([cellStates], states))
   }
     
-  var createRule = function(n){
+  var createRuleTable = function(n){
     var arr = n.toString(2).split("").map( function(s){ return parseInt(s) } )          
     while (arr.length < cellStates){ arr.unshift(0); } // left-fill with zeros.
+    return arr
+
+  }
+
+  var createRule = function(n){
+    var arr = createRuleTable(n)
     return function(s){ return arr[parseInt(s.join(""), 2)] }
   }
 
