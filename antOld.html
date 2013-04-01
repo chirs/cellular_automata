@@ -20,7 +20,7 @@
   <script type="text/javascript">
     $(document).ready(function() {
       HEIGHT = 680 
-      ZOOM = 3; // Zoom is modified by the zoom slider.
+      SCALE = 3; // Zoom is modified by the zoom slider.
       SPEED = 100;
 
       var intervalID, ant, pattern;
@@ -36,14 +36,14 @@
         for (var i=0; i < cl.length; i++){
           var coord = cl[i][0]
           var color = cl[i][1]
-          fillCoord(coord, color);
+          fillCoord(ctx, coord, SCALE, color);
         };
       };
 
       var setZoom = function(){
         var zoom = $("#zoomSlider").slider("value")
         if ( zoom ) {
-          ZOOM = zoom;
+          SCALE = zoom;
           clearCanvas(antCanvas, ctx);
           redrawBoard();
         }
@@ -58,30 +58,17 @@
 
       // Move 0,0 from upper-left to center of screen.
       var translateCoord = function(coord){
-        var center = HEIGHT / (2 * ZOOM)
+        var center = HEIGHT / (2 * SCALE)
         return [coord[0] + center, coord[1] + center]
       }
 
-      // Color a coordinate.
-      // (make this more sophisticated)
-      var fillCoord = function(coord, style){
-        var ncoord = translateCoord(coord);
-        var x = ncoord[0] * ZOOM ;
-        var y = ncoord[1] * ZOOM ;
-        ctx.fillStyle = style;
-        ctx.fillRect(x,y,ZOOM,ZOOM);
-
-      };
 
       var antMove = function(){
         for (var i=0; i < SPEED; i++){
           var m = ant.move();
-          fillCoord(m.coord, m.color);
+          fillCoord(ctx, m.coord, SCALE, m.color);
         }
       };
-
-
-
 
       var pause = function(){
         clearInterval(intervalID);
