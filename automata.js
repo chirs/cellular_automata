@@ -12,14 +12,48 @@ VON_NEUMANN_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
 MOORE_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
 // MARGOLUS NEIGHBORHOOD...
 
-//STATES = 3 // The number of possible states. Not currently used.
-
 var sum = function(xs){
   var r = 0
   for (var i=0; i < xs.length; i++){
     r += xs[i];
   }
   return r;
+}
+
+
+var hammingDistance = function(xs, ys){
+  var n = 0
+  for (var i=0; i < xs.length; i++){
+    if (xs[i] !== ys[i]){
+      n += 1;
+    }
+  }
+  return n
+}
+
+
+var hammingNeighbors = function(xs, states){
+  // Strings similar to xs with a hamming distance of 1.
+
+  var subNeighbors = function(xs, index, states){
+    var b = []
+    var val = xs[index]
+    for (var i=0; i < states; i++){
+      if (i !== val){
+      var tmp = xs.slice(0)
+      tmp[index] = i
+      b.push(tmp)
+      }
+    }
+    return b
+  }
+
+  var a = []
+  for (var i=0; i < xs.length; i++){
+    var ns = subNeighbors(xs, i, states)
+    a = a.concat(ns)
+  }
+  return a
 }
 
 
