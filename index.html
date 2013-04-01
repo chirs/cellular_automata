@@ -32,10 +32,18 @@
       var elemBoard = makeBoard([30], ELEMENTARY_NEIGHBORHOOD, true, .3)
       var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
 
-      elemBoard.setRule(rule62)
+      elemBoard.setRandomRule()
       var rd = Drawer(elemContext, elemBoard, ELEMENTARY_SCALE, 30, true)
       //rd.draw()
-      setInterval(function(){ rd.drawRows(1) }, 1000 / 60)
+      ROWS = 0
+      setInterval(function(){ 
+        rd.drawRows(1) 
+        ROWS += 1;
+        if (ROWS % 36 == 1){
+          elemBoard.setRandomRule()
+          elemBoard.reset()
+        }
+      }, 1000 / 10)
 
 
       // Life-like game.
@@ -50,7 +58,7 @@
       var d = Drawer(lifeContext, lifeBoard, LIFE_SCALE)
       d.drawTable()
 
-      setInterval(d.drawTable, 750)
+      setInterval(d.drawTable, 250)
       
       // Simple ant.
 
@@ -73,9 +81,21 @@
         }
       }
 
-      setInterval(antMover(ant, antBoard, antContext), 75)
+      setInterval(antMover(ant, antBoard, antContext), 150)
 
 
+      // Blank board
+
+      var blankCanvas = document.getElementById("blankBoard");
+      var blankContext = antCanvas.getContext("2d");
+
+
+      BLANK_SCALE = 5
+      var blankBoard = makeBoard([60, 60], MOORE_NEIGHBORHOOD, false)
+      blankBoard.setRule(gameOfLifeRule)
+      var blankD = Drawer(blankContext, blankBoard, BLANK_SCALE)
+      setInterval(blankD.drawTable, 750)
+      $("#blankBoard").click(changeSquare(blankContext, blankBoard, BLANK_SCALE))
     });
   </script>
 
@@ -97,6 +117,11 @@
 <div>
   <a href="/ant.html">Langton's Ant</a>
   <canvas id="antBoard" width="300" height="300"></canvas>
+</div>
+
+<div>
+  <a href="/blank.html">Blank</a>
+  <canvas id="blankBoard" width="300" height="300"></canvas>
 </div>
 
 </body>
