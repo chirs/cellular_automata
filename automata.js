@@ -1,3 +1,8 @@
+// A program that models multi-dimensional cellular automata.
+// Capable of representing Elementary cellular automata,
+// Conway's Game of Life, Langton's Ant, and more.
+
+
 
 // Common neighborhoods
 ELEMENTARY_NEIGHBORHOOD = [[-1], [0], [1]] 
@@ -136,18 +141,13 @@ var makeAnt = function(position, rule, board){
 
   
 var makeBoard = function(dimensions, neighbors, random, density){
-  var rule, ruleNumber;
-
-  // Join states [0,1,0,0...], turn into a decimal number, e.g. 32000.
-  //var states2number =  function(states) { return parseInt(states.join(""), 2)}
 
   var cell_states = Math.pow(STATES, neighbors.length) // Number of possible cell arrangements.
   var rule_sets = Math.pow(2, cell_states)
 
-
+  // Board state.
   if (random) {
     var startFunc = function() { return randomStart(dimensions, density) }
-
   } else {
     var startFunc = function() { return canonicalStart(dimensions) }
   }
@@ -155,13 +155,17 @@ var makeBoard = function(dimensions, neighbors, random, density){
 
   var state = function(){ return history[history.length-1] }
 
+  // Rule data.
+  var rule, ruleNumber;
+
   var setRule = function(r){
     rule = r
+    ruleNumber = null
   }
   
   var setRuleByNumber = function(n){
-    var r = createRule(n);
-    setRule(r);
+    setRule(createRule(n));
+    ruleNumber = n;
   }
 
   var setRandomRule = function(){
@@ -170,37 +174,33 @@ var makeBoard = function(dimensions, neighbors, random, density){
     setRule(rule);
   }
     
-
-
   var createRule = function(n){
-    
     var arr = n.toString(2).split("").map( function(s){ return parseInt(s) } )          
     while (arr.length < cell_states){ arr.unshift(0); } // left-fill with zeros.
     return function(states){ return arr[parseInt(states.join(""), 2)] }
   }
 
-  // Need to iterate over whole table regardless of dimensions.
+
   var generateNextState = function(table){
+
+    var calculateState = function(cell){
+      var states = []
+      for (var i=0; i < neighbors.length; i++){
+        var n = getNeighbor(dimensions, cell, neighbors[i])
+        var v = getValue(n, table);
+        states.push(v)
+      }
+      return rule(states)
+  }
 
     var indexes = getIndexes(dimensions);
     var newTable = canonicalStart(dimensions);
 
     for (var i=0; i < indexes.length; i++){
-      var newVal = getState(indexes[i], table)
-      setValue(indexes[i], newVal, newTable);
+      setValue(indexes[i], calculateState(indexes[i]), newTable);
     }
     return newTable;
   }  
-
-  var getState = function(cell, table){
-    var states = []
-    for (i=0; i < neighbors.length; i++){
-      var n = getNeighbor(dimensions, cell, neighbors[i])
-      var v = getValue(n, table);
-      states.push(v)
-    }
-    return rule(states)
-  }
 
   return {
     state: state, 
@@ -216,7 +216,6 @@ var makeBoard = function(dimensions, neighbors, random, density){
       var ns = (s + 1) % STATES
       setValue(point, ns, state())
       return ns
-
     },
     
 
@@ -250,8 +249,6 @@ var makeArray = function(dimensions, callback){
     return arr;
   }
 }
-
-
 
 
 var randomStart = function (dimensions, limit) {

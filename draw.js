@@ -8,7 +8,7 @@ var clearCanvas = function(canvas, context){
 
 
 var state2color = function(a) {
-  return ["#fff", "#000"][a]
+  return ["#fff", "#000", "green"][a]
 }
 
 var fillCoord = function(context, coord, scale, style){
