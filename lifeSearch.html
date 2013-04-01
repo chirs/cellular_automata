@@ -19,33 +19,72 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 20
 
+      SCALE = 20
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
-
-      var board = makeBoard([100, 48], 2, MOORE_NEIGHBORHOOD, true, .5)
-      var board = makeBoard([100, 48], 2, VON_NEUMANN_NEIGHBORHOOD, true, .5)
-      //var board = makeBoard([100, 48], 3, VON_NEUMANN_NEIGHBORHOOD, true, .5)
-
-      //g.setRule(serviettesRule)
-      //board.setRule(gameOfLifeRule)
-      //console.log(board.state())
+      var board = makeBoard([100, 48], 3, MOORE_NEIGHBORHOOD, true, .5)
       board.setRandomRule()
-      //board.setRule(gameOfLifeRule)
-
-
-
+      
       var d = Drawer(ctx, board, SCALE)
       d.drawTable(board.state())
-      setInterval(function(){
-        d.drawTable()
-        //console.log(entropy(board.state()))
-      }, 100)
+      setInterval(d.drawTable, 750)
 
-      //$("#rule").html(board.getRuleNumber());
-      $("#rule").click(board.reset);
-    //setInterval(function(){ $("#rule").click() }, 1000)
+
+      var perturbRule = function(ruleTable, states, distance){
+
+        ruleTable = ruleTable.slice(0)
+        var index = Math.floor(Math.random() * ruleTable.length)
+        var val = (ruleTable[index] + 1) % states
+        ruleTable[index] = val
+
+        if (distance <= 1){
+          return ruleTable
+        } else {
+          return perturbRule(ruleTable, states, distance - 1)
+        }
+      }
+
+      ENTROPY_MAX = 6.63
+      ENTROPY_MIN = 0.1
+      RUNS = 0
+      DISTANCE = 1
+
+      var findNeighbor = function(){
+
+        var randomNeighborRule = perturbRule(board.ruleTable(), board.cellStates, DISTANCE)
+
+        var b = makeBoard([100, 48], 3, MOORE_NEIGHBORHOOD, true, .5)
+        b.setTableRule(randomNeighborRule)
+        for (var i=0; i < 10; i++){
+          b.next()
+          RUNS += 1
+        }
+
+        if (RUNS > 40){
+          console.log("HDistance:")
+          console.log(hammingDistance(randomNeighborRule, board.ruleTable()))
+          DISTANCE += 1
+          var e = entropy(b.state())
+          console.log("ENTROPY is: ")
+          console.log(e)
+          RUNS = 0
+
+          if (e < ENTROPY_MAX && e > ENTROPY_MIN){
+            console.log("WINNER")
+            console.log("RESETTING BOARD")
+            board = makeBoard([100, 48], 3, MOORE_NEIGHBORHOOD, true, .5)
+            board.setTableRule(randomNeighborRule)
+            ENTROPY_MAX = e
+            DISTANCE = 1
+          } else {
+            console.log("RESTARTING SEARCH")
+          }
+        }
+
+      }
+
+      setInterval(findNeighbor, 200)
 
 
     });

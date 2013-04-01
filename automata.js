@@ -8,6 +8,10 @@
 // Lyapunov exponent
 
 
+// Rule numbers for Elementary automata are inverted (110 -> 145)
+// Colors are also inverted wrt standard.
+
+
 
 // Common neighborhoods
 ELEMENTARY_NEIGHBORHOOD = [[-1], [0], [1]] 
@@ -136,6 +140,7 @@ var hammingNeighbors = function(xs, states){
 }
 
 
+
 // This is actually summing two vectors.
 // Used to identify node neighbors.
 var addPoints = function(dimensions, p1, p2){
@@ -257,22 +262,16 @@ var makeAnt = function(position, rule, board){
 }
 
   
-var makeBoard = function(dimensions, states, neighbors, random){
+var makeBoard = function(dimensions, cellStates, neighbors, random){
 
-  var cellStates = Math.pow(states, neighbors.length) // Number of possible cell arrangements.
-  var ruleSets = Math.pow(2, cellStates)
-  var startfunc
+  var neighborStates = Math.pow(cellStates, neighbors.length) // Number of possible cell arrangements.
+  //console.log(neighborStates)
+  var ruleSets = Math.pow(2, neighborStates)
 
-  // Board state.
-
-  //var startFunc = random ? function() { return randomStart(dimensions, states) } : function() { return canonicalStart(dimensions) }
-  var startFunc = function() { return (random ? randomStart(dimensions, states) : canonicalStart(dimensions)) }
-  
-
+  var startFunc = function() { return (random ? randomStart(dimensions, cellStates) : canonicalStart(dimensions)) }
   var state = startFunc()
 
-  // Rule data.
-  var rule
+  var rule, ruleTable
 
   var setRule = function(r){
     rule = r
@@ -284,17 +283,17 @@ var makeBoard = function(dimensions, states, neighbors, random){
 
 
   var setTableRule = function(t){
-    console.log(t)
+    ruleTable = t
     setRule(function(s){ return t[parseInt(s.join(""), 2)] })
   }
 
   var setRandomRule = function(){
-    setTableRule(randomStart([cellStates], states))
+    setTableRule(randomStart([neighborStates], cellStates))
   }
     
   var createRuleTable = function(n){
     var arr = n.toString(2).split("").map( function(s){ return parseInt(s) } )          
-    while (arr.length < cellStates){ arr.unshift(0); } // left-fill with zeros.
+    while (arr.length < neighborStates){ arr.unshift(0); } // left-fill with zeros.
     return arr
 
   }
@@ -341,14 +340,17 @@ var makeBoard = function(dimensions, states, neighbors, random){
     state: function() { return state }, 
     setRule: setRule,
     setRandomRule: setRandomRule,
+    setTableRule: setTableRule,
     setRuleByNumber: setRuleByNumber,
     dimensions: dimensions,
+    ruleTable: function(){ return ruleTable },
+    cellStates: cellStates,
 
     reset: function() { state = startFunc() },
 
     updateValue: function(point){
       var s = getValue(point, state)
-      var ns = (s + 1) % states
+      var ns = (s + 1) % cellStates
       setValue(point, ns, state)
       return ns
     },
@@ -409,9 +411,8 @@ var randomStart = function (dimensions, states, limit) {
 
 var canonicalStart = function(dimensions) {
   var a = makeArray(dimensions, function(){ return 0 })
-  //var i = Math.floor(rows / 2)
-  //var j = Math.floor(cols / 2)
-  //a[i][j] = 1
+  var center = dimensions.map(function(e){ return Math.floor((e-1)/2) })
+  setValue(center, 1, a)
   return a
 }
 
