@@ -6,12 +6,13 @@
 
 // Common neighborhoods
 ELEMENTARY_NEIGHBORHOOD = [[-1], [0], [1]] 
+ELEMENTARY2_NEIGHBORHOOD = [[-2],[-1], [0], [1],[2]] 
 //ELEMENTARY_NEIGHBORHOOD = [[-3], [-2], [-1], [0], [1], [2], [3]] 
 VON_NEUMANN_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0]]
 MOORE_NEIGHBORHOOD = [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
 // MARGOLUS NEIGHBORHOOD...
 
-STATES = 3 // The number of possible states. Not currently used.
+//STATES = 3 // The number of possible states. Not currently used.
 
 var sum = function(xs){
   var r = 0
@@ -38,10 +39,10 @@ var getNeighbor = function(dimensions, p1, p2){
 // Family: Life
 var makeLifeStyleRule = function(deadStates, liveStates){
 
-  return function(states){
+  return function(a){
 
-    var state = states[0]
-    var neighbors = sum(states.slice(1))
+    var state = a[0]
+    var neighbors = sum(a.slice(1))
 
     if (state == 0 && deadStates.indexOf(neighbors) > -1){
       return 1
@@ -140,14 +141,14 @@ var makeAnt = function(position, rule, board){
 }
 
   
-var makeBoard = function(dimensions, neighbors, random, density){
+var makeBoard = function(dimensions, states, neighbors, random){
 
-  var cellStates = Math.pow(STATES, neighbors.length) // Number of possible cell arrangements.
+  var cellStates = Math.pow(states, neighbors.length) // Number of possible cell arrangements.
   var ruleSets = Math.pow(2, cellStates)
 
   // Board state.
   if (random) {
-    var startFunc = function() { return randomStart(dimensions, density) }
+    var startFunc = function() { return randomStart(dimensions, states) }
   } else {
     var startFunc = function() { return canonicalStart(dimensions) }
   }
@@ -171,27 +172,27 @@ var makeBoard = function(dimensions, neighbors, random, density){
   var setRandomRule = function(){
     //var ruleNumber = Math.floor(Math.random() * rule_sets)
     //var rule = createRule(ruleNumber)
-    var arr = randomStart([cellStates])
-    setRule(function(states){ return arr[parseInt(states.join(""), 2)] })
+    var arr = randomStart([cellStates], states)
+    setRule(function(s){ return arr[parseInt(s.join(""), 2)] })
   }
     
   var createRule = function(n){
     var arr = n.toString(2).split("").map( function(s){ return parseInt(s) } )          
     while (arr.length < cellStates){ arr.unshift(0); } // left-fill with zeros.
-    return function(states){ return arr[parseInt(states.join(""), 2)] }
+    return function(s){ return arr[parseInt(s.join(""), 2)] }
   }
 
 
   var generateNextState = function(table){
 
     var calculateState = function(cell){
-      var states = []
+      var a = []
       for (var i=0; i < neighbors.length; i++){
         var n = getNeighbor(dimensions, cell, neighbors[i])
         var v = getValue(n, table);
-        states.push(v)
+        a.push(v)
       }
-      return rule(states)
+      return rule(a)
   }
 
     var indexes = getIndexes(dimensions);
@@ -214,7 +215,7 @@ var makeBoard = function(dimensions, neighbors, random, density){
 
     updateValue: function(point){
       var s = getValue(point, state())
-      var ns = (s + 1) % STATES
+      var ns = (s + 1) % states
       setValue(point, ns, state())
       return ns
     },
@@ -252,16 +253,16 @@ var makeArray = function(dimensions, callback){
 }
 
 
-var randomStart = function (dimensions, limit) {
+var randomStart = function (dimensions, states, limit) {
   // Cutoff stops making sense with more than 2 states.
   // Need a probability distribution.
 
-  var sectorSize = 1 / STATES
+  var sectorSize = 1 / states
 
   var f = function(){
     var cutoff = 0
     var r = Math.random()
-    for (var i=0; i < STATES; i++){
+    for (var i=0; i < states; i++){
       cutoff += sectorSize
       if (r < cutoff) {
         return i

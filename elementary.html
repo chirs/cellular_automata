@@ -44,8 +44,8 @@
         SCALE = 8
         var points = elemCanvas.width / SCALE 
 
-        //var board = makeBoard([points], ELEMENTARY_NEIGHBORHOOD, false)
-        var board = makeBoard([points], ELEMENTARY_NEIGHBORHOOD, true)
+        //var board = makeBoard([points], 2, ELEMENTARY_NEIGHBORHOOD, false)
+        var board = makeBoard([points], 3, ELEMENTARY2_NEIGHBORHOOD, true)
         //board.setRuleByNumber(110)
         board.updateValue([points/2])
         board.setRandomRule()

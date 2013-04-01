@@ -29,7 +29,7 @@
 
       ELEMENTARY_SCALE = 10
 
-      var elemBoard = makeBoard([30], ELEMENTARY_NEIGHBORHOOD, true, .3)
+      var elemBoard = makeBoard([30], 3, ELEMENTARY2_NEIGHBORHOOD, true, .3)
       var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
 
       elemBoard.setRandomRule()
@@ -52,7 +52,7 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var lifeContext = lifeCanvas.getContext("2d");
 
-      var lifeBoard = makeBoard([75, 75], MOORE_NEIGHBORHOOD, true, .3)
+      var lifeBoard = makeBoard([75, 75], 2, MOORE_NEIGHBORHOOD, true, .3)
       lifeBoard.setRule(gameOfLifeRule)
 
       var d = Drawer(lifeContext, lifeBoard, LIFE_SCALE)
@@ -67,7 +67,7 @@
 
 
       ANT_SCALE = 5
-      var antBoard = makeBoard([60, 60], MOORE_NEIGHBORHOOD, false)
+      var antBoard = makeBoard([60, 60], 2, MOORE_NEIGHBORHOOD, false)
       var ant = makeAnt([30,30], langtonsAntRule, antBoard)
 
       drawTable(antContext, antBoard.state(), ANT_SCALE)
@@ -91,7 +91,7 @@
 
 
       BLANK_SCALE = 5
-      var blankBoard = makeBoard([60, 60], MOORE_NEIGHBORHOOD, false)
+      var blankBoard = makeBoard([60, 60], 2, MOORE_NEIGHBORHOOD, false)
       blankBoard.setRule(gameOfLifeRule)
       var blankD = Drawer(blankContext, blankBoard, BLANK_SCALE)
       setInterval(blankD.drawTable, 750)

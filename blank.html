@@ -24,7 +24,7 @@
       var blankCanvas = document.getElementById("blankBoard");
       var context = blankCanvas.getContext("2d");
 
-      var board = makeBoard([180, 80], MOORE_NEIGHBORHOOD, false, .9)
+      var board = makeBoard([180, 80], 2, MOORE_NEIGHBORHOOD, false, .9)
       board.setRule(twoByTwoRule)
 
       var drawer = Drawer(context, board, SCALE)
