@@ -27,12 +27,12 @@
       var board = makeBoard([180, 80], MOORE_NEIGHBORHOOD, false, .9)
       board.setRule(twoByTwoRule)
 
-      var drawer = tableDrawer(context, board, SCALE)
+      var drawer = Drawer(context, board, SCALE)
     
       $("canvas").click(changeSquare(context, board, SCALE))
-      $("#next").click(function(){ drawer.draw(board) })
+      $("#next").click(function(){ drawer.drawTable(board) })
       $("#play").click(function(){ 
-        setInterval(function(){ drawer.draw(board) }, 1000)
+        setInterval(function(){ drawer.drawTable(board) }, 1000)
       })
       });
   </script>

@@ -29,22 +29,9 @@ var drawTable = function(context, table, scale){
   }
 }
 
-var clearCanvas = function(canvas, context){
-  context.clearRect(0,0,canvas.width,canvas.height);
-};
 
 
-var tableDrawer = function(context, board, scale){
-  return {
-    draw: function(){
-      board.next()
-      drawTable(context, board.state(), scale)
-    }
-  }
-}
-
-
-var rowDrawer = function(context, board, scale, maximum, repeat){
+var Drawer = function(context, board, scale, maximum, repeat){
 
   var row = 0
 
@@ -57,7 +44,17 @@ var rowDrawer = function(context, board, scale, maximum, repeat){
 
 
   return {
-    draw: function(count){
+
+    clearCanvas: function(canvas){
+      context.clearRect(0,0,canvas.width,canvas.height);
+    },
+
+    drawTable: function(){
+      board.next()
+      drawTable(context, board.state(), scale)
+    },
+
+    drawRows: function(count){
       if (row > maximum){ 
         if (repeat){
           row = 0
@@ -77,8 +74,6 @@ var rowDrawer = function(context, board, scale, maximum, repeat){
 
   }
 }
-
-
 
 
 var changeSquare = function(context, board, scale){
@@ -150,15 +145,3 @@ var generateShade = function(){
 }
 
 
-// Bonepile.
-
-var panner = function(){
-  var p;
-  
-  setMousePosition = function(){
-    this.mousemove();
-  }
-}
-
-
-          

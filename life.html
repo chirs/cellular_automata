@@ -28,11 +28,12 @@
       //g.setRule(serviettesRule)
       g.setRule(gameOfLifeRule)
 
-      var d = tableDrawer(ctx, g, SCALE)
-      setInterval(d.draw, 100)
+      var d = Drawer(ctx, g, SCALE)
+      setInterval(d.drawTable, 100)
 
-      $("#rule").html(g.getRuleNumber());
+      //$("#rule").html(g.getRuleNumber());
       $("#rule").click(g.reset);
+    //setInterval(function(){ $("#rule").click() }, 1000)
 
 
     });

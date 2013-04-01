@@ -49,8 +49,8 @@
         //board.setRuleByNumber(110)
         board.updateValue([points/2])
         board.setRandomRule()
-        var rd = rowDrawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
-        setInterval(function(){ rd.draw(1) }, 1000 / 60)
+        var rd = Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
+        setInterval(function(){ rd.drawRows(1) }, 1000 / 60)
 
         //$("#eid").html(ruleNumber);
       }
