@@ -281,16 +281,23 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
     setTableRule(createRuleTable(n));
   }
 
+  var array2binary = function(a){
+    var n = 0
+    for (var i=0; i < a.length; i++){ n = n << 1; n += a[i]}
+  }
+
 
   var setTableRule = function(t){
     ruleTable = t
-    setRule(function(s){ return t[parseInt(s.join(""), 2)] })
+    //setRule(function(s){ return t[parseInt(s.join(""), 2)] })
+    setRule(function(s){ return t[array2binary(s)] })
   }
 
   var setRandomRule = function(){
     setTableRule(randomStart([neighborStates], cellStates))
   }
     
+  // awkward.
   var createRuleTable = function(n){
     var arr = n.toString(2).split("").map( function(s){ return parseInt(s) } )          
     while (arr.length < neighborStates){ arr.unshift(0); } // left-fill with zeros.
@@ -300,7 +307,8 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
 
   var createRule = function(n){
     var arr = createRuleTable(n)
-    return function(s){ return arr[parseInt(s.join(""), 2)] }
+    //return function(s){ return arr[parseInt(s.join(""), 2)] }
+    return function(s){ return t[array2binary(s)] }
   }
 
   // Create a lookup table from a rule function.
