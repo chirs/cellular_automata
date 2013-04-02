@@ -72,14 +72,11 @@
 
       var antD = Drawer(antContext, antBoard, ANT_SCALE)
       antD.drawTable()
-      //drawTable(antContext, antBoard.state(), ANT_SCALE)
-      //fillCoord(antContext, ant.getPosition(), ANT_SCALE, "red")
 
       var antMover = function(ant, board, context, drawer){
         return function(){
           ant.move()
           drawer.drawTable()
-          //drawTable(context, board.state(), ANT_SCALE);
           fillCoord(context, ant.getPosition(), ANT_SCALE, "red")
         }
       }

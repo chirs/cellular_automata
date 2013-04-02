@@ -34,14 +34,7 @@ var Drawer = function(context, board, scale, maximum, repeat){
     }
   }
 
-
-  return {
-
-    clearCanvas: function(canvas){
-      context.clearRect(0,0,canvas.width,canvas.height);
-    },
-
-    drawTable: function(){
+  var drawTable = function(){
       var boardState = board.state()
       var rows = boardState.length
       if (rows == 0) { return; }
@@ -55,14 +48,26 @@ var Drawer = function(context, board, scale, maximum, repeat){
           fillCoord(context, [i,j], scale, color);
         }
       }
+  }
+
+
+  return {
+
+    clearCanvas: function(canvas){
+      context.clearRect(0,0,canvas.width,canvas.height);
+    },
+    
+    changeSquare: function(){
+      var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)]
+      var nstate = board.updateValue(point)
+      fillCoord(context, point, scale, state2color(nstate));
     },
 
-    //drawTable(context, board.state(), scale)
-    //},
+    drawTable: drawTable,
 
     drawTableNext: function(){
+      board.next()
       drawTable(context, board.state(), scale)
-      //board.next()
     },
 
     drawRows: function(count){
@@ -86,14 +91,6 @@ var Drawer = function(context, board, scale, maximum, repeat){
   }
 }
 
-
-var changeSquare = function(context, board, scale){
-  return function(event){
-    var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)]
-    var nstate = board.updateValue(point)
-    fillCoord(context, point, scale, state2color(nstate));
-  }
-}
 
 
 
