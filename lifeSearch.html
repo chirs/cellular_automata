@@ -27,8 +27,8 @@
       board.setRandomRule()
       
       var d = Drawer(ctx, board, SCALE)
-      d.drawTable(board.state())
-      setInterval(d.drawTable, 750)
+      d.drawTableNext(board.state())
+      setInterval(d.drawTableNext, 750)
 
 
       var perturbRule = function(ruleTable, states, distance){

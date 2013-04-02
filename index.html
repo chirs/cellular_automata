@@ -58,7 +58,7 @@
       var d = Drawer(lifeContext, lifeBoard, LIFE_SCALE)
       d.drawTable()
 
-      setInterval(d.drawTable, 250)
+      setInterval(d.drawTableNext, 250)
       
       // Simple ant.
 
@@ -70,18 +70,21 @@
       var antBoard = makeBoard([60, 60], 2, MOORE_NEIGHBORHOOD, false)
       var ant = makeAnt([30,30], langtonsAntRule, antBoard)
 
-      drawTable(antContext, antBoard.state(), ANT_SCALE)
+      var antD = Drawer(antContext, antBoard, ANT_SCALE)
+      antD.drawTable()
+      //drawTable(antContext, antBoard.state(), ANT_SCALE)
       //fillCoord(antContext, ant.getPosition(), ANT_SCALE, "red")
 
-      var antMover = function(ant, board, context){
+      var antMover = function(ant, board, context, drawer){
         return function(){
           ant.move()
-          drawTable(context, board.state(), ANT_SCALE);
+          drawer.drawTable()
+          //drawTable(context, board.state(), ANT_SCALE);
           fillCoord(context, ant.getPosition(), ANT_SCALE, "red")
         }
       }
 
-      setInterval(antMover(ant, antBoard, antContext), 150)
+      setInterval(antMover(ant, antBoard, antContext, antD), 150)
 
 
       // Blank board
@@ -94,7 +97,7 @@
       var blankBoard = makeBoard([60, 60], 2, MOORE_NEIGHBORHOOD, false)
       blankBoard.setRule(gameOfLifeRule)
       var blankD = Drawer(blankContext, blankBoard, BLANK_SCALE)
-      setInterval(blankD.drawTable, 750)
+      setInterval(blankD.drawTableNext, 750)
       $("#blankBoard").click(changeSquare(blankContext, blankBoard, BLANK_SCALE))
     });
   </script>

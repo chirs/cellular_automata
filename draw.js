@@ -57,9 +57,11 @@ var Drawer = function(context, board, scale, maximum, repeat){
 
     drawTable: function(){
       drawTable(context, board.state(), scale)
-      board.next()
+    },
 
-
+    drawTableNext: function(){
+      drawTable(context, board.state(), scale)
+      //board.next()
     },
 
     drawRows: function(count){

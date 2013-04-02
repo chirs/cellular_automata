@@ -289,12 +289,14 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
 
   var setTableRule = function(t){
     ruleTable = t
-    //setRule(function(s){ return t[parseInt(s.join(""), 2)] })
+    setRule(function(s){ return t[parseInt(s.join(""), 2)] })
     setRule(function(s){ return t[array2binary(s)] })
   }
 
   var setRandomRule = function(){
-    setTableRule(randomStart([neighborStates], cellStates))
+    var s = randomStart([neighborStates], cellStates)
+    console.log(s);
+    setTableRule(s)
   }
     
   // awkward.
@@ -307,7 +309,7 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
 
   var createRule = function(n){
     var arr = createRuleTable(n)
-    //return function(s){ return arr[parseInt(s.join(""), 2)] }
+    return function(s){ return arr[parseInt(s.join(""), 2)] }
     return function(s){ return t[array2binary(s)] }
   }
 

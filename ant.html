@@ -25,7 +25,7 @@
       var ctx = lifeCanvas.getContext("2d");
 
       var board = makeBoard([180, 80], 2, MOORE_NEIGHBORHOOD, false, .9)
-      board.setRule(twoByTwoRule)
+      //board.setRule(twoByTwoRule)
       drawTable(ctx, board.state(), SCALE);
 
 
@@ -41,8 +41,8 @@
       setInterval(function(){
         a1.moves(100)
         // This drawer isn't working right...
-        //d.draw()
-        drawTable(ctx, board.state(), SCALE);
+        d.drawTable()
+        //drawTable(ctx, board.state(), SCALE);
 
         fillCoord(ctx, a1.getPosition(), SCALE, "red")
       }, 100)
