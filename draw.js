@@ -20,20 +20,6 @@ var fillCoord = function(context, coord, scale, style){
 };
 
 
-var drawTable = function(context, table, scale){
-  var rows = table.length
-  if (rows == 0) { return; }
-  
-  var cols = table[0].length;
-  
-  for (var i=0; i < rows; i++){
-    for (var j=0; j < cols; j++){
-      var state = table[i][j]
-      var color = state2color(state)
-      fillCoord(context, [i,j], scale, color);
-    }
-  }
-}
 
 
 
@@ -56,8 +42,23 @@ var Drawer = function(context, board, scale, maximum, repeat){
     },
 
     drawTable: function(){
-      drawTable(context, board.state(), scale)
+      var boardState = board.state()
+      var rows = boardState.length
+      if (rows == 0) { return; }
+  
+      var cols = boardState[0].length;
+  
+      for (var i=0; i < rows; i++){
+        for (var j=0; j < cols; j++){
+          var state = boardState[i][j]
+          var color = state2color(state)
+          fillCoord(context, [i,j], scale, color);
+        }
+      }
     },
+
+    //drawTable(context, board.state(), scale)
+    //},
 
     drawTableNext: function(){
       drawTable(context, board.state(), scale)

@@ -26,7 +26,7 @@
 
       var board = makeBoard([180, 80], 2, MOORE_NEIGHBORHOOD, false, .9)
       //board.setRule(twoByTwoRule)
-      drawTable(ctx, board.state(), SCALE);
+      //drawTable(ctx, board.state(), SCALE);
 
 
       var antMove = function(ant, steps){
@@ -37,6 +37,7 @@
 
       var a1 = makeAnt([90,40], langtonsAntRule, board)
       var d = Drawer(ctx, board, SCALE)
+      d.drawTable()
 
       setInterval(function(){
         a1.moves(100)
