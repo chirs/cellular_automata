@@ -92,12 +92,12 @@ var makeAnt = function(position, rule, board){
 
   var move = function(){
     // Change the value of the cell occupied cell.
-    var cellState = getValue(position, board.state());
+    var cellState = board.get(position);
     updateInternalState(cellState);
     board.updateValue(position);
 
     var move = rule(cellState, internalState);
-    position = addPoints(board.dimensions, position, move);
+    position = matrix.move(position, move)
     return position;
   };
 
@@ -123,8 +123,8 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
   var neighborStates = Math.pow(cellStates, neighbors.length); // Number of possible cell arrangements.
   var ruleSets = Math.pow(2, neighborStates);
 
-  var startFunc = function() { return (random ? randomStart(dimensions, cellStates) : canonicalStart(dimensions)); };
-  var state = startFunc();
+  var startFunc = function() { return createMatrix(random ? randomStart(dimensions, cellStates) : canonicalStart(dimensions)); };
+  var matrix = startFunc();
 
   var rule;
   var ruleTable = null;
@@ -157,29 +157,30 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
   };
 
 
-  var generateNextState = function(table){
+  var generateNextState = function(){
 
     var calculateState = function(cell){
       var a = [];
       for (var i=0; i < neighbors.length; i++){
-        var n = addPoints(dimensions, cell, neighbors[i]);
-        var v = getValue(n, table);
+        var n = matrix.move(cell, neighbors[i])
+        var v = matrix.get(n)
         a.push(v);
       }
       return rule(a);
     };
 
     var indexes = getIndexes(dimensions);
-    var newTable = canonicalStart(dimensions);
+    var newMatrix = createMatrix(canonicalStart(dimensions));
 
     for (var i=0; i < indexes.length; i++){
-      setValue(indexes[i], calculateState(indexes[i]), newTable);
+      newMatrix.set(indexes[i], calculateState(indexes[i]));
     }
-    return newTable;
+
+    return newMatrix;
   };  
 
   return {
-    state: function() { return state; }, 
+    state: function() { return matrix.state(); }, 
     setRule: setRule,
     setRandomRule: setRandomRule,
     setRuleTable: setRuleTable,
@@ -188,19 +189,19 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
     ruleTable: function(){ return ruleTable; },
     cellStates: cellStates,
 
-    reset: function() { state = startFunc(); },
+    reset: function() { matrix = startFunc(); },
 
     updateValue: function(point){
-      var s = getValue(point, state);
+      var s = matrix.get(point);
       var ns = (s + 1) % cellStates;
-      setValue(point, ns, state);
+      matrix.set(point, ns);
       return ns;
     },
     
 
     next: function(){
-      state = generateNextState(state);
-      return state;
+      matrix = generateNextState();
+      return matrix
     }
 
   };
@@ -254,7 +255,7 @@ var randomStart = function (dimensions, states, limit) {
 var canonicalStart = function(dimensions) {
   var a = blankStart(dimensions);
   var center = dimensions.map(function(e){ return Math.floor((e-1)/2); });
-  setValue(center, 1, a);
+  //setValue(center, 1, a);
   return a;
 };
 
@@ -335,39 +336,6 @@ var createMatrix = function(matrix){
 
   };
 };
-
-
-var getValue = function(p, table){
-  // Given a value like [1,4,7], pull those indexes from a nested array.
-  if (p.length === 0){
-    return table;
-  } else {
-    return getValue(p.slice(1), table[p[0]]);
-  }
-};
-
-
-var setValue = function(p, value, table){
-  if (p.length === 1){
-    table[p[0]] = value;
-  } else {
-    return setValue(p.slice(1), value, table[p[0]]);
-  }
-};
-
-
-// This is actually summing two vectors.
-// Used to identify node neighbors.
-var addPoints = function(dimensions, p1, p2){
-  var l = [];
-  for (var i=0; i<p1.length; i++){
-    var dimension = dimensions[i];
-    var v = (p1[i] + p2[i] + dimension) % dimension;
-    l.push(v);
-  }
-  return l;
-};
-
 
 
 
