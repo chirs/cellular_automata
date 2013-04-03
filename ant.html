@@ -24,7 +24,7 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var board = makeBoard([180, 80], 2, MOORE_NEIGHBORHOOD, false, .9)
+      var board = makeBoard([180, 80], 2, NEIGHBORHOODS.MOORE, false, .9)
       //board.setRule(twoByTwoRule)
 
       var a1 = makeAnt([90,40], langtonsAntRule, board)

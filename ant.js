@@ -36,7 +36,6 @@ var makeAnt = function(description, colorList){
   description = description || "LR"
 
   colorList = colorList || ["#000", "#fff", "#ff0000", "#00ff00", "#0000ff",];
-  //console.log(colorList);
 
   var totalColors = description.length
 

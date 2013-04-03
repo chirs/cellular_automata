@@ -44,8 +44,8 @@
         SCALE = 2
         var points = elemCanvas.width / SCALE 
 
-        var board = makeBoard([points], 2, ELEMENTARY_NEIGHBORHOOD, false)
-        //var board = makeBoard([points], 3, ELEMENTARY2_NEIGHBORHOOD, true)
+        var board = makeBoard([points], 2, NEIGHBORHOODS.ELEMENTARY, false)
+        //var board = makeBoard([points], 3, NEIGHBORHOODS.ELEMENTARY2, true)
         //board.setRuleByNumber(110)
         //board.setRandomRule()
         //board.setRuleByNumber(110)
@@ -55,7 +55,6 @@
         var rd = Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
         setInterval(function(){ 
           rd.drawRows(1) 
-          //console.log(entropy(board.state()))
         }, 1000 / 60)
 
         //$("#eid").html(ruleNumber);

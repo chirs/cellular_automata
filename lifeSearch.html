@@ -23,7 +23,7 @@
       SCALE = 20
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
-      var board = makeBoard([100, 48], 3, MOORE_NEIGHBORHOOD, true, .5)
+      var board = makeBoard([100, 48], 3, NEIGHBORHOODS.MOORE, true, .5)
       board.setRandomRule()
       
       var d = Drawer(ctx, board, SCALE)
