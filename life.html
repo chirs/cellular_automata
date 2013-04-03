@@ -19,15 +19,16 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 20
+      SCALE = 10
 
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-    //var board = makeBoard([400, 192], 2, NEIGHBORHOODS.MOORE, true, .5)
-    var board = makeBoard([100, 48], 3, NEIGHBORHOODS.VON_NEUMANN, true, .5)
+    var board = makeBoard([100, 48], 12, NEIGHBORHOODS.VON_NEUMANN, true, .5)
+    //var board = makeBoard([100, 48], 4, NEIGHBORHOODS.VON_NEUMANN, true, .5)
     //board.setRule(gameOfLifeRule)
-    board.setRandomRule()
+    //board.setRandomRule()
+    board.setRule(cyclicRule(12))
 
       var d = Drawer(ctx, board, SCALE)
       d.drawTableNext(board.state())

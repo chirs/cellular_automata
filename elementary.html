@@ -24,34 +24,15 @@
       var elemCanvas = document.getElementById("elemBoard");
       var ctx = elemCanvas.getContext("2d");
 
-
-      var getNum = function(){
-        return parseInt($("#eid").html());
-      };
-
-      var getRandom = function(){
-        return $("#randomCheckbox").is(":checked")
-      };
-
-      var getPopulation = function(){
-        return $("#populationSlider").slider("value")
-      }
-
-
-
       var reset = function(){
 
-        SCALE = 8
-        var points = elemCanvas.width / SCALE 
-
-        var board = makeBoard([points], 2, NEIGHBORHOODS.ELEMENTARY, false)
-        //var board = makeBoard([points], 3, NEIGHBORHOODS.ELEMENTARY2, true)
-        //board.setRuleByNumber(110)
+        SCALE = 1
+        var cellCount = elemCanvas.width / SCALE 
+        var board = makeBoard([cellCount], 4, NEIGHBORHOODS.ELEMENTARY, true)
         //board.setRandomRule()
-    //board.setRuleByNumber(110)
-        board.setRuleByNumber(145)
-        //board.setRandomRule()
+        //board.setRuleByNumber(145)
         //board.setRule(function(){ if (Math.random() > .3) { return 0; } else { return 1; } })
+        board.setRule(cyclicRule(4))
 
         var rd = Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
         setInterval(function(){ 
@@ -82,11 +63,7 @@
       $("#eid").click(function(){ reset() });
       $("#randomCheckbox").change(function(){ reset(getNum()) });
       
-      //var hash = getURLHash(window, null)
-      //if (hash) { reset(parseInt(hash)); }
-      //else { reset(); }
-
-      reset()
+      reset();
 
 });
   </script>
@@ -95,12 +72,6 @@
 
 
 <body class="home">
-
-<div id="controls">
-<div id="eid"></div>
-<div>random <input id="randomCheckbox" type="checkbox" /></div>
-<div id="populationSlider"></div>
-</div>
 
 <canvas id="elemBoard" width="1600" height="800"></canvas>
 

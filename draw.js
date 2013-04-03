@@ -3,9 +3,20 @@
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
 var state2color = function(a) {
-  return ["#fff", "#333", "#666","#999", "#000"][a];
+  return ["#ff0", "#0f0", "#00f","#f00", "#0ff", "#f0f"][a];
   //return ["#fff", "#000", "#333", "#666","#999"][a]
 };
+
+
+
+
+var state2color = function(a) {
+  return gc[a]
+  
+  //return arr[a]
+  var a = 4 * a
+  return "rgb(" + a + "," + 0 + "," + a + ")"
+}
 
 var Drawer = function(context, board, scale, maximum, repeat){
 
@@ -138,4 +149,4 @@ var generateColors = function(n){
   return colors;
 };
 
-
+var gc = generateColors(20);

@@ -15,12 +15,31 @@
 
 // Common neighborhoods
 var NEIGHBORHOODS = {
-  ELEMENTARY: [[-1], [0], [1]],
+  // 1d
+  //ELEMENTARY: [[-1], [0], [1]],
+  ELEMENTARY: [[0], [-1], [1]],
   ELEMENTARY2: [[-2],[-1], [0], [1],[2]],
   ELEMENTARY3: [[-3], [-2], [-1], [0], [1], [2], [3]],
+  // 2d
   VON_NEUMANN: [[0,0], [0,1], [-1,0], [0,-1], [1,0]],
   MOORE: [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
   // MARGOLUS NEIGHBORHOOD...
+};
+
+
+// 1-Dimenisonal
+
+var cyclicRule = function(modulus){
+  return function(states){
+    var currentState = states[0];
+    for (var i=1; i < states.length; i++){
+      var s = (states[i] - currentState + modulus) % modulus;
+      if (s === 1){
+        return states[i];
+      }
+    }
+    return currentState;
+  };
 };
 
 
@@ -479,6 +498,6 @@ var hammingNeighbors = function(xs, states){
 
 
 
-
+exports.cyclicRule = cyclicRule
 
 
