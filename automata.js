@@ -92,12 +92,13 @@ var makeAnt = function(position, rule, board){
 
   var move = function(){
     // Change the value of the cell occupied cell.
-    var cellState = board.get(position);
+    var cellState = board.matrix().get(position);
     updateInternalState(cellState);
     board.updateValue(position);
 
+
     var move = rule(cellState, internalState);
-    position = matrix.move(position, move)
+    position = board.matrix().move(position, move) // Update position
     return position;
   };
 
@@ -157,6 +158,9 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
   };
 
 
+
+
+
   var generateNextState = function(){
 
     var calculateState = function(cell){
@@ -181,6 +185,7 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
 
   return {
     state: function() { return matrix.state(); }, 
+    matrix: function() { return matrix; }, 
     setRule: setRule,
     setRandomRule: setRandomRule,
     setRuleTable: setRuleTable,
@@ -264,6 +269,16 @@ var blankStart = function(dimensions) {
 };
 
 
+
+var getDimensions = function(table){
+  var D = []
+  while (isArray(table)){
+    D.push(table.length)
+    table = table[0]
+  }
+  return D
+}
+
 var getIndexes = function(dimensions){
   // Given dimensions like [3,4,3], return [[0,0,0],...[2,4,2]
   if (dimensions.length === 0){
@@ -290,15 +305,6 @@ var getIndexes = function(dimensions){
 
 // Matrix state management.
 
-
-var getDimensions = function(table){
-  var D = []
-  while (isArray(table)){
-    D.push(table.length)
-    table = table[0]
-  }
-  return D
-}
 
 
 var createMatrix = function(matrix){
