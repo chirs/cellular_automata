@@ -9,6 +9,18 @@
 }
 
 
+.box { 
+    display: inline-block;
+    margin: 15px 200px;
+    padding: 10px;
+    text-align: center;
+}
+
+.box div {
+    padding: 5px;
+}
+
+
 
 #controls {
     position: fixed;

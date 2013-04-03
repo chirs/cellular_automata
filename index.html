@@ -48,17 +48,18 @@
 
       // Life-like game.
 
-      LIFE_SCALE = 4
+      LIFE_SCALE = 10
       var lifeCanvas = document.getElementById("lifeBoard");
       var lifeContext = lifeCanvas.getContext("2d");
 
-      var lifeBoard = makeBoard([75, 75], 2, NEIGHBORHOODS.MOORE, true, .3)
+      var lifeBoard = makeBoard([30, 30], 2, NEIGHBORHOODS.MOORE, true, .3)
       lifeBoard.setRule(gameOfLifeRule)
 
       var d = Drawer(lifeContext, lifeBoard, LIFE_SCALE)
       d.drawTable()
 
       setInterval(d.drawTableNext, 250)
+
       
       // Simple ant.
 
@@ -81,13 +82,12 @@
         }
       }
 
-      setInterval(antMover(ant, antBoard, antContext, antD), 150)
+      setInterval(antMover(ant, antBoard, antContext, antD), 1000 / 60)
 
 
       // Blank board
-
       var blankCanvas = document.getElementById("blankBoard");
-      var blankContext = antCanvas.getContext("2d");
+      var blankContext = blankCanvas.getContext("2d");
 
 
       BLANK_SCALE = 5
@@ -95,11 +95,33 @@
       blankBoard.setRule(gameOfLifeRule)
       var blankD = Drawer(blankContext, blankBoard, BLANK_SCALE)
       blankD.drawTable()
-      //setInterval(blankD.drawTableNext, 750)
-      $("#blankBoard").click(function(){
-        blankD.changeSquare()
-        blankD.drawTableNext()
-      })
+
+      $("#blankBoard").click(blankD.changeSquare)
+
+      var make2dGame = function(canvasID, board, scale){
+        var canvas = document.getElementById(canvasID)
+        console.log(canvas)
+        var context = canvas.getContext("2d");        
+        var drawer = Drawer(context, board, scale)
+        drawer.drawTable()
+        setInterval(drawer.drawTableNext, 250)
+      }
+
+
+      var morleyBoard = makeBoard([30, 30], 2, NEIGHBORHOODS.MOORE, true, .3)
+      morleyBoard.setRule(morleyRule)
+      make2dGame("morleyBoard", morleyBoard, 10)
+
+      var serviettesBoard = makeBoard([100, 100], 2, NEIGHBORHOODS.MOORE, true, .3)
+      serviettesBoard.setRule(serviettesRule)
+      make2dGame("serviettesBoard", serviettesBoard, 3)
+
+      var mazeBoard = makeBoard([60, 60], 2, NEIGHBORHOODS.MOORE, true, .3)
+      mazeBoard.setRule(mazeRule)
+      make2dGame("mazeBoard", mazeBoard, 5)
+
+
+
     });
   </script>
 
@@ -109,23 +131,58 @@
 <body class="home">
 
 <div>
-  <a href="/elementary.html">Elementary cellular automaton</a>
+<div class="box">
   <canvas id="elemBoard" width="300" height="300"></canvas>
+  <div><a href="/elementary.html">Elementary cellular automaton</a></div>
 </div>
 
-<div>
-  <a href="/life.html">Conway's Game of Life</a>
+<div class="box">
   <canvas id="lifeBoard" width="300" height="300"></canvas>
+  <div><a href="/life.html">Conway's Game of Life</a></div>
+</div>
 </div>
 
+
 <div>
-  <a href="/ant.html">Langton's Ant</a>
+<div class="box">
+
   <canvas id="antBoard" width="300" height="300"></canvas>
+  <div><a href="/ant.html">Langton's Ant</a></div>
+</div>
+
+<div class="box">
+
+  <canvas id="blankBoard" width="300" height="300"></canvas>
+  <div><a href="/blank.html">Blank</a></div>
+</div>
 </div>
 
 <div>
-  <a href="/blank.html">Blank</a>
+<div class="box">
+  <div><a href="/elementary.html">Morley</a></div>
+  <canvas id="morleyBoard" width="300" height="300"></canvas>
+
+</div>
+
+<div class="box">
+  <div><a href="/life.html">Serviettes</a></div>
+  <canvas id="serviettesBoard" width="300" height="300"></canvas>
+
+</div>
+</div>
+
+<div>
+<div class="box">
+  <div><a href="/ant.html">Maze</a></div>
+  <canvas id="mazeBoard" width="300" height="300"></canvas>
+
+</div>
+
+<div class="box">
+  <div><a href="/blank.html">Blank</a></div>
   <canvas id="blankBoard" width="300" height="300"></canvas>
+
+</div>
 </div>
 
 </body>
