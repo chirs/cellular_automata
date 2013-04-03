@@ -118,7 +118,6 @@ var makeAnt = function(position, rule, board){
 
 
 
-  
 var makeBoard = function(dimensions, cellStates, neighbors, random){
 
   var neighborStates = Math.pow(cellStates, neighbors.length); // Number of possible cell arrangements.
@@ -127,39 +126,36 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
   var startFunc = function() { return (random ? randomStart(dimensions, cellStates) : canonicalStart(dimensions)); };
   var state = startFunc();
 
-  var rule, ruleTable;
+  var rule;
+  var ruleTable = null;
 
-  // 6 rule functions is far too many.
-  var setRule = function(r){
-    rule = r;
+  var setRule = function(r){ 
+    ruleTable = null;
+    rule = r; 
   };
+
   
   var setRuleByNumber = function(n){
-    setTableRule(createRuleTable(n));
+    setRuleTable(createRuleTable(n));
   };
 
-  var setTableRule = function(t){
+  var setRuleTable = function(t){
+    setRule(function(a){ return ruleTable[array2integer(a, 10)] });
     ruleTable = t;
-    setRule(function(s){ return t[parseInt(s.join(""), 2)]; });
-    //setRule(function(s){ return t[array2binary(s)]; });
   };
 
   var setRandomRule = function(){
-    var s = randomStart([neighborStates], cellStates);
-    setTableRule(s);
+    setRuleTable(randomStart([neighborStates], cellStates));
   };
-    
+
+
   var createRuleTable = function(n){
+    // Fix this.
     var arr = n.toString(2).split("").map( function(s){ return parseInt(s, 10); } );
     while (arr.length < neighborStates){ arr.unshift(0); } // left-fill with zeros.
     return arr;
   };
 
-  var createRule = function(n){
-    var arr = createRuleTable(n);
-    return function(s){ return arr[parseInt(s.join(""), 2)]; };
-    //return function(s){ return t[array2binary(s)]; }
-  };
 
   var generateNextState = function(table){
 
@@ -186,7 +182,7 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
     state: function() { return state; }, 
     setRule: setRule,
     setRandomRule: setRandomRule,
-    setTableRule: setTableRule,
+    setRuleTable: setRuleTable,
     setRuleByNumber: setRuleByNumber,
     dimensions: dimensions,
     ruleTable: function(){ return ruleTable; },
@@ -256,10 +252,14 @@ var randomStart = function (dimensions, states, limit) {
 
 
 var canonicalStart = function(dimensions) {
-  var a = makeArray(dimensions, function(){ return 0; });
+  var a = blankStart(dimensions);
   var center = dimensions.map(function(e){ return Math.floor((e-1)/2); });
   setValue(center, 1, a);
   return a;
+};
+
+var blankStart = function(dimensions) {
+  return makeArray(dimensions, function(){ return 0; });
 };
 
 
@@ -455,15 +455,14 @@ var simpleHash = function(s, tableSize) {
     return Math.abs(hash) % tableSize;
 };
 
-
-var array2binary = function(a){
-  // Create a decimal number from an array.
-  // Is this a bug?
+// base 10.
+var array2integer = function(arr){
   var n = 0;
-  for (var i=0; i < a.length; i++){ 
+  for (var i=0; i < arr.length; i++){ 
     n = n << 1; 
-    n += a[i]; 
+    n += arr[i]; 
   }
+  return n
 };
 
 
