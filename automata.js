@@ -70,6 +70,12 @@ var range = function(start, end){
   return A;
 };
 
+
+var randomChoice = function(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+};
+
+
 // Entropy of a ca is undecidable: 
 // http://people.unipmn.it/manzini/papers/tcs03.pdf
 
@@ -144,19 +150,6 @@ var hammingNeighbors = function(xs, states){
 
 
 
-// This is actually summing two vectors.
-// Used to identify node neighbors.
-var addPoints = function(dimensions, p1, p2){
-  var l = [];
-  for (var i=0; i<p1.length; i++){
-    var dimension = dimensions[i];
-    var v = (p1[i] + p2[i] + dimension) % dimension;
-    l.push(v);
-  }
-  return l;
-};
-
-
 
 // Family: Life
 var makeLifeStyleRule = function(deadStates, liveStates){
@@ -181,9 +174,6 @@ var serviettesRule = makeLifeStyleRule([], [2,3,4]);
 var walledCitiesRule = makeLifeStyleRule([2,3,4,5], [4,5,6,7,8]);
 
 
-var randomChoice = function(arr){
-  return arr[Math.floor(Math.random() * arr.length);];
-};
 
 var randomWalkRule = function(state){
   return randomChoice([[0,1],[1,0],[-1,0],[0,-1]]);
@@ -430,9 +420,37 @@ var getIndexes = function(dimensions){
 // Sub these into table object.
 // Make them not recursive.
 
-var createBoard = function(matrix){
+
+// Matrix state management.
+
+
+var getDimensions = function(table){
+  var D = []
+  while (isArray(table)){
+    D.push(table.length)
+    table = table[0]
+  }
+  return D
+}
+
+
+var createMatrix = function(matrix){
+
+  var dimensions = getDimensions(matrix);
+
   return {
     state: function() {return matrix; },
+
+    move: function(p1, p2){
+      var l = [];
+      for (var i=0; i<p1.length; i++){
+        var dimension = dimensions[i];
+        var v = (p1[i] + p2[i] + dimension) % dimension;
+        l.push(v);
+      }
+      return l;
+    },
+
     get: function(key){
       var res = matrix;
       for (var i=0; i < key.length; i++){
@@ -440,13 +458,15 @@ var createBoard = function(matrix){
       }
       return res;
     },
+
     set: function(key, value){
       var res = matrix
-      for (var i=0; i < key.length-1; i++){
+      for (var i=0; i < (key.length - 1); i++){
         res = res[key[i]];
       }
-      matrix[key[i]] = value // This index might be wrong?
+      res[key[i]] = value 
     }
+
   };
 };
 
@@ -467,6 +487,19 @@ var setValue = function(p, value, table){
   } else {
     return setValue(p.slice(1), value, table[p[0]]);
   }
+};
+
+
+// This is actually summing two vectors.
+// Used to identify node neighbors.
+var addPoints = function(dimensions, p1, p2){
+  var l = [];
+  for (var i=0; i<p1.length; i++){
+    var dimension = dimensions[i];
+    var v = (p1[i] + p2[i] + dimension) % dimension;
+    l.push(v);
+  }
+  return l;
 };
 
 
