@@ -13,9 +13,7 @@
 // Colors are also inverted wrt standard.
 
 
-
 // Common neighborhoods
-
 var NEIGHBORHOODS = {
   ELEMENTARY: [[-1], [0], [1]],
   ELEMENTARY2: [[-2],[-1], [0], [1],[2]],
@@ -26,131 +24,7 @@ var NEIGHBORHOODS = {
 };
 
 
-
-// Utility funcitons.
-
-var isArray = function (o) {
-  return (o instanceof Array) ||
-    (Object.prototype.toString.apply(o) === '[object Array]');
-};
-
-
-var sum = function(xs){
-  var r = 0;
-  for (var i=0; i < xs.length; i++){
-    r += xs[i];
-  }
-  return r;
-};
-
-var flatten = function(arr){
-  var A = [];
-  for (var i=0; i < arr.length; i++){
-    if (isArray(arr[i])){
-      A = A.concat(flatten(arr[i]));
-    } else {
-      A.push(arr[i]);
-    }
-
-  }
-  return A;
-};
-
-
-var range = function(start, end){
-  if (end === undefined){
-    end = start; 
-    start = 0;
-  }
-
-  var A = [];
-  for (var i=start; i < end; i++){
-    A.push(i);
-  }
-  return A;
-};
-
-
-var randomChoice = function(arr){
-  return arr[Math.floor(Math.random() * arr.length)];
-};
-
-
-// Entropy of a ca is undecidable: 
-// http://people.unipmn.it/manzini/papers/tcs03.pdf
-
-var entropy = function(xs){
-  var total = 0;
-  var frequencies = {};
-  for (var i=0; i < xs.length; i++){
-    total += 1;
-    if (xs[i] in frequencies){
-      frequencies[xs[i]] += 1;
-    } else {
-      frequencies[xs[i]] = 1;
-    }
-  }
-  var s = 0;
-  for (var k in frequencies){
-    if (frequencies.hasOwnProperty(k)){ 
-      var freq = frequencies[k] / total;
-      s += freq * (Math.log(freq) / Math.LN2);
-    }
-
-  }
-  return (-1 * s);
-};
-
-
-// from http://pmav.eu/stuff/javascript-hashing-functions/source.html
-var simpleHash = function(s, tableSize) {
-  var hash = 0;
-  for (var i = 0; i < s.length; i++) {
-    hash += (s[i].charCodeAt() * (i+1));
-  }
-    return Math.abs(hash) % tableSize;
-};
-
-
-
-var hammingDistance = function(xs, ys){
-  var n = 0;
-  for (var i=0; i < xs.length; i++){
-    if (xs[i] !== ys[i]){
-      n += 1;
-    }
-  }
-  return n;
-};
-
-
-var hammingNeighbors = function(xs, states){
-  // Strings similar to xs with a hamming distance of 1.
-
-  var subNeighbors = function(xs, index, states){
-    var b = [];
-    var val = xs[index];
-    for (var i=0; i < states; i++){
-      if (i !== val){
-        var tmp = xs.slice(0);
-        tmp[index] = i;
-        b.push(tmp);
-      }
-    }
-    return b;
-  };
-
-  var a = [];
-  for (var i=0; i < xs.length; i++){
-    var ns = subNeighbors(xs, i, states);
-    a = a.concat(ns);
-  }
-  return a;
-};
-
-
-
-
+// 2-Dimensional
 // Family: Life
 var makeLifeStyleRule = function(deadStates, liveStates){
 
@@ -174,6 +48,7 @@ var serviettesRule = makeLifeStyleRule([], [2,3,4]);
 var walledCitiesRule = makeLifeStyleRule([2,3,4,5], [4,5,6,7,8]);
 
 
+// Ant Rules
 
 var randomWalkRule = function(state){
   return randomChoice([[0,1],[1,0],[-1,0],[0,-1]]);
@@ -192,13 +67,13 @@ var langtonsAntRule = function(boardState, internalState){
   return moves[internalState];
 };
 
+
 // Adder ant was caused by a bug in the state rule funcion.
 // Action on cellState 0 was nothing; only changed state (left 90 degrees) on seeing a 1.
 //var adderAntRule = function(boardState, internalState){
 //  var moves = [[0,1],[1,0],[0,-1],[-1,0]]
 //  return moves[internalState];
 //}
-
 
 
 var makeAnt = function(position, rule, board){
@@ -241,6 +116,8 @@ var makeAnt = function(position, rule, board){
   };
 };
 
+
+
   
 var makeBoard = function(dimensions, cellStates, neighbors, random){
 
@@ -252,6 +129,7 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
 
   var rule, ruleTable;
 
+  // 6 rule functions is far too many.
   var setRule = function(r){
     rule = r;
   };
@@ -259,17 +137,6 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
   var setRuleByNumber = function(n){
     setTableRule(createRuleTable(n));
   };
-
-  var array2binary = function(a){
-    // Create a decimal number from an array.
-    // Is this a bug?
-    var n = 0;
-    for (var i=0; i < a.length; i++){ 
-      n = n << 1; 
-      n += a[i]; 
-    }
-  };
-
 
   var setTableRule = function(t){
     ruleTable = t;
@@ -282,7 +149,6 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
     setTableRule(s);
   };
     
-  // awkward.
   var createRuleTable = function(n){
     var arr = n.toString(2).split("").map( function(s){ return parseInt(s, 10); } );
     while (arr.length < neighborStates){ arr.unshift(0); } // left-fill with zeros.
@@ -501,6 +367,141 @@ var addPoints = function(dimensions, p1, p2){
   }
   return l;
 };
+
+
+
+
+// Utility funcitons.
+
+var isArray = function (o) {
+  return (o instanceof Array) ||
+    (Object.prototype.toString.apply(o) === '[object Array]');
+};
+
+
+var sum = function(xs){
+  var r = 0;
+  for (var i=0; i < xs.length; i++){
+    r += xs[i];
+  }
+  return r;
+};
+
+var flatten = function(arr){
+  var A = [];
+  for (var i=0; i < arr.length; i++){
+    if (isArray(arr[i])){
+      A = A.concat(flatten(arr[i]));
+    } else {
+      A.push(arr[i]);
+    }
+
+  }
+  return A;
+};
+
+
+var range = function(start, end){
+  if (end === undefined){
+    end = start; 
+    start = 0;
+  }
+
+  var A = [];
+  for (var i=start; i < end; i++){
+    A.push(i);
+  }
+  return A;
+};
+
+
+var randomChoice = function(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+};
+
+
+// Entropy of a ca is undecidable: 
+// http://people.unipmn.it/manzini/papers/tcs03.pdf
+
+var entropy = function(xs){
+  var total = 0;
+  var frequencies = {};
+  for (var i=0; i < xs.length; i++){
+    total += 1;
+    if (xs[i] in frequencies){
+      frequencies[xs[i]] += 1;
+    } else {
+      frequencies[xs[i]] = 1;
+    }
+  }
+  var s = 0;
+  for (var k in frequencies){
+    if (frequencies.hasOwnProperty(k)){ 
+      var freq = frequencies[k] / total;
+      s += freq * (Math.log(freq) / Math.LN2);
+    }
+
+  }
+  return (-1 * s);
+};
+
+
+// from http://pmav.eu/stuff/javascript-hashing-functions/source.html
+var simpleHash = function(s, tableSize) {
+  var hash = 0;
+  for (var i = 0; i < s.length; i++) {
+    hash += (s[i].charCodeAt() * (i+1));
+  }
+    return Math.abs(hash) % tableSize;
+};
+
+
+var array2binary = function(a){
+  // Create a decimal number from an array.
+  // Is this a bug?
+  var n = 0;
+  for (var i=0; i < a.length; i++){ 
+    n = n << 1; 
+    n += a[i]; 
+  }
+};
+
+
+var hammingDistance = function(xs, ys){
+  var n = 0;
+  for (var i=0; i < xs.length; i++){
+    if (xs[i] !== ys[i]){
+      n += 1;
+    }
+  }
+  return n;
+};
+
+
+var hammingNeighbors = function(xs, states){
+  // Strings similar to xs with a hamming distance of 1.
+
+  var subNeighbors = function(xs, index, states){
+    var b = [];
+    var val = xs[index];
+    for (var i=0; i < states; i++){
+      if (i !== val){
+        var tmp = xs.slice(0);
+        tmp[index] = i;
+        b.push(tmp);
+      }
+    }
+    return b;
+  };
+
+  var a = [];
+  for (var i=0; i < xs.length; i++){
+    var ns = subNeighbors(xs, i, states);
+    a = a.concat(ns);
+  }
+  return a;
+};
+
 
 
 
