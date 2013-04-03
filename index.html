@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>Langtons Ant</title>
+  <title>INDEX</title>
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
@@ -82,7 +82,7 @@
         }
       }
 
-      //setInterval(antMover(ant, antBoard, antContext, antD), 1000 / 60)
+      setInterval(antMover(ant, antBoard, antContext, antD), 1000 / 60)
 
 
       // Blank board
@@ -100,7 +100,6 @@
 
       var make2dGame = function(canvasID, board, scale){
         var canvas = document.getElementById(canvasID)
-        console.log(canvas)
         var context = canvas.getContext("2d");        
         var drawer = Drawer(context, board, scale)
         drawer.drawTable()
@@ -135,39 +134,31 @@
   <canvas id="elemBoard" width="300" height="300"></canvas>
   <div><a href="/elementary.html">Elementary cellular automaton</a></div>
 </div>
-
 <div class="box">
   <canvas id="lifeBoard" width="300" height="300"></canvas>
   <div><a href="/life.html">Conway's Game of Life</a></div>
 </div>
 </div>
 
-
 <div>
 <div class="box">
-
   <canvas id="antBoard" width="300" height="300"></canvas>
   <div><a href="/ant.html">Langton's Ant</a></div>
 </div>
-
 <div class="box">
-
-  <canvas id="blankBoard" width="300" height="300"></canvas>
-  <div><a href="/blank.html">Blank</a></div>
+  <div><a href="/life.html">Morley</a></div>
+  <canvas id="morleyBoard" width="300" height="300"></canvas>
 </div>
 </div>
 
 <div>
 <div class="box">
-  <div><a href="/elementary.html">Morley</a></div>
-  <canvas id="morleyBoard" width="300" height="300"></canvas>
-
+  <canvas id="blankBoard" width="300" height="300"></canvas>
+  <div><a href="/blank.html">Blank</a></div>
 </div>
-
 <div class="box">
   <div><a href="/life.html">Serviettes</a></div>
   <canvas id="serviettesBoard" width="300" height="300"></canvas>
-
 </div>
 </div>
 
@@ -175,14 +166,11 @@
 <div class="box">
   <div><a href="/ant.html">Maze</a></div>
   <canvas id="mazeBoard" width="300" height="300"></canvas>
-
 </div>
-
-<div class="box">
+<!--<div class="box">
   <div><a href="/blank.html">Blank</a></div>
   <canvas id="blankBoard" width="300" height="300"></canvas>
-
-</div>
+</div>-->
 </div>
 
 </body>

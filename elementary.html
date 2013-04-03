@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>Langtons Ant</title>
+  <title>Elementary 1-d cellular automata</title>
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
@@ -41,7 +41,7 @@
 
       var reset = function(){
 
-        SCALE = 2
+        SCALE = 8
         var points = elemCanvas.width / SCALE 
 
         var board = makeBoard([points], 2, NEIGHBORHOODS.ELEMENTARY, false)
@@ -51,6 +51,7 @@
         //board.setRuleByNumber(110)
         board.setRuleByNumber(145)
         //board.setRandomRule()
+        //board.setRule(function(){ if (Math.random() > .3) { return 0; } else { return 1; } })
 
         var rd = Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
         setInterval(function(){ 

@@ -260,8 +260,9 @@ var randomStart = function (dimensions, states, limit) {
 var canonicalStart = function(dimensions) {
   var a = blankStart(dimensions);
   var center = dimensions.map(function(e){ return Math.floor((e-1)/2); });
-  //setValue(center, 1, a);
-  return a;
+  var m = createMatrix(a);
+  m.set(center, 1)
+  return m.state()
 };
 
 var blankStart = function(dimensions) {
