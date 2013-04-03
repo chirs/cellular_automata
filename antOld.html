@@ -92,7 +92,6 @@
         var pattern = getPattern();
         ant = makeAnt(pattern, generateColors(pattern.length));
 
-        //ctx.restore()
         clearCanvas(antCanvas, ctx);
         pause(); // need to balance with unpause to maintain intervalID...fix.
         unPause();
@@ -169,7 +168,6 @@
         return;
       })
 
-      //cnvs.click(function(){alert("click"); });
     });
   </script>
 

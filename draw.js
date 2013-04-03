@@ -2,22 +2,10 @@
 
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
-var clearCanvas = function(canvas, context){
-  context.clearRect(0,0,canvas.width,canvas.height);
-};
-
-
 var state2color = function(a) {
   return ["#fff", "#333", "#666","#999", "#000"][a]
   return ["#fff", "#000", "#333", "#666","#999"][a]
 }
-
-var fillCoord = function(context, coord, scale, style){
-  var x = coord[0] * scale ;
-  var y = coord[1] * scale ;
-  context.fillStyle = style;
-  context.fillRect(x,y,scale,scale);
-};
 
 
 
@@ -30,9 +18,19 @@ var Drawer = function(context, board, scale, maximum, repeat){
   var dRow = function(arr){
     for (var i=0; i < arr.length; i++){
       var color = state2color(arr[i])
-      fillCoord(context, [i, row], scale, color)
+      fillCoord([i, row], color)
     }
   }
+
+
+
+  var fillCoord = function(coord, style){
+    var x = coord[0] * scale ;
+    var y = coord[1] * scale ;
+    context.fillStyle = style;
+    context.fillRect(x,y,scale,scale);
+  };
+
 
   var drawTable = function(){
       var boardState = board.state()
@@ -45,7 +43,7 @@ var Drawer = function(context, board, scale, maximum, repeat){
         for (var j=0; j < cols; j++){
           var state = boardState[i][j]
           var color = state2color(state)
-          fillCoord(context, [i,j], scale, color);
+          fillCoord([i,j], color);
         }
       }
   }
@@ -60,10 +58,11 @@ var Drawer = function(context, board, scale, maximum, repeat){
     changeSquare: function(){
       var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)]
       var nstate = board.updateValue(point)
-      fillCoord(context, point, scale, state2color(nstate));
+      fillCoord(point, state2color(nstate));
     },
 
     drawTable: drawTable,
+    fillCoord: fillCoord,
 
     drawTableNext: function(){
       board.next()

@@ -77,7 +77,7 @@
         return function(){
           ant.move()
           drawer.drawTable()
-          fillCoord(context, ant.getPosition(), ANT_SCALE, "red")
+          drawer.fillCoord(context, ant.getPosition(), ANT_SCALE, "red")
         }
       }
 
@@ -94,8 +94,12 @@
       var blankBoard = makeBoard([60, 60], 2, MOORE_NEIGHBORHOOD, false)
       blankBoard.setRule(gameOfLifeRule)
       var blankD = Drawer(blankContext, blankBoard, BLANK_SCALE)
-      setInterval(blankD.drawTableNext, 750)
-      $("#blankBoard").click(changeSquare(blankContext, blankBoard, BLANK_SCALE))
+      blankD.drawTable()
+      //setInterval(blankD.drawTableNext, 750)
+      $("#blankBoard").click(function(){
+        blankD.changeSquare()
+        blankD.drawTableNext()
+      })
     });
   </script>
 
