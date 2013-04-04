@@ -149,6 +149,10 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
   var rule;
   var ruleTable = null;
 
+  var colorMap = generateColors(cellStates);
+  var state2color = function(state){ return colorMap[state]; }
+
+
   var setRule = function(r){ 
     ruleTable = null;
     rule = r; 
@@ -212,6 +216,7 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
     dimensions: dimensions,
     ruleTable: function(){ return ruleTable; },
     cellStates: cellStates,
+    state2color: state2color,
 
     reset: function() { matrix = startFunc(); },
 
@@ -498,6 +503,6 @@ var hammingNeighbors = function(xs, states){
 
 
 
-exports.cyclicRule = cyclicRule
-exports.createMatrix = createMatrix
-exports.makeBoard = makeBoard
+//exports.cyclicRule = cyclicRule
+//exports.createMatrix = createMatrix
+//exports.makeBoard = makeBoard

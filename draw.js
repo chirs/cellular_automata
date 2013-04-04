@@ -2,21 +2,6 @@
 
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
-var state2color = function(a) {
-  return ["#ff0", "#0f0", "#00f","#f00", "#0ff", "#f0f"][a];
-  //return ["#fff", "#000", "#333", "#666","#999"][a]
-};
-
-
-
-
-var state2color = function(a) {
-  return gc[a]
-  
-  //return arr[a]
-  var a = 4 * a
-  return "rgb(" + a + "," + 0 + "," + a + ")"
-}
 
 var Drawer = function(context, board, scale, maximum, repeat){
 
@@ -25,7 +10,7 @@ var Drawer = function(context, board, scale, maximum, repeat){
   var dRow = function(arr){
     console.log(row);
     for (var i=0; i < arr.length; i++){
-      var color = state2color(arr[i]);
+      var color = board.state2color(arr[i]);
       fillCoord([i, row], color);
     }
   };
@@ -50,7 +35,7 @@ var Drawer = function(context, board, scale, maximum, repeat){
     for (var i=0; i < rows; i++){
       for (var j=0; j < cols; j++){
         var state = boardState[i][j];
-        var color = state2color(state);
+        var color = board.state2color(state);
         fillCoord([i,j], color);
       }
     }
@@ -65,7 +50,7 @@ var Drawer = function(context, board, scale, maximum, repeat){
     changeSquare: function(){
       var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)];
       var nstate = board.updateValue(point);
-      fillCoord(point, state2color(nstate));
+      fillCoord(point, board.state2color(nstate));
     },
 
     drawTable: drawTable,
@@ -134,6 +119,10 @@ var hsv2rgb = function(h, s, v){
 var generateColors = function(n){
   //return ["#ff0", "#0f0", "#00f","#f00", "#0ff", "#f0f"][a];
 
+  if (n === 2){
+    return ["#000", "#fff"];
+  }
+
 
   var help = function(e){ 
     var s = Math.floor(e).toString(16);
@@ -157,4 +146,4 @@ var generateColors = function(n){
   return colors;
 };
 
-var gc = generateColors(10000);
+//var gc = generateColors(10000);
