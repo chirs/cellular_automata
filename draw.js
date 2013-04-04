@@ -23,6 +23,7 @@ var Drawer = function(context, board, scale, maximum, repeat){
   var row = 0;
 
   var dRow = function(arr){
+    console.log(row);
     for (var i=0; i < arr.length; i++){
       var color = state2color(arr[i]);
       fillCoord([i, row], color);
@@ -75,7 +76,12 @@ var Drawer = function(context, board, scale, maximum, repeat){
       drawTable(context, board.state(), scale);
     },
 
+    reset: function(){
+      row = 0;
+    },
+
     drawRows: function(count){
+      console.log('d')
       if (row > maximum){ 
         if (repeat){
           row = 0;
@@ -126,6 +132,8 @@ var hsv2rgb = function(h, s, v){
 
 
 var generateColors = function(n){
+  //return ["#ff0", "#0f0", "#00f","#f00", "#0ff", "#f0f"][a];
+
 
   var help = function(e){ 
     var s = Math.floor(e).toString(16);
@@ -149,4 +157,4 @@ var generateColors = function(n){
   return colors;
 };
 
-var gc = generateColors(20);
+var gc = generateColors(10000);

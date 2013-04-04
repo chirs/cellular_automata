@@ -499,5 +499,5 @@ var hammingNeighbors = function(xs, states){
 
 
 exports.cyclicRule = cyclicRule
-
-
+exports.createMatrix = createMatrix
+exports.makeBoard = makeBoard

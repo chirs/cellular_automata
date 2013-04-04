@@ -19,27 +19,28 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 10
+      SCALE = 4
 
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-    var board = makeBoard([100, 48], 12, NEIGHBORHOODS.VON_NEUMANN, true, .5)
-    //var board = makeBoard([100, 48], 4, NEIGHBORHOODS.VON_NEUMANN, true, .5)
-    //board.setRule(gameOfLifeRule)
-    //board.setRandomRule()
-    board.setRule(cyclicRule(12))
+      //var board = makeBoard([250, 120], 12, NEIGHBORHOODS.VON_NEUMANN, true, .5)
+      var board = makeBoard([250, 120], 12, NEIGHBORHOODS.VON_NEUMANN, true, .5)
+      var board = makeBoard([250, 120], 35, NEIGHBORHOODS.VON_NEUMANN, true, .5)
+      //var board = makeBoard([250, 120], 4, NEIGHBORHOODS.VON_NEUMANN, true, .5)
+      //board.setRule(gameOfLifeRule)
+      //board.setRandomRule()
+      board.setRule(cyclicRule(12))
 
       var d = Drawer(ctx, board, SCALE)
       d.drawTableNext(board.state())
       setInterval(function(){
         d.drawTableNext()
-      }, 100)
+      }, 1000 / 60)
 
       //$("#rule").html(board.getRuleNumber());
       $("#rule").click(board.reset);
-    //setInterval(function(){ $("#rule").click() }, 1000)
-
+      //setInterval(function(){ $("#rule").click() }, 1000)
 
     });
   </script>

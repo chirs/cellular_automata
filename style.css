@@ -4,6 +4,11 @@
 }
 */
 
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
 
 #eid { 
     font-size: 3em;
@@ -11,10 +16,11 @@
 
 
 .box { 
-    display: inline-block;
-    margin: 15px 200px;
+    /* display: inline-block; */
+    margin: 15px 100px;
     padding: 10px;
     text-align: center;
+    float: left;
 }
 
 .box div {
@@ -35,5 +41,18 @@
     background: white;
     opacity: 30%;
     opacity: .4;
+}
+
+
+
+
+#scrollable {
+    overflow: auto;
+    width: 100%;
+    height: 500px;
+    }
+
+#items {
+    width: 5000px;
 }
 
