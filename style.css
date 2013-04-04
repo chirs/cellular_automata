@@ -56,3 +56,12 @@ html, body {
     width: 5000px;
 }
 
+
+.next {
+    background-color: white;
+    padding: 10px;
+    position: absolute;
+    left: 2%;
+    top: 2%%;
+
+}
