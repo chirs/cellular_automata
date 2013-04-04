@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Elementary 1-d cellular automata</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
+  <meta name="description" content="Langton's Ant">
+
+  <link rel="stylesheet" type="text/css" href="/style.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+
+  <script type="text/javascript" src="/automata.js"></script>
+  <script type="text/javascript" src="/draw.js"></script>
+
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      iID = null
+
+      var elemCanvas = document.getElementById("elemBoard");
+      var ctx = elemCanvas.getContext("2d");
+
+      var reset = function(){
+
+        SCALE = 2
+        var cellCount = elemCanvas.width / SCALE 
+        var board = makeBoard([cellCount], 2, NEIGHBORHOODS.ELEMENTARY, true)
+        board.setRandomRule()
+
+        //board.setRuleByNumber(145)
+        //board.setRule(cyclicRule(4))
+
+        var rd = Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
+        setInterval(function(){ 
+          rd.drawRows(1) 
+        }, 1000 / 60)
+
+        $(elemCanvas).click(function(){
+          board.setRandomRule()
+          rd.reset();
+          //board.setRandomRule();
+        });
+
+        //$("#eid").html(ruleNumber);
+      }
+      
+
+      $('html').keydown(function (e) {
+        var keyCode = e.keyCode || e.which,
+        arrow = {left: 37, up: 38, right: 39, down: 40 };
+
+        switch (keyCode) {
+        case arrow.left: reset(getNum()-1); break;
+        case arrow.right: reset(getNum()+1); break;
+        }
+      });
+
+      $("#populationSlider").slider({
+        max: 1, min: 0, value: .5, step: .01,
+        change: function(){ 
+          if (getRandom()){ reset(getNum()) }
+          }
+      });
+
+      $("#eid").click(function(){ reset() });
+      $("#randomCheckbox").change(function(){ reset(getNum()) });
+      
+      reset();
+
+});
+  </script>
+
+</head>
+
+
+<body class="home">
+
+<canvas id="elemBoard" width="1600" height="800"></canvas>
+
+</body>
