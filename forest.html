@@ -42,7 +42,12 @@
       $("#rule").click(board.reset);
       
       $("#restart").click();
-      setInterval(d.drawTableNext, 1000 / 60)
+      setInterval(function(){
+        d.drawTableNext()
+        var counts = board.getPopulationCount()
+        $("#tree_number").html(counts[1]);
+        $("#burntree_number").html(counts[2])
+      }, 1000 / 60)
 
     });
   </script>
@@ -59,6 +64,13 @@
     <input id="burnProb" type="input" value=".01" />
     <input id="restart" type="submit" value="restart" />
 </div>
+
+<div id="display">
+  <p>Tree count: <span id="tree_number"> </span> </p>
+  <p>Burning Tree count: <span id="burntree_number"> </span> </p>
+
+</div>
+
 
 
 </body>

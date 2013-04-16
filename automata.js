@@ -205,7 +205,15 @@ var makeBoard = function(dimensions, cellStates, neighbors, initial_distribution
     return arr;
   };
 
+  var getPopulationCount = function(){
+    var counts = blankStart([cellStates]);
+    var indexes = getIndexes(dimensions);
 
+    for (var i=0; i < indexes.length; i++){
+      counts[matrix.get(indexes[i])] += 1;
+    }
+    return counts;
+  };
 
 
 
@@ -242,6 +250,7 @@ var makeBoard = function(dimensions, cellStates, neighbors, initial_distribution
     ruleTable: function(){ return ruleTable; },
     cellStates: cellStates,
     state2color: state2color,
+    getPopulationCount: getPopulationCount,
 
     reset: function() { matrix = startFunc(); },
 

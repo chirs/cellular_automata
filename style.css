@@ -40,6 +40,11 @@ html, body {
     background: white;
 }
 
+#display {
+    position: fixed;
+    right: 6%;
+    top: 30%;
+}
 
 
 
