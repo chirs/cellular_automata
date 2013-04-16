@@ -37,10 +37,7 @@ html, body {
     cursor: pointer;
     height: 5%;
     width: 4%;
-    border: 1px solid black;
     background: white;
-    opacity: 30%;
-    opacity: .4;
 }
 
 

@@ -122,6 +122,9 @@ var generateColors = function(n){
   if (n === 2){
     return ["#000", "#fff"];
   }
+  if (n === 3){
+    return ["black", "green", "red"];
+  }
 
 
   var help = function(e){ 

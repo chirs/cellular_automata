@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Game of Life</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="description" content="Forest Fires">
+
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+
+  <script type="text/javascript" src="automata.js"></script>
+  <script type="text/javascript" src="draw.js"></script>
+
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      SCALE = 4
+
+      var lifeCanvas = document.getElementById("lifeBoard");
+      var ctx = lifeCanvas.getContext("2d");
+
+      var board = makeBoard([250, 150], 3, NEIGHBORHOODS.MOORE, [0.70, 0.25, 0.05])
+      
+      //board.setRule(makeTreeRule(.05, .01))
+
+      var d = Drawer(ctx, board, SCALE)
+      d.drawTable(board.state())
+
+      var getRule = function(){
+        var g = parseFloat($("#growProb").val());
+        var b = parseFloat($("#burnProb").val());
+        return makeTreeRule(g, b);
+      }
+
+      $("#restart").click(function(){
+        board.setRule(getRule());
+      });
+      $("#rule").click(board.reset);
+      
+      $("#restart").click();
+      setInterval(d.drawTableNext, 1000 / 60)
+
+    });
+  </script>
+
+</head>
+
+
+<body class="home">
+
+<canvas id="lifeBoard" width="1800" height="800"></canvas>
+
+<div id="controls">
+    <input id="growProb" type="input" value=".05" />
+    <input id="burnProb" type="input" value=".01" />
+    <input id="restart" type="submit" value="restart" />
+</div>
+
+
+</body>

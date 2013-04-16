@@ -42,6 +42,31 @@ var cyclicRule = function(modulus){
   };
 };
 
+var treeRule = function(states){
+  var currentState = states[0];
+  var tree_prob = 0.005
+  var prob_grow = Math.random()
+  var neighbors = states.slice(1);
+
+  if (currentState === 0 && prob_grow <tree_prob) {return 1;}
+  if (currentState === 1 && neighbors.indexOf(2)> -1) {return 2;}
+  if (currentState === 2) {return 0;}
+  return currentState;
+}
+
+var makeTreeRule = function(growProb, burnProb){
+  return function(states){
+    var currentState = states[0];
+    var neighbors = states.slice(1);
+
+    if (currentState === 0 && Math.random() <growProb) {return 1;}
+    if (currentState === 1 && neighbors.indexOf(2)> -1) {return 2;}
+    if (currentState === 1 && Math.random() <burnProb ) {return 2;}
+
+    if (currentState === 2) {return 0;}
+    return currentState;
+  }
+}
 
 // 2-Dimensional
 // Family: Life
@@ -138,12 +163,12 @@ var makeAnt = function(position, rule, board){
 
 
 
-var makeBoard = function(dimensions, cellStates, neighbors, random){
+var makeBoard = function(dimensions, cellStates, neighbors, initial_distribution){
 
   var neighborStates = Math.pow(cellStates, neighbors.length); // Number of possible cell arrangements.
   var ruleSets = Math.pow(2, neighborStates);
 
-  var startFunc = function() { return createMatrix(random ? randomStart(dimensions, cellStates) : canonicalStart(dimensions)); };
+  var startFunc = function() { return createMatrix(initial_distribution ? randomStart(dimensions, initial_distribution) : canonicalStart(dimensions)); };
   var matrix = startFunc();
 
   var rule;
@@ -187,13 +212,13 @@ var makeBoard = function(dimensions, cellStates, neighbors, random){
   var generateNextState = function(){
 
     var calculateState = function(cell){
-      var a = [];
+      var states = [];
       for (var i=0; i < neighbors.length; i++){
         var n = matrix.move(cell, neighbors[i])
         var v = matrix.get(n)
-        a.push(v);
+        states.push(v);
       }
-      return rule(a);
+      return rule(states);
     };
 
     var indexes = getIndexes(dimensions);
@@ -260,17 +285,13 @@ var makeArray = function(dimensions, callback){
 };
 
 
-var randomStart = function (dimensions, states, limit) {
-  // Cutoff stops making sense with more than 2 states.
-  // Need a probability distribution.
-
-  var sectorSize = 1 / states;
-
+var randomStart = function (dimensions, distribution) {
+ 
   var f = function(){
     var cutoff = 0;
     var r = Math.random();
-    for (var i=0; i < states; i++){
-      cutoff += sectorSize;
+    for (var i=0; i < distribution.length; i++){
+      cutoff += distribution[i];
       if (r < cutoff) {
         return i;
       }
