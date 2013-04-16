@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Game of Life</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
+  <meta name="description" content="Langton's Ant">
+
+  <link rel="stylesheet" type="text/css" href="/style.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+
+  <script type="text/javascript" src="/automata.js"></script>
+  <script type="text/javascript" src="/draw.js"></script>
+
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      SCALE = 4
+
+      var lifeCanvas = document.getElementById("lifeBoard");
+      var ctx = lifeCanvas.getContext("2d");
+
+      //var board = makeBoard([250, 120], 2, NEIGHBORHOODS.VON_NEUMANN, true, .5)
+      var board = makeBoard([240, 160], 3, NEIGHBORHOODS.VON_NEUMANN, true, [.99, .01, 0])
+      //var board = makeBoard([60, 40], 2, NEIGHBORHOODS.VON_NEUMANN, true, .5)
+      //var board = makeBoard([250, 120], 4, NEIGHBORHOODS.VON_NEUMANN, true, .5)
+      //board.setRule(gameOfLifeRule)
+      //board.setRandomRule()
+      //board.setRule(cyclicRule(12))
+
+      var growRule = function(states){
+        var s = states[0];
+        var neighborStates = states.slice(1);
+        if (s == 1){
+          return 1;
+        }
+        if (s == 0){
+          var hasTreeNeighbor = neighborStates.indexOf(1) > -1;
+          if (hasTreeNeighbor){
+            if (Math.random() < .1){
+              return 1;
+            } 
+          }
+        }
+        return 0;
+      }
+
+      var burnRule = function(states){
+        var s = states[0];
+        var neighborStates = states.slice(1);
+
+        if (Math.random() < .00001){
+          return 2;
+        }
+
+        if (s == 0){
+          return 0;
+        }
+        if (s == 1){
+          for (var i=0; i < neighborStates.length; i++){
+            if (neighborStates[i] == 2){
+              if (Math.random() < .7){ return 2 }
+            }
+          }
+        }
+        
+        if (s == 2){
+          if (Math.random() < .7){
+            return 0;
+          }
+        }
+
+        return s
+      }
+
+      var biRule = function(states){
+        if (ROUNDS > FIRE_CUTOFF){
+          return burnRule(states);
+        } else {
+          return growRule(states);
+        }
+      }
+
+
+      board.setRule(biRule)
+
+      FIRE_CUTOFF = 40; 
+      ROUNDS = 0;
+
+      var d = Drawer(ctx, board, SCALE)
+      d.drawTable(board.state())
+      setInterval(function(){
+        ROUNDS += 1
+        d.drawTableNext()
+        }, 100)
+
+    });
+  </script>
+
+</head>
+
+
+<body class="home">
+
+
+<canvas id="lifeBoard" width="960" height="640"></canvas>
+
+</body>
