@@ -25,9 +25,9 @@
       var ctx = lifeCanvas.getContext("2d");
 
       //var board = makeBoard([250, 120], 2, NEIGHBORHOODS.VON_NEUMANN, true, .5)
-      var board = makeBoard([240, 160], 2, NEIGHBORHOODS.VON_NEUMANN, true, .5)
-      //board.setRule(gameOfLifeRule)
-      board.setRandomRule()
+      var board = makeBoard([240, 160], 2, NEIGHBORHOODS.VON_NEUMANN, [.5, .5])
+      board.setRule(gameOfLifeRule)
+      //board.setRandomRule()
       //board.setRule(cyclicRule(12))
 
       var d = Drawer(ctx, board, SCALE)

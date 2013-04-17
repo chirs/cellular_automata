@@ -23,7 +23,8 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var board = makeBoard([250, 150], 3, NEIGHBORHOODS.MOORE, [0.70, 0.25, 0.05])
+      var board = makeBoard([250, 150], 3, NEIGHBORHOODS.MOORE, [0.70, 0.3, 0])
+
       
       //board.setRule(makeTreeRule(.05, .01))
 
@@ -37,6 +38,7 @@
       }
 
       $("#restart").click(function(){
+        board.reset();
         board.setRule(getRule());
       });
       $("#rule").click(board.reset);
@@ -60,8 +62,8 @@
 <canvas id="lifeBoard" width="1800" height="800"></canvas>
 
 <div id="controls">
-    <input id="growProb" type="input" value=".05" />
-    <input id="burnProb" type="input" value=".01" />
+    <input id="growProb" type="input" value=".005" />
+    <input id="burnProb" type="input" value=".0001" />
     <input id="restart" type="submit" value="restart" />
 </div>
 

@@ -28,10 +28,9 @@
 
         SCALE = 2
         var cellCount = elemCanvas.width / SCALE 
-        var board = makeBoard([cellCount], 2, NEIGHBORHOODS.ELEMENTARY, false)
-        board.setRandomRule()
-
-        //board.setRuleByNumber(145)
+        var board = makeBoard([cellCount], 2, NEIGHBORHOODS.ELEMENTARY)
+        //board.setRandomRule()
+        board.setRuleByNumber(195)
         //board.setRule(cyclicRule(4))
 
         var rd = Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))

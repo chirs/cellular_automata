@@ -24,23 +24,18 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      //var board = makeBoard([250, 120], 12, NEIGHBORHOODS.VON_NEUMANN, true, .5)
-      var board = makeBoard([250, 120], 12, NEIGHBORHOODS.VON_NEUMANN, true, .5)
-      var board = makeBoard([250, 120], 35, NEIGHBORHOODS.VON_NEUMANN, true, .5)
-      //var board = makeBoard([250, 120], 4, NEIGHBORHOODS.VON_NEUMANN, true, .5)
-      //board.setRule(gameOfLifeRule)
-      //board.setRandomRule()
-      board.setRule(cyclicRule(12))
+      //var board = makeBoard([250, 120], 2, NEIGHBORHOODS.VON_NEUMANN, [.5, .5])
+      var board = makeBoard([250, 150], 2, NEIGHBORHOODS.MOORE, [0.70, 0.3])
+      board.setRule(gameOfLifeRule)
+      
 
       var d = Drawer(ctx, board, SCALE)
-      d.drawTableNext(board.state())
+      d.drawTable(board.state())
       setInterval(function(){
         d.drawTableNext()
       }, 1000 / 60)
 
-      //$("#rule").html(board.getRuleNumber());
       $("#rule").click(board.reset);
-      //setInterval(function(){ $("#rule").click() }, 1000)
 
     });
   </script>
