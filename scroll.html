@@ -32,7 +32,7 @@
 
       ELEMENTARY_SCALE = 10
 
-      var elemBoard = makeBoard([30], 3, NEIGHBORHOODS.ELEMENTARY2, true, .3)
+      var elemBoard = new Board([30], 3, NEIGHBORHOODS.ELEMENTARY2, true, .3)
       var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
 
       elemBoard.setRandomRule()
@@ -55,7 +55,7 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var lifeContext = lifeCanvas.getContext("2d");
 
-      var lifeBoard = makeBoard([30, 30], 2, NEIGHBORHOODS.MOORE, true, .3)
+      var lifeBoard = new Board([30, 30], 2, NEIGHBORHOODS.MOORE, true, .3)
       lifeBoard.setRule(gameOfLifeRule)
 
       var d = Drawer(lifeContext, lifeBoard, LIFE_SCALE)
@@ -71,7 +71,7 @@
 
 
       ANT_SCALE = 5
-      var antBoard = makeBoard([60, 60], 2, NEIGHBORHOODS.MOORE, false)
+      var antBoard = new Board([60, 60], 2, NEIGHBORHOODS.MOORE, false)
       var ant = new Ant([30,30], langtonsAntRule, antBoard)
 
       var antD = Drawer(antContext, antBoard, ANT_SCALE)
@@ -94,7 +94,7 @@
 
 
       BLANK_SCALE = 5
-      var blankBoard = makeBoard([60, 60], 2, NEIGHBORHOODS.MOORE, false)
+      var blankBoard = new Board([60, 60], 2, NEIGHBORHOODS.MOORE, false)
       blankBoard.setRule(gameOfLifeRule)
       var blankD = Drawer(blankContext, blankBoard, BLANK_SCALE)
       blankD.drawTable()
@@ -110,15 +110,15 @@
       }
 
 
-      var morleyBoard = makeBoard([30, 30], 2, NEIGHBORHOODS.MOORE, true, .3)
+      var morleyBoard = new Board([30, 30], 2, NEIGHBORHOODS.MOORE, true, .3)
       morleyBoard.setRule(morleyRule)
       make2dGame("morleyBoard", morleyBoard, 10)
 
-      var serviettesBoard = makeBoard([100, 100], 2, NEIGHBORHOODS.MOORE, true, .3)
+      var serviettesBoard = new Board([100, 100], 2, NEIGHBORHOODS.MOORE, true, .3)
       serviettesBoard.setRule(serviettesRule)
       make2dGame("serviettesBoard", serviettesBoard, 3)
 
-      var mazeBoard = makeBoard([60, 60], 2, NEIGHBORHOODS.MOORE, true, .3)
+      var mazeBoard = new Board([60, 60], 2, NEIGHBORHOODS.MOORE, true, .3)
       mazeBoard.setRule(mazeRule)
       make2dGame("mazeBoard", mazeBoard, 5)
 

@@ -23,7 +23,7 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var board = makeBoard([250, 150], 3, NEIGHBORHOODS.MOORE, [0.70, 0.3, 0])
+      var board = new Board([250, 150], 3, NEIGHBORHOODS.MOORE, [0.70, 0.3, 0])
 
       
       //board.setRule(makeTreeRule(.05, .01))

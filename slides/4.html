@@ -28,7 +28,7 @@
 
         SCALE = 2
         var cellCount = elemCanvas.width / SCALE 
-        var board = makeBoard([cellCount], 4, NEIGHBORHOODS.ELEMENTARY, true)
+        var board = new Board([cellCount], 4, NEIGHBORHOODS.ELEMENTARY, true)
         board.setRandomRule()
         board.setRule(cyclicRule(4))
 

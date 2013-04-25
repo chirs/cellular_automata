@@ -23,7 +23,7 @@
       SCALE = 20
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
-      var board = makeBoard([100, 48], 3, NEIGHBORHOODS.MOORE, true, .5)
+      var board = new Board([100, 48], 3, NEIGHBORHOODS.MOORE, true, .5)
       board.setRandomRule()
       
       var d = Drawer(ctx, board, SCALE)
@@ -54,7 +54,7 @@
 
         var randomNeighborRule = perturbRule(board.ruleTable(), board.cellStates, DISTANCE)
 
-        var b = makeBoard([100, 48], 3, MOORE_NEIGHBORHOOD, true, .5)
+        var b = new Board([100, 48], 3, MOORE_NEIGHBORHOOD, true, .5)
         b.setTableRule(randomNeighborRule)
         for (var i=0; i < 10; i++){
           b.next()
@@ -73,7 +73,7 @@
           if (e < ENTROPY_MAX && e > ENTROPY_MIN){
             console.log("WINNER")
             console.log("RESETTING BOARD")
-            board = makeBoard([100, 48], 3, MOORE_NEIGHBORHOOD, true, .5)
+            board = new Board([100, 48], 3, MOORE_NEIGHBORHOOD, true, .5)
             board.setTableRule(randomNeighborRule)
             ENTROPY_MAX = e
             DISTANCE = 1

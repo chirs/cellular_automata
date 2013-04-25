@@ -158,7 +158,7 @@ var Ant = function(position, rule, board){
 
 
 
-var makeBoard = function(dimensions, cellStates, neighbors, initial_distribution){
+var Board = function(dimensions, cellStates, neighbors, initial_distribution){
 
   var neighborStates = Math.pow(cellStates, neighbors.length); // Number of possible cell arrangements.
   var ruleSets = Math.pow(2, neighborStates);
@@ -234,35 +234,32 @@ var makeBoard = function(dimensions, cellStates, neighbors, initial_distribution
     return newMatrix;
   };  
 
-  return {
-    state: function() { return matrix.state(); }, 
-    matrix: function() { return matrix; }, 
-    setRule: setRule,
-    setRandomRule: setRandomRule,
-    setRuleTable: setRuleTable,
-    setRuleByNumber: setRuleByNumber,
-    dimensions: dimensions,
-    ruleTable: function(){ return ruleTable; },
-    cellStates: cellStates,
-    state2color: state2color,
-    getPopulationCount: getPopulationCount,
 
-    reset: function() { matrix = startFunc(); },
+  this.state = function() { return matrix.state(); }
+  this.matrix = function() { return matrix; }
+  this.setRule = setRule
+  this.setRandomRule = setRandomRule
+  this.setRuleTable = setRuleTable
+  this.setRuleByNumber = setRuleByNumber
+  this.dimensions = dimensions
+  this.ruleTable = function(){ return ruleTable; }
+  this.cellStates = cellStates
+  this.state2color = state2color
+  this.getPopulationCount = getPopulationCount
+  this.reset = function() { matrix = startFunc(); }
 
-    updateValue: function(point){
+  this.updateValue = function(point){
       var s = matrix.get(point);
       var ns = (s + 1) % cellStates;
       matrix.set(point, ns);
       return ns;
-    },
-    
-
-    next: function(){
+    }
+  this.next = function(){
       matrix = generateNextState();
       return matrix
-    }
+  }
 
-  };
+
 };
 
 
