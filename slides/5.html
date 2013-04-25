@@ -27,7 +27,7 @@
       var board = new Board([240, 160], 100, NEIGHBORHOODS.VON_NEUMANN, 100)
       board.setRule(cyclicRule(12))
 
-      var d = Drawer(ctx, board, SCALE)
+      var d = new Drawer(ctx, board, SCALE)
       d.drawTableNext(board.state())
       setInterval(function(){
         d.drawTableNext()
@@ -35,7 +35,6 @@
 
       //$("#rule").html(board.getRuleNumber());
       $(lifeCanvas).click(function(){
-        console.log("hello");
         board.setRandomRule();
         board.reset();
       })

@@ -27,7 +27,7 @@
       var board = new Board([240, 160], 2, NEIGHBORHOODS.MOORE, [.5, .5])
       board.setRule(gameOfLifeRule)
 
-      var d = Drawer(ctx, board, SCALE)
+      var d = new Drawer(ctx, board, SCALE)
       d.drawTable(board.state())
       setInterval(function(){
         d.drawTableNext()
@@ -37,7 +37,6 @@
 
       //$("#rule").html(board.getRuleNumber());
       $(lifeCanvas).click(function(){
-        console.log("hello");
         board.setRandomRule();
         board.reset();
       })

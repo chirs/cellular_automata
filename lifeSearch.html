@@ -26,7 +26,7 @@
       var board = new Board([100, 48], 3, NEIGHBORHOODS.MOORE, true, .5)
       board.setRandomRule()
       
-      var d = Drawer(ctx, board, SCALE)
+      var d = new Drawer(ctx, board, SCALE)
       d.drawTableNext(board.state())
       setInterval(d.drawTableNext, 750)
 
@@ -62,12 +62,8 @@
         }
 
         if (RUNS > 40){
-          console.log("HDistance:")
-          console.log(hammingDistance(randomNeighborRule, board.ruleTable()))
           DISTANCE += 1
           var e = entropy(b.state())
-          console.log("ENTROPY is: ")
-          console.log(e)
           RUNS = 0
 
           if (e < ENTROPY_MAX && e > ENTROPY_MIN){

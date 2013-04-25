@@ -33,7 +33,7 @@
       var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
 
       elemBoard.setRandomRule()
-      var rd = Drawer(elemContext, elemBoard, ELEMENTARY_SCALE, 30, true)
+      var rd = new Drawer(elemContext, elemBoard, ELEMENTARY_SCALE, 30, true)
       //rd.draw()
       ROWS = 0
       setInterval(function(){ 

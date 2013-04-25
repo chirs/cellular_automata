@@ -36,7 +36,7 @@
       var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
 
       elemBoard.setRandomRule()
-      var rd = Drawer(elemContext, elemBoard, ELEMENTARY_SCALE, 30, true)
+      var rd = new Drawer(elemContext, elemBoard, ELEMENTARY_SCALE, 30, true)
       //rd.draw()
       ROWS = 0
       setInterval(function(){ 
@@ -58,7 +58,7 @@
       var lifeBoard = new Board([30, 30], 2, NEIGHBORHOODS.MOORE, true, .3)
       lifeBoard.setRule(gameOfLifeRule)
 
-      var d = Drawer(lifeContext, lifeBoard, LIFE_SCALE)
+      var d = new Drawer(lifeContext, lifeBoard, LIFE_SCALE)
       d.drawTable()
 
       setInterval(d.drawTableNext, 250)
@@ -74,7 +74,7 @@
       var antBoard = new Board([60, 60], 2, NEIGHBORHOODS.MOORE, false)
       var ant = new Ant([30,30], langtonsAntRule, antBoard)
 
-      var antD = Drawer(antContext, antBoard, ANT_SCALE)
+      var antD = new Drawer(antContext, antBoard, ANT_SCALE)
       antD.drawTable()
 
       var antMover = function(ant, board, context, drawer){
@@ -96,7 +96,7 @@
       BLANK_SCALE = 5
       var blankBoard = new Board([60, 60], 2, NEIGHBORHOODS.MOORE, false)
       blankBoard.setRule(gameOfLifeRule)
-      var blankD = Drawer(blankContext, blankBoard, BLANK_SCALE)
+      var blankD = new Drawer(blankContext, blankBoard, BLANK_SCALE)
       blankD.drawTable()
 
       $("#blankBoard").click(blankD.changeSquare)
@@ -104,7 +104,7 @@
       var make2dGame = function(canvasID, board, scale){
         var canvas = document.getElementById(canvasID)
         var context = canvas.getContext("2d");        
-        var drawer = Drawer(context, board, scale)
+        var drawer = new Drawer(context, board, scale)
         drawer.drawTable()
         setInterval(drawer.drawTableNext, 250)
       }

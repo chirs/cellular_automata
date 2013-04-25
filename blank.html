@@ -27,7 +27,7 @@
       var board = new Board([180, 80], 2, NEIGHBORHOODS.MOORE, false, .9)
       board.setRule(twoByTwoRule)
 
-      var drawer = Drawer(context, board, SCALE)
+      var drawer = new Drawer(context, board, SCALE)
     
       $("canvas").click(drawer.changeSquare)
       $("#next").click(function(){ drawer.drawTableNext(); console.log(board.state()) })

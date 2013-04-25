@@ -28,7 +28,7 @@
       //board.setRule(twoByTwoRule)
 
       var a1 = new Ant([90,40], langtonsAntRule, board)
-      var d = Drawer(ctx, board, SCALE)
+      var d = new Drawer(ctx, board, SCALE)
       d.drawTable()
 
       setInterval(function(){

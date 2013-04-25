@@ -8,7 +8,6 @@ var Drawer = function(context, board, scale, maximum, repeat){
   var row = 0;
 
   var dRow = function(arr){
-    console.log(row);
     for (var i=0; i < arr.length; i++){
       var color = board.state2color(arr[i]);
       fillCoord([i, row], color);
@@ -41,50 +40,46 @@ var Drawer = function(context, board, scale, maximum, repeat){
     }
   };
 
-  return {
 
-    clearCanvas: function(canvas){
+  this.clearCanvas = function(canvas){
       context.clearRect(0,0,canvas.width,canvas.height);
-    },
+  }
     
-    changeSquare: function(){
+  this.changeSquare = function(){
       var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)];
       var nstate = board.updateValue(point);
       fillCoord(point, board.state2color(nstate));
-    },
+  }
 
-    drawTable: drawTable,
-    fillCoord: fillCoord,
+  this.drawTable = drawTable
+  this.fillCoord = fillCoord
 
-    drawTableNext: function(){
+  this.drawTableNext = function(){
       board.next();
       drawTable(context, board.state(), scale);
-    },
-
-    reset: function(){
-      row = 0;
-    },
-
-    drawRows: function(count){
-      console.log('d')
-      if (row > maximum){ 
-        if (repeat){
-          row = 0;
-        } else {
-          return;
-        }
-      }
-
-      if (count === undefined){ count = 1; }
-
-      for (var i=0; i < count; i++){
-        dRow(board.state());
-        board.next();
-        row += 1;
-      }
     }
 
-  };
+  this.reset = function(){
+      row = 0;
+  }
+
+  this.drawRows = function(count){
+    if (row > maximum){ 
+      if (repeat){
+        row = 0;
+      } else {
+        return;
+      }
+    }
+    
+    if (count === undefined){ count = 1; }
+    
+    for (var i=0; i < count; i++){
+      dRow(board.state());
+      board.next();
+      row += 1;
+    }
+  }
 };
 
 

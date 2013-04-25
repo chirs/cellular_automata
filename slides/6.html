@@ -91,7 +91,7 @@
       FIRE_CUTOFF = 40; 
       ROUNDS = 0;
 
-      var d = Drawer(ctx, board, SCALE)
+      var d = new Drawer(ctx, board, SCALE)
       d.drawTable(board.state())
       setInterval(function(){
         ROUNDS += 1

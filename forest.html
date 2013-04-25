@@ -28,7 +28,7 @@
       
       //board.setRule(makeTreeRule(.05, .01))
 
-      var d = Drawer(ctx, board, SCALE)
+      var d = new Drawer(ctx, board, SCALE)
       d.drawTable(board.state())
 
       var getRule = function(){

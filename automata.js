@@ -287,12 +287,10 @@ var makeArray = function(dimensions, callback){
 
 
 var randomStart = function (dimensions, distribution) {
-  console.log(distribution);
 
   if (typeof(distribution) === "number"){
     var val = 1 / distribution;
     var distribution = makeArray([distribution], function(){ return val });
-    console.log(distribution);
   }
  
   var f = function(){

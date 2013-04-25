@@ -33,7 +33,7 @@
         board.setRuleByNumber(195)
         //board.setRule(cyclicRule(4))
 
-        var rd = Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
+        var rd = new Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
         setInterval(function(){ 
           rd.drawRows(1) 
         }, 1000 / 60)
