@@ -72,7 +72,7 @@
 
       ANT_SCALE = 5
       var antBoard = makeBoard([60, 60], 2, NEIGHBORHOODS.MOORE, false)
-      var ant = makeAnt([30,30], langtonsAntRule, antBoard)
+      var ant = new Ant([30,30], langtonsAntRule, antBoard)
 
       var antD = Drawer(antContext, antBoard, ANT_SCALE)
       antD.drawTable()

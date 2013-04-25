@@ -27,7 +27,7 @@
       var board = makeBoard([180, 80], 2, NEIGHBORHOODS.MOORE, false, .9)
       //board.setRule(twoByTwoRule)
 
-      var a1 = makeAnt([90,40], langtonsAntRule, board)
+      var a1 = new Ant([90,40], langtonsAntRule, board)
       var d = Drawer(ctx, board, SCALE)
       d.drawTable()
 

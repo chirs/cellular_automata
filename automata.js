@@ -120,7 +120,7 @@ var langtonsAntRule = function(boardState, internalState){
 //}
 
 
-var makeAnt = function(position, rule, board){
+var Ant = function(position, rule, board){
   //var moves = [[0,1],[1,0],[-1,0],[0,-1]]
 
   // Pass state logic as a parameter.
@@ -146,19 +146,14 @@ var makeAnt = function(position, rule, board){
     return position;
   };
 
-  return {
+  this.move = move
+  this.moves = function(n){
+    for (var i=0; i<n; i++){
+      move();
+    }
+  }
+  this.getPosition = function() { return position; }
 
-    getPosition: function() { return position; },
-
-    moves: function(n){
-      for (var i=0; i<n; i++){
-        move();
-      }
-    },
-
-    move: move
-    
-  };
 };
 
 
@@ -168,7 +163,7 @@ var makeBoard = function(dimensions, cellStates, neighbors, initial_distribution
   var neighborStates = Math.pow(cellStates, neighbors.length); // Number of possible cell arrangements.
   var ruleSets = Math.pow(2, neighborStates);
 
-  var startFunc = function() { return createMatrix(initial_distribution ? randomStart(dimensions, initial_distribution) : canonicalStart(dimensions)); };
+  var startFunc = function() { return new Matrix(initial_distribution ? randomStart(dimensions, initial_distribution) : canonicalStart(dimensions)); };
   var matrix = startFunc();
 
   var rule;
@@ -230,7 +225,7 @@ var makeBoard = function(dimensions, cellStates, neighbors, initial_distribution
     };
 
     var indexes = getIndexes(dimensions);
-    var newMatrix = createMatrix(canonicalStart(dimensions));
+    var newMatrix = new Matrix(canonicalStart(dimensions));
 
     for (var i=0; i < indexes.length; i++){
       newMatrix.set(indexes[i], calculateState(indexes[i]));
@@ -321,7 +316,7 @@ var randomStart = function (dimensions, distribution) {
 var canonicalStart = function(dimensions) {
   var a = blankStart(dimensions);
   var center = dimensions.map(function(e){ return Math.floor((e-1)/2); });
-  var m = createMatrix(a);
+  var m = new Matrix(a);
   m.set(center, 1)
   return m.state()
 };
@@ -369,42 +364,39 @@ var getIndexes = function(dimensions){
 
 
 
-var createMatrix = function(matrix){
+var Matrix = function(matrix){
 
   var dimensions = getDimensions(matrix);
 
-  return {
-    state: function() {return matrix; },
+  this.state = function() {return matrix; }
 
-    move: function(p1, p2){
-      var l = [];
-      for (var i=0; i<p1.length; i++){
-        var dimension = dimensions[i];
-        var v = (p1[i] + p2[i] + dimension) % dimension;
-        l.push(v);
-      }
-      return l;
-    },
-
-    get: function(key){
-      var res = matrix;
-      for (var i=0; i < key.length; i++){
-        res = res[key[i]];
-      }
-      return res;
-    },
-
-    set: function(key, value){
-      var res = matrix
-      for (var i=0; i < (key.length - 1); i++){
-        res = res[key[i]];
-      }
-      res[key[i]] = value 
+  this.move = function(p1, p2){
+    var l = [];
+    for (var i=0; i<p1.length; i++){
+      var dimension = dimensions[i];
+      var v = (p1[i] + p2[i] + dimension) % dimension;
+      l.push(v);
     }
+    return l;
+  }
 
-  };
+  this.get = function(key){
+    var res = matrix;
+    for (var i=0; i < key.length; i++){
+      res = res[key[i]];
+      }
+    return res;
+  }
+
+  this.set = function(key, value){
+    var res = matrix
+    for (var i=0; i < (key.length - 1); i++){
+      res = res[key[i]];
+    }
+    res[key[i]] = value 
+  }
+
 };
-
 
 
 // Utility funcitons.
@@ -541,5 +533,5 @@ var hammingNeighbors = function(xs, states){
 
 
 //exports.cyclicRule = cyclicRule
-//exports.createMatrix = createMatrix
+//exports.Matrix = Matrix
 //exports.makeBoard = makeBoard
