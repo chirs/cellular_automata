@@ -1,4 +1,6 @@
-"use strict";
+!function(scope){
+
+//"use strict";
 // A program that models multi-dimensional cellular automata.
 // Capable of representing Elementary cellular automata,
 // Conway's Game of Life, Langton's Ant, and more.
@@ -14,25 +16,69 @@
 
 
 // Common neighborhoods
-var NEIGHBORHOODS = {
-  // 1d
-  //ELEMENTARY: [[-1], [0], [1]],
-  ELEMENTARY: [[0], [-1], [1]],
-  ELEMENTARY2: [[-2],[-1], [0], [1],[2]],
-  ELEMENTARY3: [[-3], [-2], [-1], [0], [1], [2], [3]],
-  // 2d
-  VON_NEUMANN: [[0,0], [0,1], [-1,0], [0,-1], [1,0]],
-  MOORE: [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
-  // MARGOLUS NEIGHBORHOOD...
-};
 
 
 // 1-Dimenisonal
 
-var cyclicRule = function(modulus){
+
+
+var hsv2rgb = function(h, s, v){
+  var h_i = h * 6;
+  var f = h * 6 - h_i;
+  var p = v * (1 - s);
+  var q = v * (1 - f * s);
+  var t = v * (1 - (1 - f * s));
+  var r, g, b;
+  switch(Math.floor(h_i)){
+  case 0: r=v, g=t, b=p; break;
+  case 1: r=q, g=v, b=p; break;
+  case 2: r=p, g=v, b=t; break;
+  case 3: r=p, g=q, b=v; break;
+  case 4: r=t, g=p, b=v; break;
+  case 5: r=v, g=p, b=q; break;
+  }
+  return [r*256,g*256,b*256];
+};
+
+
+var generateColors = function(n){
+  //return ["#ff0", "#0f0", "#00f","#f00", "#0ff", "#f0f"][a];
+
+  if (n === 2){
+    return ["#000", "#fff"];
+  }
+  if (n === 3){
+    return ["black", "green", "red"];
+  }
+
+
+  var help = function(e){ 
+    var s = Math.floor(e).toString(16);
+    if (s.length === 1){ s = "0" + s; }
+    return s;
+  };
+  var rgb2css = function(l){ return "#" + help(l[0]) + help(l[1]) + help(l[2]); };
+
+  var goldenRatioConjugate = 0.618033988749895;
+  var hue = Math.random();
+  var colors = [];
+
+  for (var i=0; i<n; i++){
+    hue += goldenRatioConjugate;
+    if (hue > 1){
+      hue = hue - 1;
+    }
+    var l = hsv2rgb(hue, 0.5, 0.95);
+    colors.push(rgb2css(l));
+  }
+  return colors;
+};
+
+
+var makeCyclicRule = function(modulus){
   return function(states){
     var currentState = states[0];
-    for (var i=1; i < states.length; i++){
+    for (var i=1, l=states.length; i < l; i++){
       var s = (states[i] - currentState + modulus) % modulus;
       if (s === 1){
         return states[i];
@@ -41,6 +87,7 @@ var cyclicRule = function(modulus){
     return currentState;
   };
 };
+
 
 var treeRule = function(states){
   var currentState = states[0];
@@ -134,24 +181,18 @@ var Ant = function(position, rule, board){
     }
   };
 
-  var move = function(){
+  var move = function(n){
     // Change the value of the cell occupied cell.
     var cellState = board.matrix().get(position);
     updateInternalState(cellState);
     board.updateValue(position);
 
-
-    var move = rule(cellState, internalState);
-    position = board.matrix().move(position, move) // Update position
+    var m = rule(cellState, internalState);
+    position = board.matrix().move(position, m) // Update position
     return position;
   };
 
   this.move = move
-  this.moves = function(n){
-    for (var i=0; i<n; i++){
-      move();
-    }
-  }
   this.getPosition = function() { return position; }
 
 };
@@ -172,13 +213,11 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
   var colorMap = generateColors(cellStates);
   var state2color = function(state){ return colorMap[state]; }
 
-
   var setRule = function(r){ 
     ruleTable = null;
     rule = r; 
   };
 
-  
   var setRuleByNumber = function(n){
     setRuleTable(createRuleTable(n));
   };
@@ -192,11 +231,11 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
     setRuleTable(randomStart([neighborStates], cellStates));
   };
 
-
   var createRuleTable = function(n){
     // Fix this.
     var arr = n.toString(2).split("").map( function(s){ return parseInt(s, 10); } );
-    while (arr.length < neighborStates){ arr.unshift(0); } // left-fill with zeros.
+    var l = arr.length
+    while (l < neighborStates){ arr.unshift(0); } // left-fill with zeros.
     return arr;
   };
 
@@ -204,61 +243,61 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
     var counts = blankStart([cellStates]);
     var indexes = getIndexes(dimensions);
 
-    for (var i=0; i < indexes.length; i++){
+    for (var i=0, l=indexes.length; i < l; i++){
       counts[matrix.get(indexes[i])] += 1;
     }
     return counts;
   };
 
 
+  var calculateState = function(cell){
+    var states = [];
+    for (var i=0, l=neighbors.length; i < l; i++){
+      var n = matrix.move(cell, neighbors[i])
+      var v = matrix.get(n)
+      states.push(v);
+    }
+    return rule(states);
+  };
 
   var generateNextState = function(){
-
-    var calculateState = function(cell){
-      var states = [];
-      for (var i=0; i < neighbors.length; i++){
-        var n = matrix.move(cell, neighbors[i])
-        var v = matrix.get(n)
-        states.push(v);
-      }
-      return rule(states);
-    };
 
     var indexes = getIndexes(dimensions);
     var newMatrix = new Matrix(canonicalStart(dimensions));
 
-    for (var i=0; i < indexes.length; i++){
+    for (var i=0, l=indexes.length; i < l; i++){
       newMatrix.set(indexes[i], calculateState(indexes[i]));
     }
 
     return newMatrix;
   };  
 
-
-  this.state = function() { return matrix.state(); }
-  this.matrix = function() { return matrix; }
-  this.setRule = setRule
-  this.setRandomRule = setRandomRule
-  this.setRuleTable = setRuleTable
-  this.setRuleByNumber = setRuleByNumber
-  this.dimensions = dimensions
-  this.ruleTable = function(){ return ruleTable; }
-  this.cellStates = cellStates
-  this.state2color = state2color
-  this.getPopulationCount = getPopulationCount
-  this.reset = function() { matrix = startFunc(); }
-
-  this.updateValue = function(point){
+  var updateValue = function(point){
       var s = matrix.get(point);
       var ns = (s + 1) % cellStates;
       matrix.set(point, ns);
       return ns;
-    }
-  this.next = function(){
+  }
+
+  var next = function(){
       matrix = generateNextState();
       return matrix
   }
 
+  this.cellStates = cellStates
+  this.dimensions = dimensions
+  this.getPopulationCount = getPopulationCount
+  this.matrix = function() { return matrix; }
+  this.next = next
+  this.reset = function() { matrix = startFunc(); }
+  this.ruleTable = function(){ return ruleTable; }
+  this.setRule = setRule
+  this.setRandomRule = setRandomRule
+  this.setRuleTable = setRuleTable
+  this.setRuleByNumber = setRuleByNumber
+  this.state = function() { return matrix.state(); }
+  this.state2color = state2color
+  this.updateValue = updateValue
 
 };
 
@@ -270,17 +309,15 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
 var makeArray = function(dimensions, callback){
   // Turn this into a map?
   // Fix the redundant code...
-  var i;
+
   var arr = [];
-  if (dimensions.length === 0){
-    // pass
+  if (dimensions.length === 0){ // pass
   } else if (dimensions.length === 1){
-    for (i=0; i < dimensions[0]; i++){ arr.push(callback()); }
+    for (var i=0; i < dimensions[0]; i++){ arr.push(callback()); }
   } else {
-    for (i=0; i<dimensions[0]; i++){
+    for (var i=0; i<dimensions[0]; i++){
       arr.push(makeArray(dimensions.slice(1), callback));
     }
-
   }
   return arr;
 };
@@ -296,7 +333,7 @@ var randomStart = function (dimensions, distribution) {
   var f = function(){
     var cutoff = 0;
     var r = Math.random();
-    for (var i=0; i < distribution.length; i++){
+    for (var i=0, l=distribution.length; i < l; i++){
       cutoff += distribution[i];
       if (r < cutoff) {
         return i;
@@ -319,8 +356,6 @@ var canonicalStart = function(dimensions) {
 var blankStart = function(dimensions) {
   return makeArray(dimensions, function(){ return 0; });
 };
-
-
 
 var getDimensions = function(table){
   var D = []
@@ -351,14 +386,6 @@ var getIndexes = function(dimensions){
 };
       
 
-// Sub these into table object.
-// Make them not recursive.
-
-
-// Matrix state management.
-
-
-
 var Matrix = function(matrix){
 
   var dimensions = getDimensions(matrix);
@@ -366,18 +393,18 @@ var Matrix = function(matrix){
   this.state = function() {return matrix; }
 
   this.move = function(p1, p2){
-    var l = [];
-    for (var i=0; i<p1.length; i++){
+    var arr = [];
+    for (var i=0, l=p1.length; i<l; i++){
       var dimension = dimensions[i];
       var v = (p1[i] + p2[i] + dimension) % dimension;
-      l.push(v);
+      arr.push(v);
     }
-    return l;
+    return arr;
   }
 
   this.get = function(key){
     var res = matrix;
-    for (var i=0; i < key.length; i++){
+    for (var i=0, l=key.length; i < l; i++){
       res = res[key[i]];
       }
     return res;
@@ -385,26 +412,24 @@ var Matrix = function(matrix){
 
   this.set = function(key, value){
     var res = matrix
-    for (var i=0; i < (key.length - 1); i++){
+    for (var i=0,l=key.length-1; i < l; i++){
       res = res[key[i]];
     }
     res[key[i]] = value 
   }
-
 };
 
 
-// Utility funcitons.
+// Utility functions.
 
 var isArray = function (o) {
   return (o instanceof Array) ||
     (Object.prototype.toString.apply(o) === '[object Array]');
 };
 
-
 var sum = function(xs){
   var r = 0;
-  for (var i=0; i < xs.length; i++){
+  for (var i=0, l=xs.length; i < l; i++){
     r += xs[i];
   }
   return r;
@@ -412,7 +437,7 @@ var sum = function(xs){
 
 var flatten = function(arr){
   var A = [];
-  for (var i=0; i < arr.length; i++){
+  for (var i=0,l=arr.length; i < l; i++){
     if (isArray(arr[i])){
       A = A.concat(flatten(arr[i]));
     } else {
@@ -422,7 +447,6 @@ var flatten = function(arr){
   }
   return A;
 };
-
 
 var range = function(start, end){
   if (end === undefined){
@@ -437,7 +461,6 @@ var range = function(start, end){
   return A;
 };
 
-
 var randomChoice = function(arr){
   return arr[Math.floor(Math.random() * arr.length)];
 };
@@ -449,7 +472,7 @@ var randomChoice = function(arr){
 var entropy = function(xs){
   var total = 0;
   var frequencies = {};
-  for (var i=0; i < xs.length; i++){
+  for (var i=0,l=xs.length; i < l; i++){
     total += 1;
     if (xs[i] in frequencies){
       frequencies[xs[i]] += 1;
@@ -468,11 +491,10 @@ var entropy = function(xs){
   return (-1 * s);
 };
 
-
 // from http://pmav.eu/stuff/javascript-hashing-functions/source.html
 var simpleHash = function(s, tableSize) {
   var hash = 0;
-  for (var i = 0; i < s.length; i++) {
+  for (var i=0,l=s.length; i < l; i++) {
     hash += (s[i].charCodeAt() * (i+1));
   }
     return Math.abs(hash) % tableSize;
@@ -481,7 +503,7 @@ var simpleHash = function(s, tableSize) {
 // base 10.
 var array2integer = function(arr){
   var n = 0;
-  for (var i=0; i < arr.length; i++){ 
+  for (var i=0,l=arr.length; i < l; i++){ 
     n = n << 1; 
     n += arr[i]; 
   }
@@ -491,14 +513,13 @@ var array2integer = function(arr){
 
 var hammingDistance = function(xs, ys){
   var n = 0;
-  for (var i=0; i < xs.length; i++){
+  for (var i=0,l=xs.length; i < l; i++){
     if (xs[i] !== ys[i]){
       n += 1;
     }
   }
   return n;
 };
-
 
 var hammingNeighbors = function(xs, states){
   // Strings similar to xs with a hamming distance of 1.
@@ -517,16 +538,34 @@ var hammingNeighbors = function(xs, states){
   };
 
   var a = [];
-  for (var i=0; i < xs.length; i++){
+  for (var i=0,l=xs.length; i < l; i++){
     var ns = subNeighbors(xs, i, states);
     a = a.concat(ns);
   }
   return a;
 };
+  
+  this.Ant = Ant
+  this.Board = Board
+  this.neighborhoods = {
+    elementary: [[0], [-1], [1]],
+    elementary2: [[-2],[-1], [0], [1],[2]],
+    elementary3: [[-3], [-2], [-1], [0], [1], [2], [3]],
+    vonNeumann: [[0,0], [0,1], [-1,0], [0,-1], [1,0]],
+    moore: [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
+    // margolis...
+  }
 
-
-
-
-//exports.cyclicRule = cyclicRule
-//exports.Matrix = Matrix
-//exports.makeBoard = makeBoard
+  this.rules = {
+    makeCyclic: makeCyclicRule,
+    gameOfLife: gameOfLifeRule,
+    makeTree: makeTreeRule,
+    langtonsAnt: langtonsAntRule,
+    twoByTwo: twoByTwoRule,
+    makeTree: makeTreeRule,
+    maze: mazeRule,
+    serviettes: serviettesRule,
+    morley: morleyRule
+  }
+    
+}(this);

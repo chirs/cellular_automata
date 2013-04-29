@@ -24,8 +24,7 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var board = new Board([240, 160], 2, NEIGHBORHOODS.MOORE, [.5, .5])
-      //board.setRule(gameOfLifeRule)
+      var board = new Board([240, 160], 2, neighborhoods.moore, [.5, .5])
 
       var d = new Drawer(ctx, board, SCALE)
       d.drawTable(board.state())

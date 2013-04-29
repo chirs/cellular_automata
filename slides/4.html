@@ -26,11 +26,11 @@
 
       var reset = function(){
 
-        SCALE = 2
+        var SCALE = 2
         var cellCount = elemCanvas.width / SCALE 
-        var board = new Board([cellCount], 4, NEIGHBORHOODS.ELEMENTARY, true)
-        board.setRandomRule()
-        board.setRule(cyclicRule(4))
+        var board = new Board([cellCount], 4, neighborhoods.elementary, true)
+        //board.setRandomRule()
+        board.setRule(rules.makeCyclic(4))
 
         var rd = new Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
         //setInterval(function(){ 

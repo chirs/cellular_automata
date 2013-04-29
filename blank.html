@@ -19,20 +19,18 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 10
 
       var blankCanvas = document.getElementById("blankBoard");
       var context = blankCanvas.getContext("2d");
 
-      var board = new Board([180, 80], 2, NEIGHBORHOODS.MOORE, false, .9)
-      board.setRule(twoByTwoRule)
-
-      var drawer = new Drawer(context, board, SCALE)
+      var board = new Board([180, 80], 2, neighborhoods.moore, false)
+      board.setRule(rules.twoByTwo)
+      var drawer = new Drawer(context, board, 10)
     
       $("canvas").click(drawer.changeSquare)
       $("#next").click(function(){ drawer.drawTableNext(); console.log(board.state()) })
       $("#play").click(function(){ 
-        setInterval(function(){ drawer.drawTableNext(board) }, 1000)
+        setInterval(function(){ drawer.drawTable(board); board.next() }, 1000)
       })
       });
   </script>

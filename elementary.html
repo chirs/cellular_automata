@@ -23,16 +23,11 @@
 
       var elemCanvas = document.getElementById("elemBoard");
       var ctx = elemCanvas.getContext("2d");
-
       var reset = function(){
-
-        SCALE = 2
+        var SCALE = 2
         var cellCount = elemCanvas.width / SCALE 
-        var board = new Board([cellCount], 2, NEIGHBORHOODS.ELEMENTARY)
-        //board.setRandomRule()
+        var board = new Board([cellCount], 2, neighborhoods.elementary, false)
         board.setRuleByNumber(145)
-        //board.setRule(function(){ if (Math.random() > .3) { return 0; } else { return 1; } })
-        //board.setRule(cyclicRule(4))
 
         var rd = new Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
         setInterval(function(){ 
@@ -42,7 +37,6 @@
         //$("#eid").html(ruleNumber);
       }
       
-
       $('html').keydown(function (e) {
         var keyCode = e.keyCode || e.which,
         arrow = {left: 37, up: 38, right: 39, down: 40 };

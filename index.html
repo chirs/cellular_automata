@@ -13,7 +13,6 @@
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <!--<script type="text/javascript" src="ant.js"></script>-->
   <script type="text/javascript" src="automata.js"></script>
   <script type="text/javascript" src="draw.js"></script>
 
@@ -27,13 +26,11 @@
       var elemCanvas = document.getElementById("elemBoard");
       var elemContext = elemCanvas.getContext("2d");
 
-      ELEMENTARY_SCALE = 10
-
-      var elemBoard = new Board([30], 3, NEIGHBORHOODS.ELEMENTARY2, true, .3)
+      var elemBoard = new Board([30], 3, neighborhoods.elementary2, [.3, .7])
       var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
 
       elemBoard.setRandomRule()
-      var rd = new Drawer(elemContext, elemBoard, ELEMENTARY_SCALE, 30, true)
+      var rd = new Drawer(elemContext, elemBoard, 10, 30, true)
       //rd.draw()
       ROWS = 0
       setInterval(function(){ 
@@ -48,17 +45,20 @@
 
       // Life-like game.
 
-      LIFE_SCALE = 10
       var lifeCanvas = document.getElementById("lifeBoard");
       var lifeContext = lifeCanvas.getContext("2d");
+      var lifeBoard = new Board([30, 30], 2, neighborhoods.moore, true, [.3, .7])
+      lifeBoard.setRule(rules.gameOfLife)
 
-      var lifeBoard = new Board([30, 30], 2, NEIGHBORHOODS.MOORE, true, .3)
-      lifeBoard.setRule(gameOfLifeRule)
+      var lifeD = new Drawer(lifeContext, lifeBoard, 10)
+      lifeD.drawTable()
+      setInterval(function(){
+        lifeD.drawTable();
+        lifeBoard.next();
+      }, 1000 / 60)
 
-      var d = Drawer(lifeContext, lifeBoard, LIFE_SCALE)
-      d.drawTable()
 
-      setInterval(d.drawTableNext, 250)
+      //setInterval(d.drawTableNext, 250)
 
       
       // Simple ant.
@@ -68,10 +68,10 @@
 
 
       ANT_SCALE = 5
-      var antBoard = new Board([60, 60], 2, NEIGHBORHOODS.MOORE, false)
-      var ant = new Ant([30,30], langtonsAntRule, antBoard)
+      var antBoard = new Board([60, 60], 2,neighborhoods.moore, false)
+      var ant = new Ant([30,30], rules.langtonsAnt, antBoard)
 
-      var antD = Drawer(antContext, antBoard, ANT_SCALE)
+      var antD = new Drawer(antContext, antBoard, ANT_SCALE)
       antD.drawTable()
 
       var antMover = function(ant, board, context, drawer){
@@ -91,9 +91,9 @@
 
 
       BLANK_SCALE = 5
-      var blankBoard = new Board([60, 60], 2, NEIGHBORHOODS.MOORE, false)
-      blankBoard.setRule(gameOfLifeRule)
-      var blankD = Drawer(blankContext, blankBoard, BLANK_SCALE)
+      var blankBoard = new Board([60, 60], 2, neighborhoods.moore, false)
+      blankBoard.setRule(rules.gameOfLife)
+      var blankD = new Drawer(blankContext, blankBoard, BLANK_SCALE)
       blankD.drawTable()
 
       $("#blankBoard").click(blankD.changeSquare)
@@ -101,24 +101,23 @@
       var make2dGame = function(canvasID, board, scale){
         var canvas = document.getElementById(canvasID)
         var context = canvas.getContext("2d");        
-        var drawer = Drawer(context, board, scale)
+        var drawer = new Drawer(context, board, scale)
         drawer.drawTable()
         setInterval(drawer.drawTableNext, 250)
       }
 
 
-      var morleyBoard = new Board([30, 30], 2, NEIGHBORHOODS.MOORE, true, .3)
-      morleyBoard.setRule(morleyRule)
+      var morleyBoard = new Board([30, 30], 2, neighborhoods.moore, true, .3)
+      morleyBoard.setRule(rules.morley)
       make2dGame("morleyBoard", morleyBoard, 10)
 
-      var serviettesBoard = new Board([100, 100], 2, NEIGHBORHOODS.MOORE, true, .3)
-      serviettesBoard.setRule(serviettesRule)
+      var serviettesBoard = new Board([100, 100], 2, neighborhoods.moore, true, .3)
+      serviettesBoard.setRule(rules.serviettes)
       make2dGame("serviettesBoard", serviettesBoard, 3)
 
-      var mazeBoard = new Board([60, 60], 2, NEIGHBORHOODS.MOORE, true, .3)
-      mazeBoard.setRule(mazeRule)
-      make2dGame("mazeBoard", mazeBoard, 5)
-
+      var mazeBoard = new Board([60, 60], 2, neighborhoods.moore, true, .3)
+      mazeBoard.setRule(rules.maze)
+      //make2dGame("mazeBoard", mazeBoard, 5)
 
 
     });
@@ -146,8 +145,8 @@
   <div><a href="/ant.html">Langton's Ant</a></div>
 </div>
 <div class="box">
-  <div><a href="/life.html">Morley</a></div>
   <canvas id="morleyBoard" width="300" height="300"></canvas>
+  <div><a href="/life.html">Morley</a></div>
 </div>
 </div>
 
@@ -157,8 +156,8 @@
   <div><a href="/blank.html">Blank</a></div>
 </div>
 <div class="box">
-  <div><a href="/life.html">Serviettes</a></div>
   <canvas id="serviettesBoard" width="300" height="300"></canvas>
+  <div><a href="/life.html">Serviettes</a></div>
 </div>
 </div>
 
