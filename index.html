@@ -109,6 +109,12 @@
       board6.setRule(rules.makeTree(.05, .003))
       draw2dBoard("board6", board6, 2);
 
+
+      // Voting
+      var board7 = new Board([50, 50], 2, neighborhoods.moore, 2)
+      board7.setRule(rules.vote)
+      draw2dBoard("board7", board7, 6);
+
     });
   </script>
 
@@ -150,5 +156,17 @@
   <div><a href="/examples/forest.html">Forest fire</a></div>
 </div>
 </div>
+
+<div>
+<div class="box">
+  <canvas id="board7" width="300" height="300"></canvas>
+  <div><a href="/examples/blank.html">Vote</a></div>
+</div>
+<div class="box">
+  <canvas id="board8" width="300" height="300"></canvas>
+  <div><a href="/examples/forest.html">nothing</a></div>
+</div>
+</div>
+
 
 </body>
