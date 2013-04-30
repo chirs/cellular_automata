@@ -6,14 +6,14 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="description" content="Forest Fires">
 
-  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="automata.js"></script>
-  <script type="text/javascript" src="draw.js"></script>
+  <script type="text/javascript" src="/js/automata.js"></script>
+  <script type="text/javascript" src="/js/draw.js"></script>
 
 
   <script type="text/javascript">
@@ -24,7 +24,7 @@
 
       var board = new Board([250, 150], 3, neighborhoods.moore, [0.70, 0.3, 0])
 
-      //board.setRule(makeTreeRule(.05, .01))
+    
 
       var d = new Drawer(ctx, board, 4)
       d.drawTable(board.state())

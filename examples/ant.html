@@ -7,48 +7,47 @@
   <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
   <meta name="description" content="Langton's Ant">
 
-  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="automata.js"></script>
-  <script type="text/javascript" src="draw.js"></script>
-
+  <script type="text/javascript" src="/js/automata.js"></script>
+  <script type="text/javascript" src="/js/draw.js"></script>
 
   <script type="text/javascript">
     $(document).ready(function() {
 
-
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var board = new Board([250, 150], 2, neighborhoods.moore, [0.70, 0.3])
-      board.setRule(rules.gameOfLife)
-      
-      var d = new Drawer(ctx, board, 4)
-      d.drawTable(board.state())
-      setInterval(function(){
-        d.drawTable();
-        board.next();
-      }, 1000 / 60)
+      var board = new Board([180, 80], 2, neighborhoods.moore, false)
+      var a1 = new Ant([90,40], rules.langtonsAnt, board)
+      var d = new Drawer(ctx, board, 10)
 
-      $("#rule").click(board.reset);
+      d.drawTable()
+      setInterval(function(){
+        a1.move(100)
+        d.drawTable()
+        d.fillCoord(a1.getPosition(), "red")
+      }, 100)
+
+      //$("#next").click(function(){ drawTable(ctx, g.next(), SCALE) })
+      //$("#reset").click(function(){g.reset(); drawTable(ctx, g.state(), SCALE) })
+      //$("#lifeBoard").click(changeSquare(ctx, g, SCALE))
 
     });
   </script>
 
 </head>
-
-
 <body class="home">
-
 
 <canvas id="lifeBoard" width="1800" height="800"></canvas>
 
 <div id="controls">
-<div id="rule">RESET</div>
+<div id="next">next</div>
+<div id="reset">reset</div>
 </div>
 
 </body>

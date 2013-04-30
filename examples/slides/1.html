@@ -7,36 +7,39 @@
   <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
   <meta name="description" content="Langton's Ant">
 
-  <link rel="stylesheet" type="text/css" href="/style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="/automata.js"></script>
-  <script type="text/javascript" src="/draw.js"></script>
+  <script type="text/javascript" src="/js/automata.js"></script>
+  <script type="text/javascript" src="/js/draw.js"></script>
 
 
   <script type="text/javascript">
     $(document).ready(function() {
+      iID = null
 
       var elemCanvas = document.getElementById("elemBoard");
       var ctx = elemCanvas.getContext("2d");
 
       var reset = function(){
 
-        var SCALE = 2
+        SCALE = 2
         var cellCount = elemCanvas.width / SCALE 
-        var board = new Board([cellCount], 4, neighborhoods.elementary, true)
+        var board = new Board([cellCount], 2, neighborhoods.elementary)
         //board.setRandomRule()
-        board.setRule(rules.makeCyclic(4))
+        board.setRuleByNumber(195)
+        //board.setRule(cyclicRule(4))
 
         var rd = new Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
-        //setInterval(function(){ 
-        //  rd.drawRows(1) 
-        //}, 1000 / 60)
+        setInterval(function(){ 
+          rd.drawRows(1) 
+        }, 1000 / 60)
 
         $(elemCanvas).click(function(){
+          board.setRandomRule()
           rd.reset();
           //board.setRandomRule();
         });
@@ -72,7 +75,10 @@
 
 </head>
 
+
 <body class="home">
-  <canvas id="elemBoard" width="1600" height="800"></canvas>
-  <div class="next"><a href="5.html">></a></a>
+
+<canvas id="elemBoard" width="960" height="640"></canvas>
+<div class="next"><a href="2.html">></a></a>
+
 </body>

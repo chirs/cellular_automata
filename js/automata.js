@@ -45,7 +45,7 @@ var generateColors = function(n){
   //return ["#ff0", "#0f0", "#00f","#f00", "#0ff", "#f0f"][a];
 
   if (n === 2){
-    return ["#000", "#fff"];
+    return ["#fff", "#000"];
   }
   if (n === 3){
     return ["black", "green", "red"];
@@ -128,16 +128,6 @@ var makeLifeStyleRule = function(deadStates, liveStates){
   };
 };
 
-var forgotRule = makeLifeStyleRule([2], []);
-var gameOfLifeRule = makeLifeStyleRule([3], [2,3]);
-var morleyRule = makeLifeStyleRule([3,6,8], [2,4,5]); // Named after Stephen Morley; also called Move. Supports very high-period and slow spaceships
-var dayAndNightRule = makeLifeStyleRule([3,6,7,8], [3,4,6,7,8]);
-var highLifeRule = makeLifeStyleRule([3,6], [2,3]);
-var twoByTwoRule = makeLifeStyleRule([3,6], [1,2,5]);
-var mazeRule = makeLifeStyleRule([1,2,3,4,5], [3]);
-var serviettesRule = makeLifeStyleRule([], [2,3,4]);
-var walledCitiesRule = makeLifeStyleRule([2,3,4,5], [4,5,6,7,8]);
-
 
 // Ant Rules
 
@@ -216,6 +206,7 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
   var setRule = function(r){ 
     ruleTable = null;
     rule = r; 
+    return self;
   };
 
   var setRuleByNumber = function(n){
@@ -558,14 +549,21 @@ var hammingNeighbors = function(xs, states){
 
   this.rules = {
     makeCyclic: makeCyclicRule,
-    gameOfLife: gameOfLifeRule,
     makeTree: makeTreeRule,
     langtonsAnt: langtonsAntRule,
-    twoByTwo: twoByTwoRule,
-    makeTree: makeTreeRule,
-    maze: mazeRule,
-    serviettes: serviettesRule,
-    morley: morleyRule
+    gnarl: makeLifeStyleRule([1], [1]),
+    gameOfLife: makeLifeStyleRule([3], [2,3]),
+    highLife: makeLifeStyleRule([3,6], [2,3]),
+    twoByTwo: makeLifeStyleRule([3,6], [1,2,5]),
+    walledCities: makeLifeStyleRule([2,3,4,5], [4,5,6,7,8]),
+    seeds: makeLifeStyleRule([2], []),
+    dayAndNight: makeLifeStyleRule([3,6,7,8], [3,4,6,7,8]),
+    maze: makeLifeStyleRule([1,2,3,4,5], [3]),
+    serviettes: makeLifeStyleRule([], [2,3,4]),
+    amoeba: makeLifeStyleRule([3,5,7], [1,3,5,8]),
+    coral: makeLifeStyleRule([3], [4,5,6,7,8]),
+    morley: makeLifeStyleRule([3,6,8], [2,4,5]), // Named after Stephen Morley; also called Move. Supports very high-period and slow spaceships
+    vote: makeLifeStyleRule([5,6,7,8], [4,5,6,7,8]),
   }
     
 }(this);

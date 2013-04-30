@@ -7,14 +7,14 @@
   <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
   <meta name="description" content="Langton's Ant">
 
-  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="automata.js"></script>
-  <script type="text/javascript" src="draw.js"></script>
+  <script type="text/javascript" src="/js/automata.js"></script>
+  <script type="text/javascript" src="/js/draw.js"></script>
 
 
   <script type="text/javascript">
@@ -45,22 +45,24 @@
 
       // Life-like game.
 
-      var lifeCanvas = document.getElementById("lifeBoard");
-      var lifeContext = lifeCanvas.getContext("2d");
-      var lifeBoard = new Board([30, 30], 2, neighborhoods.moore, true, [.3, .7])
+
+      var draw2dBoard = function(canvasId, board, scale){
+        var canvas = document.getElementById(canvasId);
+        var context = canvas.getContext("2d");
+
+        var d = new Drawer(context, board, scale)
+        d.drawTable(board.state())
+        setInterval(function(){
+          d.drawTable();
+          board.next();
+        }, 1000 / 60)
+      };
+
+      var lifeBoard = new Board([50, 50], 2, neighborhoods.moore, [0.70, 0.3])
       lifeBoard.setRule(rules.gameOfLife)
-
-      var lifeD = new Drawer(lifeContext, lifeBoard, 10)
-      lifeD.drawTable()
-      setInterval(function(){
-        lifeD.drawTable();
-        lifeBoard.next();
-      }, 1000 / 60)
-
-
-      //setInterval(d.drawTableNext, 250)
-
+      draw2dBoard("lifeBoard", lifeBoard, 6);
       
+
       // Simple ant.
 
       var antCanvas = document.getElementById("antBoard");
@@ -89,36 +91,23 @@
       var blankCanvas = document.getElementById("blankBoard");
       var blankContext = blankCanvas.getContext("2d");
 
-
-      BLANK_SCALE = 5
       var blankBoard = new Board([60, 60], 2, neighborhoods.moore, false)
       blankBoard.setRule(rules.gameOfLife)
-      var blankD = new Drawer(blankContext, blankBoard, BLANK_SCALE)
+      var blankD = new Drawer(blankContext, blankBoard, 5)
       blankD.drawTable()
 
       $("#blankBoard").click(blankD.changeSquare)
 
-      var make2dGame = function(canvasID, board, scale){
-        var canvas = document.getElementById(canvasID)
-        var context = canvas.getContext("2d");        
-        var drawer = new Drawer(context, board, scale)
-        drawer.drawTable()
-        setInterval(drawer.drawTableNext, 250)
-      }
 
+      // cyclic 
+      var board3 = new Board([100, 100], 10, neighborhoods.moore, 10)
+      board3.setRule(rules.makeCyclic(10))
+      draw2dBoard("board3", board3, 3);
 
-      var morleyBoard = new Board([30, 30], 2, neighborhoods.moore, true, .3)
-      morleyBoard.setRule(rules.morley)
-      make2dGame("morleyBoard", morleyBoard, 10)
-
-      var serviettesBoard = new Board([100, 100], 2, neighborhoods.moore, true, .3)
-      serviettesBoard.setRule(rules.serviettes)
-      make2dGame("serviettesBoard", serviettesBoard, 3)
-
-      var mazeBoard = new Board([60, 60], 2, neighborhoods.moore, true, .3)
-      mazeBoard.setRule(rules.maze)
-      //make2dGame("mazeBoard", mazeBoard, 5)
-
+      // forest
+      var board6 = new Board([150, 150], 3, neighborhoods.moore, [0.70, 0.3, .0])
+      board6.setRule(rules.makeTree(.05, .003))
+      draw2dBoard("board6", board6, 2);
 
     });
   </script>
@@ -131,46 +120,35 @@
 <div>
 <div class="box">
   <canvas id="elemBoard" width="300" height="300"></canvas>
-  <div><a href="/elementary.html">Elementary cellular automaton</a></div>
+  <div><a href="/examples/elementary.html">Elementary cellular automata</a></div>
 </div>
 <div class="box">
   <canvas id="lifeBoard" width="300" height="300"></canvas>
-  <div><a href="/life.html">Conway's Game of Life</a></div>
+  <div><a href="/examples/life.html">Conway's Game of Life</a></div>
 </div>
 </div>
 
 <div>
+<div class="box">
+  <canvas id="board3" width="300" height="300"></canvas>
+  <div><a href="/examples/cyclic.html">Cyclic</a></div>
+</div>
 <div class="box">
   <canvas id="antBoard" width="300" height="300"></canvas>
-  <div><a href="/ant.html">Langton's Ant</a></div>
+  <div><a href="/examples/ant.html">Langton's Ant</a></div>
 </div>
-<div class="box">
-  <canvas id="morleyBoard" width="300" height="300"></canvas>
-  <div><a href="/life.html">Morley</a></div>
-</div>
+
 </div>
 
 <div>
 <div class="box">
   <canvas id="blankBoard" width="300" height="300"></canvas>
-  <div><a href="/blank.html">Blank</a></div>
+  <div><a href="/examples/blank.html">Blank</a></div>
 </div>
 <div class="box">
-  <canvas id="serviettesBoard" width="300" height="300"></canvas>
-  <div><a href="/life.html">Serviettes</a></div>
+  <canvas id="board6" width="300" height="300"></canvas>
+  <div><a href="/examples/forest.html">Forest fire</a></div>
 </div>
 </div>
-
-<!--
-<div>
-<div class="box">
-  <div><a href="/ant.html">Maze</a></div>
-  <canvas id="mazeBoard" width="300" height="300"></canvas>
-</div>
-<div class="box">
-  <div><a href="/blank.html">Blank</a></div>
-  <canvas id="blankBoard" width="300" height="300"></canvas>
-</div>
-</div>-->
 
 </body>

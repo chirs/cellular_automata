@@ -7,49 +7,44 @@
   <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
   <meta name="description" content="Langton's Ant">
 
-  <link rel="stylesheet" type="text/css" href="/style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
 
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="/automata.js"></script>
-  <script type="text/javascript" src="/draw.js"></script>
+  <script type="text/javascript" src="/js/automata.js"></script>
+  <script type="text/javascript" src="/js/draw.js"></script>
 
 
   <script type="text/javascript">
     $(document).ready(function() {
-      SCALE = 4
+      var canvas = document.getElementById("board");
+      var ctx = canvas.getContext("2d");
+      var scale = 4
+      canvas.width = document.width
+      canvas.height = document.height
+      var cells = [canvas.height / scale, canvas.width / scale]
+      var board = new Board(cells, 2, neighborhoods.moore, [.5, .5])
+      board.setRule(rules.gameOfLife)
 
-      var lifeCanvas = document.getElementById("lifeBoard");
-      var ctx = lifeCanvas.getContext("2d");
-
-      var board = new Board([240, 160], 2, neighborhoods.moore, [.5, .5])
-
-      var d = new Drawer(ctx, board, SCALE)
-      d.drawTable()
+      var d = new Drawer(ctx, board, scale)
+      d.drawTable(board.state())
       setInterval(function(){
-        d.drawTableNext();
-      }, 100)
+        d.drawTableNext()
+      }, 1000 / 60)
 
-      //$("#rule").html(board.getRuleNumber());
-      $(lifeCanvas).click(function(){
+      $(canvas).click(function(){
         board.setRandomRule();
         board.reset();
       })
-    
-      //setInterval(function(){ $("#rule").click() }, 1000)
-
     });
   </script>
 
 </head>
-
-
 <body class="home">
-
-
-<canvas id="lifeBoard" width="960" height="640"></canvas>
-<div class="next"><a href="4.html">></a></a>
-
+  <canvas id="board"></canvas>
+  <div class="next">
+  <a href="1.html">></a>
+  </div>
 </body>
