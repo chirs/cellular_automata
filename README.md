@@ -1,4 +1,6 @@
-### structures is a framework for generating and visualizing cellular automata.
+## structures 
+
+### a framework for generating and visualizing cellular automata.
 
 structures can simulate and draw a very wide array of cellular automata. Support includes:
 
@@ -7,7 +9,7 @@ structures can simulate and draw a very wide array of cellular automata. Support
 * A board can cycle through any number of states.
 * Langton's ant-style moving cells are supported.
 
-## quick start
+### quick start
 
 To use the automata, simply include the draw.js and automata.js files.
 
@@ -24,7 +26,7 @@ board = new Board(cells, states, neighborhoods.moore, randomStart)
 board.setRule(rules.gameOfLife)
 `
 
-## Automata supported.
+### automata supported
 
 Tested automata include:
 
@@ -33,6 +35,16 @@ Tested automata include:
 * Langton's ant-style automata (can be used in conjunction with other board rules or ants.)
 * Cyclic automata
 * Forest fire simulation automata.
+
+### To-do
+
+* add 3-d visualization for 2-d and 3-d automata
+* improve user functionality in example automata
+* implement infinite horizontal scrolling on index page
+* review readme.
+* consider package organization
+* improve browser / framerate sync (package?)
+* add chaining to setRule, other methods.
 
 
 
