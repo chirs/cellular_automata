@@ -19,38 +19,32 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      var lifeCanvas = document.getElementById("lifeBoard");
-      var ctx = lifeCanvas.getContext("2d");
-
-      var board = new Board([240, 160], 2, neighborhoods.moore, [.5, .5])
+      var canvas = document.getElementById("board");
+      var ctx = canvas.getContext("2d");
+      var scale = 4
+      canvas.width = document.width
+      canvas.height = document.height
+      var cells = [canvas.height / scale, canvas.width / scale]
+      var board = new Board(cells, 2, neighborhoods.moore, [.5, .5])
       board.setRule(rules.gameOfLife)
 
-      var d = new Drawer(ctx, board, 4)
+      var d = new Drawer(ctx, board, scale)
       d.drawTable(board.state())
       setInterval(function(){
         d.drawTableNext()
       }, 1000 / 60)
 
-
-
-      //$("#rule").html(board.getRuleNumber());
-      $(lifeCanvas).click(function(){
+      $(canvas).click(function(){
         board.setRandomRule();
         board.reset();
       })
-    
-      //setInterval(function(){ $("#rule").click() }, 1000)
-
     });
   </script>
 
 </head>
-
-
 <body class="home">
-
-
-<canvas id="lifeBoard" width="960" height="640"></canvas>
-<div class="next"><a href="1.html">></a></a>
-
+  <canvas id="board"></canvas>
+  <div class="next">
+  <a href="1.html">></a>
+  </div>
 </body>

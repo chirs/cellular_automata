@@ -42,7 +42,9 @@
 
     var drawTableNext = function(){
       drawTable();
-      board.next();
+      //board.next();
+      //console.log(board)
+      //board.next();
     }
 
 

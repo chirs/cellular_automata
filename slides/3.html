@@ -27,10 +27,10 @@
       var board = new Board([240, 160], 2, neighborhoods.moore, [.5, .5])
 
       var d = new Drawer(ctx, board, SCALE)
-      d.drawTable(board.state())
-      //setInterval(function(){
-      //  d.drawTableNext()
-      //}, 100)
+      d.drawTable()
+      setInterval(function(){
+        d.drawTableNext();
+      }, 100)
 
       //$("#rule").html(board.getRuleNumber());
       $(lifeCanvas).click(function(){
