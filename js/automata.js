@@ -199,6 +199,7 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
 
   this.startFunc = function() { return new Matrix(initial_distribution ? randomStart(dimensions, initial_distribution) : canonicalStart(dimensions)); };
   this.matrix = this.startFunc();
+  this.futureMatrix = new Matrix(canonicalStart(this.dimensions));
 
   this.rule = undefined
   this.ruleTable = null;
@@ -254,16 +255,6 @@ Board.prototype.calculateState = function(cell){
     return this.rule(states);
   };
 
-Board.prototype.generateNextState = function(){
-
-    var newMatrix = new Matrix(canonicalStart(this.dimensions));
-
-    for (var i=0, l=this.indexes.length; i < l; i++){
-      newMatrix.set(this.indexes[i], this.calculateState(this.indexes[i]));
-    }
-
-    return newMatrix;
-  };  
 
 Board.prototype.updateValue = function(point){
   var s = this.matrix.get(point);
@@ -273,7 +264,13 @@ Board.prototype.updateValue = function(point){
 }
 
 Board.prototype.next = function(){
-  this.matrix = this.generateNextState();
+    for (var i=0, l=this.indexes.length; i < l; i++){
+      this.futureMatrix.set(this.indexes[i], this.calculateState(this.indexes[i]));
+    }
+
+  var tmp = this.matrix
+  this.matrix = this.futureMatrix
+  this.futureMatrix = tmp
   return this.matrix
 }
 
