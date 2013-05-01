@@ -67,6 +67,17 @@
   }
 
 
+  Drawer.prototype.draw2dBoard = function(){
+    var d = this;
+    this.drawTable(this.board.getState())
+    setInterval(function(){
+      d.drawTable();
+      d.board.next();
+    }, 1000 / 60)
+  };
+
+
+
 
 // Utilities.
 
