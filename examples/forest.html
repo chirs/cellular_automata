@@ -27,7 +27,7 @@
     
 
       var d = new Drawer(ctx, board, 4)
-      d.drawTable(board.state())
+      d.drawTable(board.getState())
 
       var getRule = function(){
         var g = parseFloat($("#growProb").val());

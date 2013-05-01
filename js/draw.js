@@ -7,25 +7,29 @@
 
 
   var Drawer = function(context, board, scale){
+    this.context = context
+    this.board = board
+    this.scale = scale
 
-    var row = 0;
+    this.row = 0; // bad idea.
+  }
 
-    var dRow = function(arr){
-      for (var i=0; i < arr.length; i++){
-        var color = board.state2color(arr[i]);
-        fillCoord([i, row], color);
+  Drawer.prototype.drawRow = function(arr){
+     for (var i=0, l=arr.length; i < l; i++){
+        var color = this.board.state2color(arr[i]);
+        this.fillCoord([i, this.row], color);
       }
     };
 
-    var fillCoord = function(coord, style){
-      var x = coord[0] * scale ;
-      var y = coord[1] * scale ;
-      context.fillStyle = style;
-      context.fillRect(x,y,scale,scale);
+  Drawer.prototype.fillCoord = function(coord, style){
+      var x = coord[0] * this.scale ;
+      var y = coord[1] * this.scale ;
+      this.context.fillStyle = style;
+      this.context.fillRect(x,y,this.scale,this.scale);
     };
 
-    var drawTable = function(){
-      var boardState = board.state();
+  Drawer.prototype.drawTable = function(){
+      var boardState = this.board.getState();
       var rows = boardState.length;
       if (rows === 0) { return; }
   
@@ -34,49 +38,42 @@
       for (var i=0; i < rows; i++){
         for (var j=0; j < cols; j++){
           var state = boardState[i][j];
-          var color = board.state2color(state);
-          fillCoord([i,j], color);
+          var color = this.board.state2color(state);
+          this.fillCoord([i,j], color);
         }
       }
     };
 
-    var drawTableNext = function(){
-      drawTable();
+   Drawer.prototype.drawTableNext = function(){
+     this.drawTable();
       //board.next();
       //console.log(board)
       //board.next();
     }
 
 
-    var drawRows = function(count){
+    Drawer.prototype.drawRows = function(count){
 
       if (count === undefined){ count = 1; }
     
       for (var i=0; i < count; i++){
-        dRow(board.state());
-        board.next();
+        this.drawRow(this.board.getState());
+        this.board.next();
       }
     }
 
-  var changeSquare = function(){
-      var point = [Math.floor(event.offsetX / scale), Math.floor(event.offsetY / scale)];
-      var nstate = board.updateValue(point);
-      fillCoord(point, board.state2color(nstate));
+  Drawer.prototype.changeSquare = function(){
+      var point = [Math.floor(event.offsetX / this.scale), Math.floor(event.offsetY / this.scale)];
+      var nstate = this.board.updateValue(point);
+      this.fillCoord(point, this.board.state2color(nstate));
   }
 
-  var clearCanvas = function(canvas){
-      context.clearRect(0,0,canvas.width,canvas.height);
+  Drawer.prototype.clearCanvas = function(canvas){
+    this.context.clearRect(0,0,canvas.width,canvas.height);
   }
 
-  this.changeSquare = changeSquare
-  this.clearCanvas = clearCanvas
-  this.drawRows = drawRows
-  this.drawTable = drawTable
-  this.drawTableNext = drawTableNext
-  this.fillCoord = fillCoord
-  this.reset = function(){ row = 0;}
+  Drawer.prototype.reset = function(){ this.row = 0;}
 
-};
 
 
 // Utilities.

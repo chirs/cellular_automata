@@ -27,7 +27,7 @@
       board.setRule(rules.gameOfLife)
       
       var d = new Drawer(ctx, board, 4)
-      d.drawTable(board.state())
+      d.drawTable(board.getState())
       setInterval(function(){
         d.drawTable();
         board.next();

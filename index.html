@@ -51,7 +51,7 @@
         var context = canvas.getContext("2d");
 
         var d = new Drawer(context, board, scale)
-        d.drawTable(board.state())
+        d.drawTable(board.getState())
         setInterval(function(){
           d.drawTable();
           board.next();
