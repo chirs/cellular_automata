@@ -29,9 +29,16 @@
         var board = new Board([cellCount], 2, neighborhoods.elementary, false)
         board.setRuleByNumber(145)
 
+        var rowIndex = 0;
+
         var rd = new Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
         setInterval(function(){ 
-          rd.drawRows(1) 
+          rd.drawRow(rowIndex);
+          board.next();
+          rowIndex = (rowIndex + 1) % 500;
+          if (rowIndex == 0){
+            board.setRandomRule();
+          }
         }, 1000 / 60)
 
         //$("#eid").html(ruleNumber);
