@@ -192,6 +192,7 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
   this.dimensions = dimensions
   this.cellStates = cellStates
   this.neighbors = neighbors
+  this.indexes = getIndexes(dimensions);
 
   this.neighborStates = Math.pow(cellStates, neighbors.length); // Number of possible cell arrangements.
   this.ruleSets = Math.pow(2, this.neighborStates);
@@ -235,10 +236,9 @@ Board.prototype.createRuleTable = function(n){
 
 Board.prototype.getPopulationCount = function(){
     var counts = blankStart([this.cellStates]);
-    var indexes = getIndexes(dimensions);
 
-    for (var i=0, l=indexes.length; i < l; i++){
-      counts[this.matrix.get(indexes[i])] += 1;
+    for (var i=0, l=this.indexes.length; i < l; i++){
+      counts[this.matrix.get(this.indexes[i])] += 1;
     }
     return counts;
   };
@@ -256,11 +256,10 @@ Board.prototype.calculateState = function(cell){
 
 Board.prototype.generateNextState = function(){
 
-    var indexes = getIndexes(this.dimensions);
     var newMatrix = new Matrix(canonicalStart(this.dimensions));
 
-    for (var i=0, l=indexes.length; i < l; i++){
-      newMatrix.set(indexes[i], this.calculateState(indexes[i]));
+    for (var i=0, l=this.indexes.length; i < l; i++){
+      newMatrix.set(this.indexes[i], this.calculateState(this.indexes[i]));
     }
 
     return newMatrix;
