@@ -11,13 +11,13 @@
     this.board = board
     this.scale = scale
 
-    this.row = 0; // bad idea.
   }
 
-  Drawer.prototype.drawRow = function(arr){
+  Drawer.prototype.drawRowHelper = function(arr, row){
+
      for (var i=0, l=arr.length; i < l; i++){
         var color = this.board.state2color(arr[i]);
-        this.fillCoord([i, this.row], color);
+        this.fillCoord([i, row], color);
       }
     };
 
@@ -52,14 +52,8 @@
     }
 
 
-    Drawer.prototype.drawRows = function(count){
-
-      if (count === undefined){ count = 1; }
-    
-      for (var i=0; i < count; i++){
-        this.drawRow(this.board.getState());
-        this.board.next();
-      }
+    Drawer.prototype.drawRow = function(row){
+      this.drawRowHelper(this.board.getState(), row);
     }
 
   Drawer.prototype.changeSquare = function(){
@@ -71,8 +65,6 @@
   Drawer.prototype.clearCanvas = function(canvas){
     this.context.clearRect(0,0,canvas.width,canvas.height);
   }
-
-  Drawer.prototype.reset = function(){ this.row = 0;}
 
 
 

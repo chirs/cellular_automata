@@ -25,22 +25,24 @@
       var elemCanvas = document.getElementById("elemBoard");
       var elemContext = elemCanvas.getContext("2d");
 
-      var elemBoard = new Board([30], 3, neighborhoods.elementary2, [.3, .7])
-      //var rule62 = function(states){ return [0,0,1,1,1,1,1,0][parseInt(states.join(""), 2)] }
+      var rows = 30
+      var elemScale = 300 / rows
 
-      elemBoard.setRandomRule()
-      var rd = new Drawer(elemContext, elemBoard, 10, 30, true)
-      //rd.draw()
-      ROWS = 0
-      setInterval(function(){ 
-        rd.drawRows(1) 
-        ROWS += 1;
-        if (ROWS % 36 == 1){
-          elemBoard.setRandomRule()
-          elemBoard.reset()
+      var elemBoard = new Board([rows], 3, neighborhoods.elementary2, [.3, .7])
+      var elemBoards = []
+      var elemDrawers = []
+      for (var i=0; i < rows; i++){
+        var b = new Board([30], 2, neighborhoods.elementary, [.5, .5]).setRandomRule()
+        elemBoards.push(b)
+        elemDrawers.push(new Drawer(elemContext, b, elemScale))
+      }
+
+      setInterval(function(){
+        for (var i=0; i < rows; i++){
+          elemDrawers[i].drawRow(i);
+          elemBoards[i].next()
         }
-      }, 1000 / 60)
-
+      })
 
       // Life-like game.
       var draw2dBoard = function(canvasId, board, scale){
@@ -87,7 +89,7 @@
       var blankCanvas = document.getElementById("blankBoard");
       var blankContext = blankCanvas.getContext("2d");
 
-      var blankBoard = new Board([60, 60], 2, neighborhoods.moore, false).setRule(rules.gameOfLife)
+      var blankBoard = new Board([60, 60], 2, neighborhoods.moore, false)
       var blankD = new Drawer(blankContext, blankBoard, 5)
       blankD.drawTable()
 

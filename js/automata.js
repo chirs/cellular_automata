@@ -216,15 +216,16 @@ Board.prototype.setRule = function(r){
   return this;
 };
 
-Board.prototype.setRuleByNumber = function(n){ this.setRuleTable(this.createRuleTable(n)); };
+Board.prototype.setRuleByNumber = function(n){ return this.setRuleTable(this.createRuleTable(n)); };
 
 Board.prototype.setRuleTable = function(t){ 
   this.setRule(function(a){ return this.ruleTable[array2integer(a, 10)] });
   this.ruleTable = t;
+  return this;
 };
 
 Board.prototype.setRandomRule = function(){
-  this.setRuleTable(randomStart([this.neighborStates], this.cellStates));
+  return this.setRuleTable(randomStart([this.neighborStates], this.cellStates));
   };
 
 Board.prototype.createRuleTable = function(n){
