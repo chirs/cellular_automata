@@ -40,7 +40,7 @@ var hsv2rgb = function(h, s, v){
   return [r*256,g*256,b*256];
 };
 
-
+// not working?
 var generateColors = function(n){
   //return ["#ff0", "#0f0", "#00f","#f00", "#0ff", "#f0f"][a];
 
@@ -74,7 +74,7 @@ var generateColors = function(n){
   return colors;
 };
 
-
+// 2-Dimensional
 var makeCyclicRule = function(modulus){
   return function(states){
     var currentState = states[0];
@@ -88,18 +88,6 @@ var makeCyclicRule = function(modulus){
   };
 };
 
-
-var treeRule = function(states){
-  var currentState = states[0];
-  var tree_prob = 0.005
-  var prob_grow = Math.random()
-  var neighbors = states.slice(1);
-
-  if (currentState === 0 && prob_grow <tree_prob) {return 1;}
-  if (currentState === 1 && neighbors.indexOf(2)> -1) {return 2;}
-  if (currentState === 2) {return 0;}
-  return currentState;
-}
 
 var makeTreeRule = function(growProb, burnProb){
   return function(states){
@@ -115,9 +103,9 @@ var makeTreeRule = function(growProb, burnProb){
   }
 }
 
-// 2-Dimensional
+
 // Family: Life
-var makeLifeStyleRule = function(deadStates, liveStates){
+var makeLifeFamilyRule = function(deadStates, liveStates){
 
   return function(states){
     var state = states[0];
@@ -175,16 +163,25 @@ Ant.prototype.updateInternalState = function(cellState){
   }
 };
 
-Ant.prototype.move = function(n){
+Ant.prototype.moveOne = function(){
   // Change the value of the cell occupied cell.
-  var cellState = this.board.getMatrix().get(this.position);
+  var cellState = this.board.matrix.get(this.position);
   this.updateInternalState(cellState);
   this.board.updateValue(this.position);
 
   var m = this.rule(cellState, this.internalState);
-  this.position = this.board.getMatrix().move(this.position, m) // Update position
+  this.position = this.board.matrix.move(this.position, m) // Update position
   return this.position;
 };
+
+Ant.prototype.move = function(n){
+  if (n === undefined){
+    n = 1;
+  }
+  for (var i=0; i < n; i++){
+    this.moveOne();
+  }
+}
 
 Ant.prototype.getPosition = function() { return this.position; }
 
@@ -281,11 +278,8 @@ Board.prototype.next = function(){
   return this.matrix
 }
 
-Board.prototype.getMatrix = function() { return this.matrix; }
 Board.prototype.reset = function() { this.matrix = this.startFunc(); }
-//Board.prototype.getRuleTable = function(){ return this.ruleTable; }
 Board.prototype.getState = function() { return this.matrix.state(); }
-
 
 
 // Functions for making and manipulating the matrixes.
@@ -546,19 +540,19 @@ var hammingNeighbors = function(xs, states){
     makeCyclic: makeCyclicRule,
     makeTree: makeTreeRule,
     langtonsAnt: langtonsAntRule,
-    gnarl: makeLifeStyleRule([1], [1]),
-    gameOfLife: makeLifeStyleRule([3], [2,3]),
-    highLife: makeLifeStyleRule([3,6], [2,3]),
-    twoByTwo: makeLifeStyleRule([3,6], [1,2,5]),
-    walledCities: makeLifeStyleRule([2,3,4,5], [4,5,6,7,8]),
-    seeds: makeLifeStyleRule([2], []),
-    dayAndNight: makeLifeStyleRule([3,6,7,8], [3,4,6,7,8]),
-    maze: makeLifeStyleRule([1,2,3,4,5], [3]),
-    serviettes: makeLifeStyleRule([], [2,3,4]),
-    amoeba: makeLifeStyleRule([3,5,7], [1,3,5,8]),
-    coral: makeLifeStyleRule([3], [4,5,6,7,8]),
-    morley: makeLifeStyleRule([3,6,8], [2,4,5]), // Named after Stephen Morley; also called Move. Supports very high-period and slow spaceships
-    vote: makeLifeStyleRule([5,6,7,8], [4,5,6,7,8]),
+    gnarl: makeLifeFamilyRule([1], [1]),
+    gameOfLife: makeLifeFamilyRule([3], [2,3]),
+    highLife: makeLifeFamilyRule([3,6], [2,3]),
+    twoByTwo: makeLifeFamilyRule([3,6], [1,2,5]),
+    walledCities: makeLifeFamilyRule([2,3,4,5], [4,5,6,7,8]),
+    seeds: makeLifeFamilyRule([2], []),
+    dayAndNight: makeLifeFamilyRule([3,6,7,8], [3,4,6,7,8]),
+    maze: makeLifeFamilyRule([1,2,3,4,5], [3]),
+    serviettes: makeLifeFamilyRule([], [2,3,4]),
+    amoeba: makeLifeFamilyRule([3,5,7], [1,3,5,8]),
+    coral: makeLifeFamilyRule([3], [4,5,6,7,8]),
+    morley: makeLifeFamilyRule([3,6,8], [2,4,5]), // Named after Stephen Morley; also called Move. Supports very high-period and slow spaceships
+    vote: makeLifeFamilyRule([5,6,7,8], [4,5,6,7,8]),
   }
     
 }(this);
