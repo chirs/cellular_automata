@@ -17,14 +17,14 @@ automata.js exposes a Board object and an Ant object, as well as objects contain
 
 To create a board for playing Conway's Game of Life
 
-`
-var cells = [50, 50]
- , states = 2
- , randomStart = true
 
-board = new Board(cells, states, neighborhoods.moore, randomStart)
-board.setRule(rules.gameOfLife)
-`
+  var cells = [50, 50]
+   , states = 2
+   , randomStart = true
+
+  board = new Board(cells, states, neighborhoods.moore, randomStart)
+  board.setRule(rules.gameOfLife)
+
 
 ### automata supported
 
