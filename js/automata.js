@@ -255,6 +255,13 @@ Board.prototype.getPopulationCount = function(){
   return counts;
 };
 
+Board.prototype.areClean = function(points){
+  for (var i=0,l=points.length; i<l; i++){
+    if (this.cleanMap.get(points[i]) === true){
+      
+    }
+  }
+}
 
 Board.prototype.calculateState = function(cell){
   var states = [];
@@ -266,15 +273,8 @@ Board.prototype.calculateState = function(cell){
   return this.rule(states);
 };
 
-Board.prototype.areClean = function(points){
-  for (var i=0,l=points.length; i<l; i++){
-    if (this.cleanMap.get(points[i]) === true){
-      
-    }
-  }
-}
 
-Board.prototype.calculateStateNew = function(p){
+Board.prototype.calculateStateB = function(p){
   var m = this.matrix;
   var neighbors = this.neighborMatrix.get(p);
   //bypass state if no neighbors have changed since last round. (right? right.)
@@ -304,13 +304,18 @@ Board.prototype.next = function(){
   }
 
   for (var i=0, l=this.indexes.length; i < l; i++){
-    this.otherMatrix.set(this.indexes[i], this.calculateState(this.indexes[i]));
+    var p = this.indexes[i]
+    this.step(p);
   }
 
   var tmp = this.matrix
   this.matrix = this.otherMatrix
   this.otherMatrix = tmp
   return this.matrix
+}
+
+Board.prototype.step = function(p){
+  this.otherMatrix.set(p, this.calculateState(p));
 }
 
 // When is this called? This is the only time static is set.
@@ -324,7 +329,6 @@ Board.prototype.diff = function()  {
     this.static = true;
     console.log('static');
   }
-  console.log(d);
   return d
   // diff seems to be missing the final item?
   }
