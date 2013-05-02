@@ -29,8 +29,11 @@
       var d = new Drawer(ctx, board, 4)
       d.drawTable(board.getState())
       setInterval(function(){
-        d.drawTable();
-        board.next();
+        var diff = board.next();
+        //console.log(diff);
+        //d.drawIndexes(diff);
+        d.drawDiff();
+        
       }, 1000 / 60)
 
       $("#rule").click(board.reset);

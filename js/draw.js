@@ -44,6 +44,20 @@
       }
     };
 
+  Drawer.prototype.drawIndexes = function(indexes){
+    var boardState = this.board.getState();
+    for (var i=0, l=indexes.length; i<l; i++){
+      var p = indexes[i];
+      var state = boardState[p[0]][p[1]]
+      var color = this.board.state2color(state)
+      this.fillCoord(p, color);
+    }
+  }
+
+  Drawer.prototype.drawDiff = function(){
+    this.drawIndexes(this.board.diff());
+  }
+
    Drawer.prototype.drawTableNext = function(){
      this.drawTable();
       //board.next();

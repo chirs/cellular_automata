@@ -199,7 +199,7 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
 
   this.startFunc = function() { return new Matrix(initial_distribution ? randomStart(dimensions, initial_distribution) : canonicalStart(dimensions)); };
   this.matrix = this.startFunc();
-  this.futureMatrix = new Matrix(canonicalStart(this.dimensions));
+  this.otherMatrix = new Matrix(canonicalStart(this.dimensions));
 
   this.rule = undefined
   this.ruleTable = null;
@@ -265,17 +265,38 @@ Board.prototype.updateValue = function(point){
 
 Board.prototype.next = function(){
     for (var i=0, l=this.indexes.length; i < l; i++){
-      this.futureMatrix.set(this.indexes[i], this.calculateState(this.indexes[i]));
+      this.otherMatrix.set(this.indexes[i], this.calculateState(this.indexes[i]));
     }
 
+  //var diff = matrixDiff(this.indexes, this.otherMatrix, this.matrix);
   var tmp = this.matrix
-  this.matrix = this.futureMatrix
-  this.futureMatrix = tmp
+  this.matrix = this.otherMatrix
+  this.otherMatrix = tmp
   return this.matrix
+  //return diff;
 }
+
+Board.prototype.diff = function()  {
+    return matrixDiff(this.indexes, this.matrix, this.otherMatrix)
+  }
 
 Board.prototype.reset = function() { this.matrix = this.startFunc(); }
 Board.prototype.getState = function() { return this.matrix.state(); }
+
+
+
+
+var matrixDiff = function(indexes, m1, m2){
+  var p;
+  var d = [];
+  for (var i=0, l=indexes.length; i<l; i++){
+    p = indexes[i];
+    if (m1.get(p) != m2.get(p)){
+      d.push(p)
+    }
+  }
+  return d;
+}
 
 
 // Functions for making and manipulating the matrixes.

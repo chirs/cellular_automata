@@ -27,10 +27,11 @@
       board.setRule(rules.makeCyclic(12))
 
       var d = new Drawer(ctx, board, 4)
+      d.drawTable()
 
       setInterval(function(){
-        d.drawTable()
         board.next()
+        d.drawDiff()
       }, 100)
 
       //$("#rule").html(board.getRuleNumber());
