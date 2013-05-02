@@ -23,10 +23,12 @@
       var canvas = document.getElementById("board");
       var ctx = canvas.getContext("2d");
 
-      var board = new Board([240, 160], 12, neighborhoods.vonNeumann, 12)
+      // 12 seems the magic number of states - before this, a single state usually overwhelms.
+      // at 12 or greater, the behavior is almost always cyclic.
+      var board = new Board([900, 400], 12, neighborhoods.vonNeumann, 12)
       board.setRule(rules.makeCyclic(12))
 
-      var d = new Drawer(ctx, board, 4)
+      var d = new Drawer(ctx, board, 2)
       d.drawTable()
 
       setInterval(function(){
@@ -49,5 +51,5 @@
 
 
 <body class="home">
-  <canvas id="board" width="960" height="640"></canvas>
+  <canvas id="board" width="1800" height="800"></canvas>
 </body>

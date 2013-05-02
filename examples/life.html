@@ -23,15 +23,13 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var board = new Board([250, 150], 2, neighborhoods.moore, [0.70, 0.3])
-      //board.setRule(rules.gameOfLife)
-      board.setRule(rules.serviettes)
+      var board = new Board([900, 400], 2, neighborhoods.moore, [0.6, 0.4])
+      board.setRule(rules.gameOfLife)
       
-      var d = new Drawer(ctx, board, 4)
+      var d = new Drawer(ctx, board, 2)
       d.drawTable(board.getState())
       setInterval(function(){
         var diff = board.next();
-        //console.log(diff);
         //d.drawIndexes(diff);
         d.drawDiff();
         

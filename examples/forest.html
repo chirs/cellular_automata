@@ -29,9 +29,9 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var board = new Board([250, 150], 3, neighborhoods.moore, [0.70, 0.3, 0])
+      var board = new Board([900, 400], 3, neighborhoods.moore, [0.70, 0.3, 0])
       board.setRule(getRule());
-      var d = new Drawer(ctx, board, 4)
+      var d = new Drawer(ctx, board, 2)
       d.drawTable()
 
       $("#restart").click(function(){
@@ -46,8 +46,9 @@
         board.next()
         d.drawDiff()
         var counts = board.getPopulationCount()
-        $("#tree_number").html(counts[1]);
-        $("#burntree_number").html(counts[2])
+        $("#dead_count").html(counts[0]);
+        $("#tree_count").html(counts[1]);
+        $("#fire_count").html(counts[2])
       }, 1000 / 60)
 
     });
@@ -61,17 +62,13 @@
 <canvas id="lifeBoard" width="1800" height="800"></canvas>
 
 <div id="controls">
-    <input id="growProb" type="input" value=".005" />
-    <input id="burnProb" type="input" value=".0001" />
-    <input id="restart" type="submit" value="restart" />
+  <input id="growProb" type="input" value=".005" />
+  <input id="burnProb" type="input" value=".0001" />
+  <input id="restart" type="submit" value="restart" />
+  <p>dead:<span id="dead_count"></span></p>
+  <p>trees:<span id="tree_count"></span></p>
+  <p>fires:<span id="fire_count"></span></p>
 </div>
-
-<div id="display">
-  <p>Tree count: <span id="tree_number"> </span> </p>
-  <p>Burning Tree count: <span id="burntree_number"> </span> </p>
-
-</div>
-
 
 
 </body>

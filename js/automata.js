@@ -155,6 +155,7 @@ var Ant = function(position, rule, board){
   this.internalState = 0;
 };
 
+// The standard turmite rule?
 Ant.prototype.updateInternalState = function(cellState){
   if (cellState === 0){
     this.internalState = (this.internalState + 1) % 4;
@@ -183,9 +184,6 @@ Ant.prototype.move = function(n){
   }
 }
 
-Ant.prototype.getPosition = function() { return this.position; }
-
-
 
 var Board = function(dimensions, cellStates, neighbors, initial_distribution){
 
@@ -207,7 +205,7 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
   this.static = false // Set when matrix == otherMatrix - not working yet. 
 
   this.colorMap = generateColors(cellStates);
-  this.neighborMatrix = this.generateNeighbors();
+  //this.neighborMatrix = this.generateNeighbors();
 }
 
 Board.prototype.state2color = function(state){ return this.colorMap[state]; }
@@ -242,41 +240,54 @@ Board.prototype.setRandomRule = function(){
 
 Board.prototype.createRuleTable = function(n){
     // Fix this.
-    var arr = n.toString(2).split("").map( function(s){ return parseInt(s, 10); } );
-    var l = arr.length
-    while (l < this.neighborStates){ arr.unshift(0); } // left-fill with zeros.
-    return arr;
-  };
+  var arr = n.toString(2).split("").map( function(s){ return parseInt(s, 10); } );
+  var l = arr.length
+  while (l < this.neighborStates){ arr.unshift(0); } // left-fill with zeros.
+  return arr;
+};
 
 Board.prototype.getPopulationCount = function(){
-    var counts = blankStart([this.cellStates]);
+  var counts = blankStart([this.cellStates]);
 
-    for (var i=0, l=this.indexes.length; i < l; i++){
-      counts[this.matrix.get(this.indexes[i])] += 1;
+  for (var i=0, l=this.indexes.length; i < l; i++){
+    counts[this.matrix.get(this.indexes[i])] += 1;
+  }
+  return counts;
+};
+
+
+Board.prototype.calculateState = function(cell){
+  var states = [];
+  for (var i=0, l=this.neighbors.length; i < l; i++){
+    var n = this.matrix.move(cell, this.neighbors[i])
+    var v = this.matrix.get(n)
+    states.push(v);
+  }
+  return this.rule(states);
+};
+
+Board.prototype.areClean = function(points){
+  for (var i=0,l=points.length; i<l; i++){
+    if (this.cleanMap.get(points[i]) === true){
+      
     }
-    return counts;
-  };
+  }
+}
 
-
-Board.prototype.calculateStateOld = function(cell){
-    var states = [];
-    for (var i=0, l=this.neighbors.length; i < l; i++){
-      var n = this.matrix.move(cell, this.neighbors[i])
-      var v = this.matrix.get(n)
-      states.push(v);
-    }
-    return this.rule(states);
-  };
-
-Board.prototype.calculateState = function(p){
+Board.prototype.calculateStateNew = function(p){
   var m = this.matrix;
   var neighbors = this.neighborMatrix.get(p);
+  //bypass state if no neighbors have changed since last round. (right? right.)
+  //if (this.areClean(neighbors)){
+  //  return m.get(p);
+  //}
   var states = []
   for (var i=0,l=neighbors.length; i<l; i++){
     states.push(m.get(neighbors[i]))
   }
+  //this seems to be slower?
   //var states = neighbors.map(function(n){ return m.get(n); });
-  return this.rule(states);
+  return this.rule(states); // memoize this?
 }
 
 
@@ -302,6 +313,7 @@ Board.prototype.next = function(){
   return this.matrix
 }
 
+// When is this called? This is the only time static is set.
 Board.prototype.diff = function()  {
 
   if (this.static === true) {

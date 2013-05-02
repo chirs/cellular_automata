@@ -22,15 +22,15 @@
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
 
-      var board = new Board([180, 80], 2, neighborhoods.moore, false)
+      var board = new Board([1800, 800], 2, neighborhoods.moore, false)
       var a1 = new Ant([90,40], rules.langtonsAnt, board)
-      var d = new Drawer(ctx, board, 10)
+      var d = new Drawer(ctx, board, 1)
 
       d.drawTable()
       setInterval(function(){
         a1.move(100)
         d.drawTable()
-        d.fillCoord(a1.getPosition(), "red")
+        d.fillCoord(a1.position, "red")
       }, 100)
 
       //$("#next").click(function(){ drawTable(ctx, g.next(), SCALE) })

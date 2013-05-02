@@ -25,14 +25,14 @@
       var elemCanvas = document.getElementById("elemBoard");
       var elemContext = elemCanvas.getContext("2d");
 
-      var rows = 30
+      var rows = 100
       var elemScale = 300 / rows
 
       var elemBoard = new Board([rows], 3, neighborhoods.elementary2, [.3, .7])
       var elemBoards = []
       var elemDrawers = []
       for (var i=0; i < rows; i++){
-        var b = new Board([30], 2, neighborhoods.elementary, [.5, .5]).setRandomRule()
+        var b = new Board([rows], 2, neighborhoods.elementary, [.5, .5]).setRandomRule()
         elemBoards.push(b)
         elemDrawers.push(new Drawer(elemContext, b, elemScale))
       }
@@ -54,27 +54,27 @@
       };
 
       // Game of Life
-      var lifeBoard = new Board([50, 50], 2, neighborhoods.moore, [0.70, 0.3]).setRule(rules.gameOfLife)
-      draw2dBoard("lifeBoard", lifeBoard, 6);
+      var lifeBoard = new Board([100, 100], 2, neighborhoods.moore, [0.70, 0.3]).setRule(rules.gameOfLife)
+      draw2dBoard("lifeBoard", lifeBoard, 3);
       
 
       // Langton's ant.
-      var ANT_SCALE = 5
+      var ANT_SCALE = 1
 
       var antCanvas = document.getElementById("antBoard");
       var antContext = antCanvas.getContext("2d");
 
-      var antBoard = new Board([60, 60], 2,neighborhoods.moore, false)
-      var ant = new Ant([30,30], rules.langtonsAnt, antBoard)
+      var antBoard = new Board([300, 300], 2,neighborhoods.moore, false)
+      var ant = new Ant([150,150], rules.langtonsAnt, antBoard)
 
       var antD = new Drawer(antContext, antBoard, ANT_SCALE)
       antD.drawTable()
 
       var antMover = function(ant, board, context, drawer){
         return function(){
-          ant.move(100)
-          drawer.drawTable()
-          drawer.fillCoord(context, ant.getPosition(), ANT_SCALE, "red")
+          ant.move(1000)
+          drawer.drawDiff();
+          drawer.fillCoord(context, ant.position, ANT_SCALE, "red")
         }
       }
 
