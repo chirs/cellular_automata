@@ -85,8 +85,10 @@
     var d = this;
     this.drawTable(this.board.getState())
     setInterval(function(){
-      d.drawTable();
       d.board.next();
+      d.drawDiff();
+      //d.drawTable();
+
     }, 1000 / 60)
   };
 

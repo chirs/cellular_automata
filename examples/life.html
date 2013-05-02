@@ -24,7 +24,8 @@
       var ctx = lifeCanvas.getContext("2d");
 
       var board = new Board([250, 150], 2, neighborhoods.moore, [0.70, 0.3])
-      board.setRule(rules.gameOfLife)
+      //board.setRule(rules.gameOfLife)
+      board.setRule(rules.serviettes)
       
       var d = new Drawer(ctx, board, 4)
       d.drawTable(board.getState())

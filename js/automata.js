@@ -204,10 +204,23 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
   this.rule = undefined
   this.ruleTable = null;
 
+  this.static = false // Set when matrix == otherMatrix - not working yet. 
+
   this.colorMap = generateColors(cellStates);
+  this.neighborMatrix = this.generateNeighbors();
 }
 
 Board.prototype.state2color = function(state){ return this.colorMap[state]; }
+
+Board.prototype.generateNeighbors = function(){
+  var m = new Matrix(blankStart(this.dimensions));
+  for (var i=0, l=this.indexes.length; i<l; i++){
+    var p = this.indexes[i]
+    var n = this.neighbors.map(function(v){ return m.move(v, p) });
+    m.set(p, n);
+  }
+  return m;
+}
 
 Board.prototype.setRule = function(r){ 
   this.ruleTable = null;
@@ -245,7 +258,7 @@ Board.prototype.getPopulationCount = function(){
   };
 
 
-Board.prototype.calculateState = function(cell){
+Board.prototype.calculateStateOld = function(cell){
     var states = [];
     for (var i=0, l=this.neighbors.length; i < l; i++){
       var n = this.matrix.move(cell, this.neighbors[i])
@@ -254,6 +267,17 @@ Board.prototype.calculateState = function(cell){
     }
     return this.rule(states);
   };
+
+Board.prototype.calculateState = function(p){
+  var m = this.matrix;
+  var neighbors = this.neighborMatrix.get(p);
+  var states = []
+  for (var i=0,l=neighbors.length; i<l; i++){
+    states.push(m.get(neighbors[i]))
+  }
+  //var states = neighbors.map(function(n){ return m.get(n); });
+  return this.rule(states);
+}
 
 
 Board.prototype.updateValue = function(point){
@@ -264,26 +288,37 @@ Board.prototype.updateValue = function(point){
 }
 
 Board.prototype.next = function(){
-    for (var i=0, l=this.indexes.length; i < l; i++){
-      this.otherMatrix.set(this.indexes[i], this.calculateState(this.indexes[i]));
-    }
+  if (this.static === true){
+    return this.matrix;
+  }
 
-  //var diff = matrixDiff(this.indexes, this.otherMatrix, this.matrix);
+  for (var i=0, l=this.indexes.length; i < l; i++){
+    this.otherMatrix.set(this.indexes[i], this.calculateState(this.indexes[i]));
+  }
+
   var tmp = this.matrix
   this.matrix = this.otherMatrix
   this.otherMatrix = tmp
   return this.matrix
-  //return diff;
 }
 
 Board.prototype.diff = function()  {
-    return matrixDiff(this.indexes, this.matrix, this.otherMatrix)
+
+  if (this.static === true) {
+    return [];
+  }
+  var d = matrixDiff(this.indexes, this.matrix, this.otherMatrix)
+  if (d.length === 1){
+    this.static = true;
+    console.log('static');
+  }
+  console.log(d);
+  return d
+  // diff seems to be missing the final item?
   }
 
 Board.prototype.reset = function() { this.matrix = this.startFunc(); }
 Board.prototype.getState = function() { return this.matrix.state(); }
-
-
 
 
 var matrixDiff = function(indexes, m1, m2){
