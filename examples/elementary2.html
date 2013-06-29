@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>Game of Life</title>
+  <title>Elementary 1-d cellular automata</title>
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
@@ -20,33 +20,37 @@
   <script type="text/javascript">
     $(document).ready(function() {
 
-      var canvas = document.getElementById("board");
-      var ctx = canvas.getContext("2d");
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-      var scale = 8
+      // Elementary cellular automata
+      var elemCanvas = document.getElementById("elemBoard");
+      var elemContext = elemCanvas.getContext("2d");
 
-      var board = new Board([canvas.width / scale, canvas.height / scale], 2, neighborhoods.moore, [0.6, 0.4])
-      board.setRule(rules.gameOfLife)
-      
-      var d = new Drawer(ctx, board, scale)
-      d.drawTable(board.getState())
+      var rows = 0
+      var elemScale = 3
+
+      var elemBoards = []
+      var elemDrawers = []
+      //for (var i=0; i < rows; i++){
+      //  var b = new Board([rows], 2, neighborhoods.elementary, [.5, .5]).setRuleByNumber(i)
+      //  elemBoards.push(b)
+      //  elemDrawers.push(new Drawer(elemContext, b, elemScale))
+      //}
+
       setInterval(function(){
-        var diff = board.next();
-        d.drawTableDiff();
-        
-      }, 1000 / 60)
+        for (var i=0; i < rows; i++){
+          elemDrawers[i].drawRow(i);
+          elemBoards[i].next()
+       }
+      })
 
-      $("#rule").click(board.reset);
 
-    });
+});
   </script>
 
 </head>
 
+
 <body class="home">
-  <canvas id="board" width="1800" height="800"></canvas>
-  <div id="controls">
-    <div id="rule">RESET</div>
-  </div>
+
+<canvas id="elemBoard" width="1000" height="765"></canvas>
+
 </body>

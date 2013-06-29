@@ -21,6 +21,9 @@
 // 1-Dimenisonal
 
 
+  var point2index = function(p,dimensions){
+  }
+
 
 var hsv2rgb = function(h, s, v){
   var h_i = h * 6;
@@ -205,7 +208,7 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
   this.static = false // Set when matrix == otherMatrix - not working yet. 
 
   this.colorMap = generateColors(cellStates);
-  //this.neighborMatrix = this.generateNeighbors();
+  this.neighborMatrix = this.generateNeighbors();
 }
 
 Board.prototype.state2color = function(state){ return this.colorMap[state]; }
@@ -263,7 +266,7 @@ Board.prototype.areClean = function(points){
   }
 }
 
-Board.prototype.calculateState = function(cell){
+Board.prototype.calculateStateB = function(cell){
   var states = [];
   for (var i=0, l=this.neighbors.length; i < l; i++){
     var n = this.matrix.move(cell, this.neighbors[i])
@@ -274,7 +277,7 @@ Board.prototype.calculateState = function(cell){
 };
 
 
-Board.prototype.calculateStateB = function(p){
+Board.prototype.calculateState = function(p){
   var m = this.matrix;
   var neighbors = this.neighborMatrix.get(p);
   //bypass state if no neighbors have changed since last round. (right? right.)
@@ -436,6 +439,50 @@ var getIndexes = function(dimensions){
 var Matrix = function(matrix){
   this.matrix = matrix;
   this.dimensions = getDimensions(matrix);
+}
+
+  Matrix.prototype.state = function() { return this.matrix; }
+
+  Matrix.prototype.move = function(p1, p2){
+    var arr = [];
+    for (var i=0, l=p1.length; i<l; i++){
+      var dimension = this.dimensions[i];
+      var v = (p1[i] + p2[i] + dimension) % dimension;
+      arr.push(v);
+    }
+    return arr;
+  }
+
+  Matrix.prototype.get = function(key){
+    var res = this.matrix;
+    for (var i=0, l=key.length; i < l; i++){
+      res = res[key[i]];
+      }
+    return res;
+  }
+
+  Matrix.prototype.set = function(key, value){
+    var res = this.matrix
+    for (var i=0,l=key.length-1; i < l; i++){
+      res = res[key[i]];
+    }
+    res[key[i]] = value 
+  }
+
+
+  var product = function(arr){
+    var prod = 1
+    for (i = 0; i < arr.length; i += 1) {
+      prod *= array[i];
+    }
+    return prod;
+  }
+
+
+var Matrix2 = function(matrix){
+  this.matrix = matrix; // flatten.
+  this.dimensions = getDimensions(matrix);
+  var length = product(this.dimensions);
 }
 
   Matrix.prototype.state = function() { return this.matrix; }

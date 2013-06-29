@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>Game of Life</title>
+  <title>INDEX</title>
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="verify-v1" content="ES7MT4WW7ZSsA5/BJKdhUjxWnzEkJL8E0UdRHLlL9Yo=" />
@@ -19,34 +19,27 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-
       var canvas = document.getElementById("board");
-      var ctx = canvas.getContext("2d");
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-      var scale = 8
-
-      var board = new Board([canvas.width / scale, canvas.height / scale], 2, neighborhoods.moore, [0.6, 0.4])
-      board.setRule(rules.gameOfLife)
-      
-      var d = new Drawer(ctx, board, scale)
-      d.drawTable(board.getState())
+      var context = canvas.getContext("2d");
+      var board = new Board([900, 400], 2, neighborhoods.moore, [0.6, 0.4]).setRule(rules.serviettes);
+      var d = new Drawer(context, board, 2)
+      d.drawTable()
       setInterval(function(){
-        var diff = board.next();
+        board.next();
         d.drawTableDiff();
-        
-      }, 1000 / 60)
+        console.log(board.diff().length)
+    }, 100)
 
-      $("#rule").click(board.reset);
 
     });
   </script>
 
 </head>
 
+
 <body class="home">
-  <canvas id="board" width="1800" height="800"></canvas>
-  <div id="controls">
-    <div id="rule">RESET</div>
-  </div>
+
+<canvas id="board" width="1800" height="800"></canvas>
+
+
 </body>

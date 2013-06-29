@@ -25,15 +25,15 @@
 
       // 12 seems the magic number of states - before this, a single state usually overwhelms.
       // at 12 or greater, the behavior is almost always cyclic.
-      var board = new Board([900, 400], 12, neighborhoods.vonNeumann, 12)
+      var board = new Board([450, 200], 12, neighborhoods.vonNeumann, 12)
       board.setRule(rules.makeCyclic(12))
 
-      var d = new Drawer(ctx, board, 2)
+      var d = new Drawer(ctx, board, 4)
       d.drawTable()
 
       setInterval(function(){
         board.next()
-        d.drawDiff()
+        d.drawTableDiff()
       }, 100)
 
       //$("#rule").html(board.getRuleNumber());

@@ -19,14 +19,15 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
+      var boardSize = 300;
 
 
       // Elementary cellular automata
       var elemCanvas = document.getElementById("elemBoard");
       var elemContext = elemCanvas.getContext("2d");
 
-      var rows = 100
-      var elemScale = 300 / rows
+      var rows = 30
+      var elemScale = boardSize / rows
 
       var elemBoard = new Board([rows], 3, neighborhoods.elementary2, [.3, .7])
       var elemBoards = []
@@ -54,18 +55,18 @@
       };
 
       // Game of Life
-      var lifeBoard = new Board([100, 100], 2, neighborhoods.moore, [0.70, 0.3]).setRule(rules.gameOfLife)
-      draw2dBoard("lifeBoard", lifeBoard, 3);
+      var lifeBoard = new Board([50, 50], 2, neighborhoods.moore, [0.70, 0.3]).setRule(rules.gameOfLife)
+      draw2dBoard("lifeBoard", lifeBoard, 6);
       
 
       // Langton's ant.
-      var ANT_SCALE = 1
+      var ANT_SCALE = 3
 
       var antCanvas = document.getElementById("antBoard");
       var antContext = antCanvas.getContext("2d");
 
-      var antBoard = new Board([300, 300], 2,neighborhoods.moore, false)
-      var ant = new Ant([150,150], rules.langtonsAnt, antBoard)
+      var antBoard = new Board([100, 100], 2,neighborhoods.moore, false)
+      var ant = new Ant([50,50], rules.langtonsAnt, antBoard)
 
       var antD = new Drawer(antContext, antBoard, ANT_SCALE)
       antD.drawTable()
@@ -73,7 +74,7 @@
       var antMover = function(ant, board, context, drawer){
         return function(){
           ant.move(1000)
-          drawer.drawDiff();
+          drawer.drawTableDiff();
           drawer.fillCoord(context, ant.position, ANT_SCALE, "red")
         }
       }
@@ -96,8 +97,8 @@
       draw2dBoard("board3", board3, 3);
 
       // forest
-      var board6 = new Board([150, 150], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
-      draw2dBoard("board6", board6, 2);
+      var board6 = new Board([100, 100], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
+      draw2dBoard("board6", board6, 3);
 
       // voting
       var board7 = new Board([100, 100], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)

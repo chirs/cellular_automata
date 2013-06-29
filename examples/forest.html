@@ -44,7 +44,7 @@
       setInterval(function(){
         
         board.next()
-        d.drawDiff()
+        d.drawTableDiff()
         var counts = board.getPopulationCount()
         $("#dead_count").html(counts[0]);
         $("#tree_count").html(counts[1]);

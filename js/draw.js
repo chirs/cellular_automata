@@ -54,7 +54,7 @@
     }
   }
 
-  Drawer.prototype.drawDiff = function(){
+  Drawer.prototype.drawTableDiff = function(){
     this.drawIndexes(this.board.diff());
   }
 
@@ -86,7 +86,7 @@
     this.drawTable(this.board.getState())
     setInterval(function(){
       d.board.next();
-      d.drawDiff();
+      d.drawTableDiff();
       //d.drawTable();
 
     }, 1000 / 60)
