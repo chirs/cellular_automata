@@ -81,17 +81,6 @@
 
       setInterval(antMover(ant, antBoard, antContext, antD), 1000 / 60)
 
-
-      // blank - editable.
-      var blankCanvas = document.getElementById("blankBoard");
-      var blankContext = blankCanvas.getContext("2d");
-
-      var blankBoard = new Board([60, 60], 2, neighborhoods.moore, false)
-      var blankD = new Drawer(blankContext, blankBoard, 5)
-      blankD.drawTable()
-
-      $("#blankBoard").click(blankD.changeSquare)
-
       // cyclic 
       var board3 = new Board([100, 100], 10, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
       draw2dBoard("board3", board3, 3);
@@ -137,8 +126,8 @@
 
 <div>
 <div class="box">
-  <canvas id="blankBoard" width="300" height="300"></canvas>
-  <div><a href="/examples/blank.html">Blank</a></div>
+  <canvas id="board7" width="300" height="300"></canvas>
+  <div><a href="/examples/life2.html">Vote</a></div>
 </div>
 <div class="box">
   <canvas id="board6" width="300" height="300"></canvas>
@@ -146,16 +135,7 @@
 </div>
 </div>
 
-<div>
-<div class="box">
-  <canvas id="board7" width="300" height="300"></canvas>
-  <div><a href="/examples/blank.html">Vote</a></div>
-</div>
-<div class="box">
-  <canvas id="board8" width="300" height="300"></canvas>
-  <div><a href="/examples/forest.html">nothing</a></div>
-</div>
-</div>
+
 
 
 </body>
