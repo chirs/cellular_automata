@@ -2,6 +2,8 @@
 
 ### a framework for generating and visualizing cellular automata.
 
+[structures.edgemon.org](http://structures.edgemon.org)
+
 structures can simulate and draw a very wide array of cellular automata. Support includes:
 
 * Automata of arbitrary dimension can be simulated; 1- and 2-dimensional automata can be visualized.
