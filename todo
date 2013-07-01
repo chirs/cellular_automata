@@ -1,0 +1,9 @@
+### To-do
+
+* add 3-d visualization for 2-d and 3-d automata
+* improve user functionality in example automata
+* implement infinite horizontal scrolling on index page
+* review readme.
+* consider package organization
+* improve browser / framerate sync (package?)
+* add chaining to setRule, other methods.
