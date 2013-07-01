@@ -27,9 +27,6 @@ Unimplemented automata:
 * Greenberg Hastings cellular automaton
 
 
-
-
-
 ### quick start
 
 To simulate an automaton, simply include the draw.js and automata.js files.
@@ -43,7 +40,6 @@ To create a board for playing Conway's Game of Life
      , randomStart = true
 
     board = new Board(cells, states, neighborhoods.moore, randomStart).setRule(rules.gameOfLife)
-
 
 To generate a novel automaton
  
@@ -59,5 +55,3 @@ To generate a novel automaton
         }      
         return Math.floor(Math.random() * 4);
      })
-
-
