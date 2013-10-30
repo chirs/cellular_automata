@@ -21,7 +21,6 @@
     $(document).ready(function() {
       var boardSize = 300;
 
-
       // Elementary cellular automata
       var elemCanvas = document.getElementById("elemBoard");
       var elemContext = elemCanvas.getContext("2d");
@@ -102,21 +101,27 @@
 <body class="home">
 
 <div>
-<div class="box">
-  <canvas id="elemBoard" width="300" height="300"></canvas>
-  <div><a href="/examples/elementary.html">Elementary cellular automata</a></div>
-</div>
+
 <div class="box">
   <canvas id="lifeBoard" width="300" height="300"></canvas>
   <div><a href="/examples/life.html">Conway's Game of Life</a></div>
 </div>
-</div>
 
-<div>
 <div class="box">
   <canvas id="board3" width="300" height="300"></canvas>
   <div><a href="/examples/cyclic.html">Cyclic</a></div>
 </div>
+</div>
+
+<div>
+
+
+
+<div class="box">
+  <canvas id="board6" width="300" height="300"></canvas>
+  <div><a href="/examples/forest.html">Forest fire</a></div>
+</div>
+
 <div class="box">
   <canvas id="antBoard" width="300" height="300"></canvas>
   <div><a href="/examples/ant.html">Langton's Ant</a></div>
@@ -129,13 +134,31 @@
   <canvas id="board7" width="300" height="300"></canvas>
   <div><a href="/examples/life2.html">Vote</a></div>
 </div>
+
 <div class="box">
-  <canvas id="board6" width="300" height="300"></canvas>
-  <div><a href="/examples/forest.html">Forest fire</a></div>
+  <canvas id="elemBoard" width="300" height="300"></canvas>
+  <div><a href="/examples/elementary.html">Elementary cellular automata</a></div>
 </div>
+
+</div>
+
+<div class="box">
+<p><a href="https://github.com/chirs/structures">github</a></p>
 </div>
 
 
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-370829-11', 'edgemon.org');
+  ga('send', 'pageview');
+
+</script>
 
 
 </body>
+
+
