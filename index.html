@@ -65,11 +65,7 @@
 
       // cyclic 
 
-      // forest
-      var board6 = new Board([100, 100], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
 
-      // voting
-      var board7 = new Board([100, 100], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
 
       var width = $(window).width()
       var height = $(window).height()
@@ -82,9 +78,19 @@
           board: new Board([width/2,height/2], 2, neighborhoods.moore, [0.70, 0.3]).setRule(rules.gameOfLife),
         },
         cyclic: {
-          board: new Board([width/10, height/10], 10, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
+          scale: 8,
+          board: new Board([width/8, height/8], 10, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
         },
-      
+        dayAndNight: {
+          scale: 4,
+          board: new Board([100, 100], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
+        },
+
+        fire: {
+          scale: 3,
+          board: new Board([width/3, height/3], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
+        }
+
       }
 
 
@@ -93,7 +99,28 @@
       var canvas = document.getElementById("board");
       var context = canvas.getContext("2d");
       var d = new Drawer(context, map.life.board, map.life.scale)
-      d.draw2dBoard();
+
+
+      $("#cyclic").click(function(){
+        d.board = map.cyclic.board;
+        d.scale = map.cyclic.scale;
+        d.draw2dBoard();
+      });
+
+      $("#fire").click(function(){
+        d.board = map.fire.board;
+        d.scale = map.fire.scale;
+        d.draw2dBoard();
+      });
+
+      $("#life").click(function(){
+        d.board = map.life.board;
+        d.scale = map.life.scale;
+        d.draw2dBoard();
+      });
+
+      $("#life").click();
+
 
 
 
