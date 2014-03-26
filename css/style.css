@@ -9,61 +9,27 @@ html, body {
     padding: 0;
 }
 
+ul {
+    list-style-type: none;
+}
+
 
 #eid { 
     font-size: 3em;
 }
 
 
-.box { 
-    /* display: inline-block; */
-    margin: 15px 100px;
-    padding: 10px;
-    text-align: center;
-    float: left;
-}
-
-.box div {
-    padding: 5px;
-}
-
-
-
-#controls {
-    position: fixed;
-    right: 6%;
-    top: 4%;
-    padding: 1%;
-    cursor: pointer;
-    height: 5%;
-    width: 4%;
-    background: white;
-}
-
-#display {
-    position: fixed;
-    right: 6%;
-    top: 30%;
-}
-
-
-
-#scrollable {
-    overflow: auto;
-    width: 100%;
-    height: 500px;
+#menu {
+    width: 20%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: white;
     }
 
-#items {
-    width: 5000px;
+
+.box { 
+    /* display: inline-block; */
 }
 
 
-.next {
-    background-color: white;
-    padding: 10px;
-    position: absolute;
-    left: 2%;
-    top: 2%%;
-
-}

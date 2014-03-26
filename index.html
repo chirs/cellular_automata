@@ -21,9 +21,6 @@
     $(document).ready(function() {
       var boardSize = 300;
 
-      // Elementary cellular automata
-      var elemCanvas = document.getElementById("elemBoard");
-      var elemContext = elemCanvas.getContext("2d");
 
       var rows = 30
       var elemScale = boardSize / rows
@@ -31,66 +28,75 @@
       var elemBoard = new Board([rows], 3, neighborhoods.elementary2, [.3, .7])
       var elemBoards = []
       var elemDrawers = []
-      for (var i=0; i < rows; i++){
-        var b = new Board([rows], 2, neighborhoods.elementary, [.5, .5]).setRandomRule()
-        elemBoards.push(b)
-        elemDrawers.push(new Drawer(elemContext, b, elemScale))
-      }
+      //for (var i=0; i < rows; i++){
+      //  var b = new Board([rows], 2, neighborhoods.elementary, [.5, .5]).setRandomRule()
+      //  elemBoards.push(b)
+      //  elemDrawers.push(new Drawer(elemContext, b, elemScale))
+      //}
 
-      setInterval(function(){
-        for (var i=0; i < rows; i++){
-          elemDrawers[i].drawRow(i);
-          elemBoards[i].next()
-        }
-      })
+      //setInterval(function(){
+      //  for (var i=0; i < rows; i++){
+      //    elemDrawers[i].drawRow(i);
+      //    elemBoards[i].next()
+      //  }
+      //})
 
-      // Life-like game.
-      var draw2dBoard = function(canvasId, board, scale){
-        var canvas = document.getElementById(canvasId);
-        var context = canvas.getContext("2d");
-
-        var d = new Drawer(context, board, scale)
-        d.draw2dBoard();
-      };
-
-      // Game of Life
-      var lifeBoard = new Board([50, 50], 2, neighborhoods.moore, [0.70, 0.3]).setRule(rules.gameOfLife)
-      draw2dBoard("lifeBoard", lifeBoard, 6);
       
 
       // Langton's ant.
       var ANT_SCALE = 3
 
-      var antCanvas = document.getElementById("antBoard");
-      var antContext = antCanvas.getContext("2d");
 
       var antBoard = new Board([100, 100], 2,neighborhoods.moore, false)
       var ant = new Ant([50,50], rules.langtonsAnt, antBoard)
 
-      var antD = new Drawer(antContext, antBoard, ANT_SCALE)
-      antD.drawTable()
+      //var antD = new Drawer(antContext, antBoard, ANT_SCALE)
+      //antD.drawTable()
 
-      var antMover = function(ant, board, context, drawer){
-        return function(){
-          ant.move(1000)
-          drawer.drawTableDiff();
-          drawer.fillCoord(context, ant.position, ANT_SCALE, "red")
-        }
-      }
+      //var antMover = function(ant, board, context, drawer){
+      //  return function(){
+      //    ant.move(1000)
+      //    drawer.drawTableDiff();
+      //    drawer.fillCoord(context, ant.position, ANT_SCALE, "red")
+      //  }
+      //}
 
-      setInterval(antMover(ant, antBoard, antContext, antD), 1000 / 60)
+      //setInterval(antMover(ant, antBoard, antContext, antD), 1000 / 60)
 
       // cyclic 
-      var board3 = new Board([100, 100], 10, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
-      draw2dBoard("board3", board3, 3);
 
       // forest
       var board6 = new Board([100, 100], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
-      draw2dBoard("board6", board6, 3);
 
       // voting
       var board7 = new Board([100, 100], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
-      draw2dBoard("board7", board7, 3);
+
+      var width = $(window).width()
+      var height = $(window).height()
+
+
+
+      var map = {
+        life: {
+          scale: 4,
+          board: new Board([width/2,height/2], 2, neighborhoods.moore, [0.70, 0.3]).setRule(rules.gameOfLife),
+        },
+        cyclic: {
+          board: new Board([width/10, height/10], 10, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
+        },
+      
+      }
+
+
+      // Game of Life
+
+      var canvas = document.getElementById("board");
+      var context = canvas.getContext("2d");
+      var d = new Drawer(context, map.life.board, map.life.scale)
+      d.draw2dBoard();
+
+
+
 
     });
   </script>
@@ -103,49 +109,18 @@
 <div>
 
 <div class="box">
-  <canvas id="lifeBoard" width="300" height="300"></canvas>
-  <div><a href="/examples/life.html">Conway's Game of Life</a></div>
+  <canvas id="board" width="1280" height="720"></canvas>
 </div>
 
-<div class="box">
-  <canvas id="board3" width="300" height="300"></canvas>
-  <div><a href="/examples/cyclic.html">Cyclic</a></div>
-</div>
-</div>
+<div id="menu">
 
-<div>
-
-
-
-<div class="box">
-  <canvas id="board6" width="300" height="300"></canvas>
-  <div><a href="/examples/forest.html">Forest fire</a></div>
-</div>
-
-<div class="box">
-  <canvas id="antBoard" width="300" height="300"></canvas>
-  <div><a href="/examples/ant.html">Langton's Ant</a></div>
-</div>
+<ul>
+  <li><a id="life">life</a></li>
+  <li><a id="cyclic">cyclic</a></li>
+  <li><a id="fire">forest fire</a></li>
+</ul>
 
 </div>
-
-<div>
-<div class="box">
-  <canvas id="board7" width="300" height="300"></canvas>
-  <div><a href="/examples/life2.html">Vote</a></div>
-</div>
-
-<div class="box">
-  <canvas id="elemBoard" width="300" height="300"></canvas>
-  <div><a href="/examples/elementary.html">Elementary cellular automata</a></div>
-</div>
-
-</div>
-
-<div class="box">
-<p><a href="https://github.com/chirs/structures">github</a></p>
-</div>
-
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

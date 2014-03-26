@@ -1,12 +1,8 @@
-## structures 
-### cellular automata simulator
-
-[structures.edgemon.org](http://structures.edgemon.org)
-
+## [structures](http://structures.edgemon.org)
 
 ### about
 
-structures is a framework for simulating cellular automata. You can simulate any cellular automata by passing in an appropriate function.
+structures is a framework for simulating [cellular automata](http://en.wikipedia.org/wiki/Cellular_automaton). You can simulate any cellular automata by passing in an appropriate function.
 
 Tested automata include:
 
@@ -17,14 +13,37 @@ Tested automata include:
 * Forest fire simulation automata.
 * Most other cellular automata can be simulated.
 
-
 ### quick start
 
 To simulate an automaton, include the draw.js and automata.js files.
 
 automata.js exposes a Board object and objects defining frequently used rules and neighborhoods.
-
 #### Conway's Game of Life
+
+
+      // Life-like game.
+
+
+      var draw2dBoard = function(canvasId, board, scale){
+        var canvas = document.getElementById(canvasId);
+        var context = canvas.getContext("2d");
+
+        var d = new Drawer(context, board, scale)
+        d.draw2dBoard();
+      };
+
+      // Game of Life
+      var lifeBoard = new Board([50, 50], 2, neighborhoods.moore, [0.70, 0.3]).setRule(rules.gameOfLife)
+      draw2dBoard("lifeBoard", lifeBoard, 6);
+
+
+    $(document).ready(function() {
+      var boardSize = 300;
+
+      // Elementary cellular automata
+      var elemCanvas = document.getElementById("elemBoard");
+      var elemContext = elemCanvas.getContext("2d");
+
 
     var cells = [50, 50]
      , states = 2
@@ -32,9 +51,15 @@ automata.js exposes a Board object and objects defining frequently used rules an
 
     board = new Board(cells, states, neighborhoods.moore, randomStart).setRule(rules.gameOfLife)
 
+    })
+
 #### custom automaton
  
-    var cells = [50, 50], states = 4, randomStart = true
+    var cells = [50, 50]
+     , states = 4
+     , randomStart = true
+
+
     var topNeighborhood = [[0,0], [1,0], [2,0]] // The cell itself, the cell above, and the cell above that.
 
     board = new Board(cells, states, 4, randomStart).setRule(function(states){
