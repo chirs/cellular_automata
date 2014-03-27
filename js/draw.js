@@ -6,11 +6,11 @@
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
 
-  var Drawer = function(context, board, scale){
+  var Drawer = function(context, board, scale, rate){
     this.context = context
     this.board = board
     this.scale = scale
-
+    this.rate = rate
   }
 
   Drawer.prototype.drawRowHelper = function(arr, row){
@@ -88,8 +88,9 @@
       d.board.next();
       d.drawTableDiff();
       //d.drawTable();
+      
 
-    }, 1000 / 60)
+    }, (1000 / 60) / this.rate )
   };
 
 

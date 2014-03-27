@@ -70,21 +70,37 @@
       var width = $(window).width()
       var height = $(window).height()
 
-
+      var simple_mapping = function(states, neighborhood, distribution, rule){
+        return {
+          scale: 3,
+          board: new Board([width/3, height/3], states, neighborhood, distribution).setRule(rule),
+        }
+      };
 
       var map = {
-        life: {
-          scale: 4,
-          board: new Board([width/2,height/2], 2, neighborhoods.moore, [0.70, 0.3]).setRule(rules.gameOfLife),
-        },
+        life: simple_mapping(2, neighborhoods.moore, [.7,.3], rules.gameOfLife),
         cyclic: {
-          scale: 8,
-          board: new Board([width/8, height/8], 10, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
+          scale: 3,
+          board: new Board([width/3, height/3], 5, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
         },
         dayAndNight: {
-          scale: 4,
-          board: new Board([100, 100], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
+          scale: 3,
+          board: new Board([width/3, height/3], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
         },
+        walledCities: {
+          scale: 3,
+          board: new Board([width/3, height/3], 2, neighborhoods.moore, 2).setRule(rules.walledCities)
+        },
+        gnarl: {
+          scale: 3,
+          board: new Board([width/3, height/3], 2, neighborhoods.moore, 2).setRule(rules.gnarl)
+        },
+        serviettes: {
+          scale: 3,
+          board: new Board([width/3, height/3], 2, neighborhoods.moore, 2).setRule(rules.serviettes)
+        },
+
+        amoeba: simple_mapping(2, neighborhoods.moore, 2, rules.amoeba),
 
         fire: {
           scale: 3,
@@ -94,16 +110,28 @@
       }
 
 
+
+
       // Game of Life
+
+      var slider = $( "#rate #slider" ).slider();
+
+      var rate = 1
 
       var canvas = document.getElementById("board");
       var context = canvas.getContext("2d");
-      var d = new Drawer(context, map.life.board, map.life.scale)
+      var d = new Drawer(context, map.life.board, map.life.scale, rate)
 
 
       $("#cyclic").click(function(){
         d.board = map.cyclic.board;
         d.scale = map.cyclic.scale;
+        d.draw2dBoard();
+      });
+
+      $("#dayAndNight").click(function(){
+        d.board = map.dayAndNight.board;
+        d.scale = map.dayAndNight.scale;
         d.draw2dBoard();
       });
 
@@ -119,10 +147,32 @@
         d.draw2dBoard();
       });
 
+      $("#gnarl").click(function(){
+        d.board = map.gnarl.board;
+        d.scale = map.gnarl.scale;
+        d.draw2dBoard();
+      });
+
+      $("#serviettes").click(function(){
+        d.board = map.serviettes.board;
+        d.scale = map.serviettes.scale;
+        d.draw2dBoard();
+      });
+
+      $("#walledCities").click(function(){
+        d.board = map.walledCities.board;
+        d.scale = map.walledCities.scale;
+        d.draw2dBoard();
+      });
+
+      $("#amoeba").click(function(){
+        d.board = map.amoeba.board;
+        d.scale = map.amoeba.scale;
+        d.draw2dBoard();
+      });
+
+
       $("#life").click();
-
-
-
 
 
     });
@@ -136,7 +186,7 @@
 <div>
 
 <div class="box">
-  <canvas id="board" width="1280" height="720"></canvas>
+  <canvas id="board" width="1280" height="640"></canvas>
 </div>
 
 <div id="menu">
@@ -145,9 +195,17 @@
   <li><a id="life">life</a></li>
   <li><a id="cyclic">cyclic</a></li>
   <li><a id="fire">forest fire</a></li>
+  <li><a id="dayAndNight">day and night</a></li>
+  <li><a id="gnarl">gnarl</a></li>
+  <li><a id="serviettes">serviettes</a></li>
+  <li><a id="walledCities">walled cities</a></li>
+  <li><a id="amoeba">amoeba</a></li>
 </ul>
 
+<div id="rate">
+<div id="slider"></div>
 </div>
+
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
