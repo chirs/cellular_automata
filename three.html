@@ -25,14 +25,30 @@ scene.add(c2);
 
 camera.position.z = 2;
 
+
+var direction = -1
+
+
+
 var render = function () {
   requestAnimationFrame(render);
+
+  if (cube.position.z > .5){
+    direction = -1;
+  }
+  
+  if (cube.position.z < -1){
+    direction = 1;                        
+                        }
+  
 
   cube.rotation.y += 0.01;
   cube.rotation.x += 0.01;
   c2.rotation.y -= 0.01;
-  c2.position.z += .001
-  cube.position.z += .00085
+
+  c2.position.z += .005 * direction
+  cube.position.z += .004 * direction
+
   renderer.render(scene, camera);
 };
 
