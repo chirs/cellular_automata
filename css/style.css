@@ -11,6 +11,15 @@ html, body {
 
 ul {
     list-style-type: none;
+    padding: 0;
+    padding-top: 10px
+    margin: 0;
+    font-size: .8em;
+    font-family: courier;
+}
+
+li {
+    padding-top: 5px;
 }
 
 
