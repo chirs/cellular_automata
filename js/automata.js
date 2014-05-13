@@ -479,41 +479,6 @@ var Matrix = function(matrix){
   }
 
 
-var Matrix2 = function(matrix){
-  this.matrix = matrix; // flatten.
-  this.dimensions = getDimensions(matrix);
-  var length = product(this.dimensions);
-}
-
-  Matrix.prototype.state = function() { return this.matrix; }
-
-  Matrix.prototype.move = function(p1, p2){
-    var arr = [];
-    for (var i=0, l=p1.length; i<l; i++){
-      var dimension = this.dimensions[i];
-      var v = (p1[i] + p2[i] + dimension) % dimension;
-      arr.push(v);
-    }
-    return arr;
-  }
-
-  Matrix.prototype.get = function(key){
-    var res = this.matrix;
-    for (var i=0, l=key.length; i < l; i++){
-      res = res[key[i]];
-      }
-    return res;
-  }
-
-  Matrix.prototype.set = function(key, value){
-    var res = this.matrix
-    for (var i=0,l=key.length-1; i < l; i++){
-      res = res[key[i]];
-    }
-    res[key[i]] = value 
-  }
-
-
 
 // Utility functions.
 
