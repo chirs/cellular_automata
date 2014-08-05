@@ -28,83 +28,55 @@
       var elemBoard = new Board([rows], 3, neighborhoods.elementary2, [.3, .7])
       var elemBoards = []
       var elemDrawers = []
-      //for (var i=0; i < rows; i++){
-      //  var b = new Board([rows], 2, neighborhoods.elementary, [.5, .5]).setRandomRule()
-      //  elemBoards.push(b)
-      //  elemDrawers.push(new Drawer(elemContext, b, elemScale))
-      //}
 
-      //setInterval(function(){
-      //  for (var i=0; i < rows; i++){
-      //    elemDrawers[i].drawRow(i);
-      //    elemBoards[i].next()
-      //  }
-      //})
-
-      
-
-      // Langton's ant.
+      // Langton's ant - unused.
       var ANT_SCALE = 3
-
-
       var antBoard = new Board([100, 100], 2,neighborhoods.moore, false)
       var ant = new Ant([50,50], rules.langtonsAnt, antBoard)
 
-      //var antD = new Drawer(antContext, antBoard, ANT_SCALE)
-      //antD.drawTable()
-
-      //var antMover = function(ant, board, context, drawer){
-      //  return function(){
-      //    ant.move(1000)
-      //    drawer.drawTableDiff();
-      //    drawer.fillCoord(context, ant.position, ANT_SCALE, "red")
-      //  }
-      //}
-
-      //setInterval(antMover(ant, antBoard, antContext, antD), 1000 / 60)
-
-      // cyclic 
-
-
+      var SCALE = 8;
+      var RATE = .05;
 
       var width = $(window).width()
       var height = $(window).height()
 
       var simple_mapping = function(states, neighborhood, distribution, rule){
         return {
-          scale: 3,
-          board: new Board([width/3, height/3], states, neighborhood, distribution).setRule(rule),
+          scale: SCALE, 
+          board: new Board([width/SCALE, height/SCALE], states, neighborhood, distribution).setRule(rule),
         }
       };
+
+
 
       var map = {
         life: simple_mapping(2, neighborhoods.moore, [.7,.3], rules.gameOfLife),
         cyclic: {
-          scale: 3,
-          board: new Board([width/3, height/3], 5, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
+          scale: SCALE,
+          board: new Board([width/SCALE, height/SCALE], 5, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
         },
         dayAndNight: {
-          scale: 3,
-          board: new Board([width/3, height/3], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
+          scale: SCALE,
+          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
         },
         walledCities: {
-          scale: 3,
-          board: new Board([width/3, height/3], 2, neighborhoods.moore, 2).setRule(rules.walledCities)
+          scale: SCALE,
+          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.walledCities)
         },
         gnarl: {
-          scale: 3,
-          board: new Board([width/3, height/3], 2, neighborhoods.moore, 2).setRule(rules.gnarl)
+          scale: SCALE,
+          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.gnarl)
         },
         serviettes: {
-          scale: 3,
-          board: new Board([width/3, height/3], 2, neighborhoods.moore, 2).setRule(rules.serviettes)
+          scale: SCALE,
+          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.serviettes)
         },
 
         amoeba: simple_mapping(2, neighborhoods.moore, 2, rules.amoeba),
 
         fire: {
-          scale: 3,
-          board: new Board([width/3, height/3], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
+          scale: SCALE,
+          board: new Board([width/SCALE, height/SCALE], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
         }
 
       }
@@ -114,63 +86,86 @@
 
       // Game of Life
 
-      var slider = $( "#rate #slider" ).slider();
+      // Rate not being set.
+      var slider = $( "#rate #slider" ).slider({ min: 0, max: 20, value: RATE * 20});
+      
+      slider.on("slidestop", function(event, ui) {
+        console.log(RATE);
+        //endPos = ui.value;
+        console.log(ui.value);
+        //RATE = ui.value / 20;
+        d.setRate(1);
 
-      var rate = 1
+      });
+
+      var pause = $("#pause")
+      var play = $("#play").hide()
+
+      pause.click(function(){
+        console.log("paused");
+        pause.hide();
+        play.show();
+      });
+
+      play.click(function(){
+        play.hide();
+        pause.show();
+      })
+
+
 
       var canvas = document.getElementById("board");
       var context = canvas.getContext("2d");
-      var d = new Drawer(context, map.life.board, map.life.scale, rate)
+      var d = new Drawer(context, map.life.board, map.life.scale, RATE)
 
 
       $("#cyclic").click(function(){
         d.board = map.cyclic.board;
         d.scale = map.cyclic.scale;
-        d.draw2dBoard();
+        intervalID = d.draw2dBoard();
       });
 
       $("#dayAndNight").click(function(){
         d.board = map.dayAndNight.board;
         d.scale = map.dayAndNight.scale;
-        d.draw2dBoard();
+        intervalID = d.draw2dBoard();
       });
 
       $("#fire").click(function(){
         d.board = map.fire.board;
         d.scale = map.fire.scale;
-        d.draw2dBoard();
+        intervalID = d.draw2dBoard();
       });
 
       $("#life").click(function(){
         d.board = map.life.board;
         d.scale = map.life.scale;
-        d.draw2dBoard();
+        intervalID = d.draw2dBoard();
       });
 
       $("#gnarl").click(function(){
         d.board = map.gnarl.board;
         d.scale = map.gnarl.scale;
-        d.draw2dBoard();
+        intervalID = d.draw2dBoard();
       });
 
       $("#serviettes").click(function(){
         d.board = map.serviettes.board;
         d.scale = map.serviettes.scale;
-        d.draw2dBoard();
+        intervalID = d.draw2dBoard();
       });
 
       $("#walledCities").click(function(){
         d.board = map.walledCities.board;
         d.scale = map.walledCities.scale;
-        d.draw2dBoard();
+        intervalID = d.draw2dBoard();
       });
 
       $("#amoeba").click(function(){
         d.board = map.amoeba.board;
         d.scale = map.amoeba.scale;
-        d.draw2dBoard();
+        intervalID = d.draw2dBoard();
       });
-
 
       $("#life").click();
 
@@ -204,6 +199,8 @@
 
 <div id="rate">
 <div id="slider"></div>
+<div id="pause">&#9616;&#9616;</div>
+<div id="play">&#9654;</div>
 </div>
 
 

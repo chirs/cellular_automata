@@ -11,6 +11,7 @@
     this.board = board
     this.scale = scale
     this.rate = rate
+
   }
 
   Drawer.prototype.drawRowHelper = function(arr, row){
@@ -80,16 +81,17 @@
     this.context.clearRect(0,0,canvas.width,canvas.height);
   }
 
+  Drawer.prototype.setRate = function(rate){
+    this.rate = rate;
+  }
+
 
   Drawer.prototype.draw2dBoard = function(){
     var d = this;
     this.drawTable(this.board.getState())
-    setInterval(function(){
+    return setInterval(function(){
       d.board.next();
       d.drawTableDiff();
-      //d.drawTable();
-      
-
     }, (1000 / 60) / this.rate )
   };
 
