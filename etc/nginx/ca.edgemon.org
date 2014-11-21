@@ -1,0 +1,12 @@
+
+server {
+
+            listen   80;
+            server_name ca.edgemon.org;
+
+            location / {
+                        root   /home/chris/www/cellular_automata/src/;
+                        index  index.html;
+                        }
+
+}
