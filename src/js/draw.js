@@ -89,6 +89,7 @@
   Drawer.prototype.draw2dBoard = function(){
     var d = this;
     this.drawTable(this.board.getState())
+    console.log(this.rate)
     return setInterval(function(){
       d.board.next();
       d.drawTableDiff();

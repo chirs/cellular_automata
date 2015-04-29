@@ -76,30 +76,41 @@
       // Game of Life
 
       // Rate not being set.
-      var slider = $( "#rate #slider" ).slider({ min: 0, max: 20, value: RATE * 20});
+	var slider = $( "#rate #slider" ).slider({ min: 0, max: 20, value: RATE * 20});
       
       slider.on("slidestop", function(event, ui) {
-        console.log(RATE);
+        //console.log(RATE);
         //endPos = ui.value;
-        console.log(ui.value);
-        //RATE = ui.value / 20;
-        d.setRate(1);
+        //console.log(ui.value);
+        RATE = ui.value / 20;
+
+	if (RATE > 0){
+            d.setRate(RATE);
+	    pause.click();
+	    play.click();
+	    }
+	  else {
+	      pause.click();
+	  }
 
       });
 
-      var pause = $("#pause")
-      var play = $("#play").hide()
+	$("#scale").on('change', function(){
+	    console.log($(this).val());
+	    d.scale = $(this).val();
+            intervalID = d.draw2dBoard();
+	    });
+
+      var pause = $("#pause").hide();
+      var play = $("#play").hide();
+
 
       pause.click(function(){
         console.log("paused");
-        pause.hide();
-        play.show();
 	clearInterval(intervalID);
       });
 
       play.click(function(){
-        play.hide();
-        pause.show();
 	intervalID = d.draw2dBoard();
       })
 
@@ -189,9 +200,10 @@
 </ul>
 
 <div id="rate">
-<div id="slider"></div>
 <div id="pause">&#9616;&#9616;</div>
 <div id="play">&#9654;</div>
+<div id="slider"></div>
+<!--<div ><input id="scale" type="text" value="8"></input></div>-->
 </div>
 
 
