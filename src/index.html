@@ -19,20 +19,9 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      var boardSize = 300;
-
+      var boardsize = 300;
 
       var rows = 30
-      var elemScale = boardSize / rows
-
-      var elemBoard = new Board([rows], 3, neighborhoods.elementary2, [.3, .7])
-      var elemBoards = []
-      var elemDrawers = []
-
-      // Langton's ant - unused.
-      var ANT_SCALE = 3
-      var antBoard = new Board([100, 100], 2,neighborhoods.moore, false)
-      var ant = new Ant([50,50], rules.langtonsAnt, antBoard)
 
       var SCALE = 8;
       var RATE = .05;
@@ -105,11 +94,13 @@
         console.log("paused");
         pause.hide();
         play.show();
+	clearInterval(intervalID);
       });
 
       play.click(function(){
         play.hide();
         pause.show();
+	intervalID = d.draw2dBoard();
       })
 
 
