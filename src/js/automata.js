@@ -229,6 +229,7 @@ Board.prototype.setRule = function(r){
   return this;
 };
 
+
 Board.prototype.setRuleByNumber = function(n){ return this.setRuleTable(this.createRuleTable(n)); };
 
 Board.prototype.setRuleTable = function(t){ 
@@ -336,7 +337,15 @@ Board.prototype.diff = function()  {
   // diff seems to be missing the final item?
   }
 
-Board.prototype.reset = function() { this.matrix = this.startFunc(); }
+
+// not working.
+Board.prototype.reset = function() { 
+    this.matrix = new Matrix(randomStart(this.dimensions, initial_distribution));
+    this.static = false;
+};
+
+			     
+
 Board.prototype.getState = function() { return this.matrix.state(); }
 
 

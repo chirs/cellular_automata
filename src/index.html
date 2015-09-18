@@ -13,18 +13,17 @@
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="/js/automata.js"></script>
   <script type="text/javascript" src="/js/draw.js"></script>
+  <script type="text/javascript" src="/js/automata.js"></script>
+
 
 
   <script type="text/javascript">
     $(document).ready(function() {
-      var boardsize = 300;
 
-      var rows = 30
-
-      var SCALE = 8;
+      var SCALE = 2;
       var RATE = .05;
+      intervalID = null;
 
       var width = $(window).width()
       var height = $(window).height()
@@ -36,14 +35,14 @@
         }
       };
 
-
-
       var map = {
         life: simple_mapping(2, neighborhoods.moore, [.7,.3], rules.gameOfLife),
         cyclic: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 5, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
         },
+	  }
+	    /*
         dayAndNight: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
@@ -68,105 +67,91 @@
           board: new Board([width/SCALE, height/SCALE], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
         }
 
+
       }
+	*/
 
 
-
-
-      // Game of Life
-
-      // Rate not being set.
 	var slider = $( "#rate #slider" ).slider({ min: 0, max: 20, value: RATE * 20});
       
+	// stops functioning when rule is changed.
+
       slider.on("slidestop", function(event, ui) {
-        //console.log(RATE);
-        //endPos = ui.value;
-        //console.log(ui.value);
         RATE = ui.value / 20;
+	console.log(RATE);
+	clearInterval(intervalID);
 
 	if (RATE > 0){
             d.setRate(RATE);
-	    pause.click();
-	    play.click();
+	    intervalID = d.draw2dBoard();
 	    }
-	  else {
-	      pause.click();
-	  }
 
       });
 
 	$("#scale").on('change', function(){
 	    console.log($(this).val());
 	    d.scale = $(this).val();
+
             intervalID = d.draw2dBoard();
 	    });
 
-      var pause = $("#pause").hide();
-      var play = $("#play").hide();
 
-
-      pause.click(function(){
-        console.log("paused");
-	clearInterval(intervalID);
-      });
-
-      play.click(function(){
-	intervalID = d.draw2dBoard();
-      })
-
-
+      var reset = $("#reset");
+      var modify = $("#modify");
 
       var canvas = document.getElementById("board");
       var context = canvas.getContext("2d");
       var d = new Drawer(context, map.life.board, map.life.scale, RATE)
 
+	var setRule = function(rule){
+	  clearInterval(intervalID);
+        d.board = rule.board;
+        d.scale = rule.scale;
+	d.setRate(RATE);
+
+        intervalID = d.draw2dBoard();
+	    };
+
+	reset.click(function(){
+	    d.board.reset();
+	    });
+
+      modify.click(function(){
+      console.log('hello');
+      d.setRate(0);
+    });
+	    
 
       $("#cyclic").click(function(){
-        d.board = map.cyclic.board;
-        d.scale = map.cyclic.scale;
-        intervalID = d.draw2dBoard();
+	  setRule(map.cyclic);
       });
 
       $("#dayAndNight").click(function(){
-        d.board = map.dayAndNight.board;
-        d.scale = map.dayAndNight.scale;
-        intervalID = d.draw2dBoard();
+	  setRule(map.dayAndNight);
       });
 
       $("#fire").click(function(){
-        d.board = map.fire.board;
-        d.scale = map.fire.scale;
-        intervalID = d.draw2dBoard();
+	  setRule(map.fire);
       });
 
       $("#life").click(function(){
-        d.board = map.life.board;
-        d.scale = map.life.scale;
-        intervalID = d.draw2dBoard();
+	  setRule(map.life);
       });
 
       $("#gnarl").click(function(){
-        d.board = map.gnarl.board;
-        d.scale = map.gnarl.scale;
-        intervalID = d.draw2dBoard();
+	  setRule(map.gnarl);
       });
 
       $("#serviettes").click(function(){
-        d.board = map.serviettes.board;
-        d.scale = map.serviettes.scale;
-        intervalID = d.draw2dBoard();
+	  setRule(map.serviettes);
       });
 
       $("#walledCities").click(function(){
-        d.board = map.walledCities.board;
-        d.scale = map.walledCities.scale;
-        intervalID = d.draw2dBoard();
+	  setRule(map.walledCities);
       });
 
       $("#amoeba").click(function(){
-        d.board = map.amoeba.board;
-        d.scale = map.amoeba.scale;
-        intervalID = d.draw2dBoard();
+	  setRule(map.amoeba);
       });
 
       $("#life").click();
@@ -204,11 +189,10 @@
 </ul>
 
 <div id="rate">
-<div id="pause">&#9616;&#9616;</div>
-<div id="play">&#9654;</div>
 <div id="slider"></div>
-<!--<div ><input id="scale" type="text" value="8"></input></div>-->
 </div>
+<div id="reset">reset</div>
+<div id="modify">modify</div>
 
 
 <script>
