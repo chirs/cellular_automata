@@ -20,143 +20,158 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-
-      var SCALE = 2;
-      var RATE = .05;
-      intervalID = null;
-
-      var width = $(window).width()
-      var height = $(window).height()
-
-      var simple_mapping = function(states, neighborhood, distribution, rule){
-        return {
-          scale: SCALE, 
-          board: new Board([width/SCALE, height/SCALE], states, neighborhood, distribution).setRule(rule),
-        }
-      };
-
-      var map = {
-        life: simple_mapping(2, neighborhoods.moore, [.7,.3], rules.gameOfLife),
-        cyclic: {
-          scale: SCALE,
-          board: new Board([width/SCALE, height/SCALE], 5, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
-        },
-	  }
-	    /*
-        dayAndNight: {
+	
+	var SCALE = 6;
+	var RATE = .05;
+	intervalID = null;
+	
+	var width = $(window).width()
+	var height = $(window).height()
+	
+	var simple_mapping = function(states, neighborhood, distribution, rule){
+            return {
+		scale: SCALE, 
+		board: new Board([width/SCALE, height/SCALE], states, neighborhood, distribution).setRule(rule),
+            }
+	};
+	
+	var map = {
+            life: simple_mapping(2, neighborhoods.moore, [.7,.3], rules.gameOfLife),
+            cyclic: {
+		scale: SCALE,
+		board: new Board([width/SCALE, height/SCALE], 5, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
+            },
+	}
+	/*
+          dayAndNight: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
-        },
-        walledCities: {
+          },
+          walledCities: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.walledCities)
-        },
-        gnarl: {
+          },
+          gnarl: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.gnarl)
-        },
-        serviettes: {
+          },
+          serviettes: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.serviettes)
-        },
-
-        amoeba: simple_mapping(2, neighborhoods.moore, 2, rules.amoeba),
-
-        fire: {
+          },
+	  
+          amoeba: simple_mapping(2, neighborhoods.moore, 2, rules.amoeba),
+	  
+          fire: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
-        }
-
-
-      }
+          }
+	  
+	  
+	  }
 	*/
-
-
+	
+	
 	var slider = $( "#rate #slider" ).slider({ min: 0, max: 20, value: RATE * 20});
-      
+	
 	// stops functioning when rule is changed.
-
-      slider.on("slidestop", function(event, ui) {
-        RATE = ui.value / 20;
-	console.log(RATE);
-	clearInterval(intervalID);
-
-	if (RATE > 0){
-            d.setRate(RATE);
-	    intervalID = d.draw2dBoard();
+	
+	slider.on("slidestop", function(event, ui) {
+            RATE = ui.value / 20;
+	    console.log(RATE);
+	    clearInterval(intervalID);
+	    
+	    if (RATE > 0){
+		d.setRate(RATE);
+		intervalID = d.draw2dBoard();
 	    }
-
-      });
-
+	    
+	});
+	
 	$("#scale").on('change', function(){
 	    console.log($(this).val());
 	    d.scale = $(this).val();
-
+	    
             intervalID = d.draw2dBoard();
-	    });
+	});
+	
+	
+	var reset = $("#reset");
+	var modify = $("#modify");
 
+	var hideshow = $(".hide-show");
 
-      var reset = $("#reset");
-      var modify = $("#modify");
-
-      var canvas = document.getElementById("board");
-      var context = canvas.getContext("2d");
-      var d = new Drawer(context, map.life.board, map.life.scale, RATE)
-
+	var canvas = document.getElementById("board");
+	var context = canvas.getContext("2d");
+	var d = new Drawer(context, map.life.board, map.life.scale, RATE)
+	
 	var setRule = function(rule){
-	  clearInterval(intervalID);
-        d.board = rule.board;
-        d.scale = rule.scale;
-	d.setRate(RATE);
-
-        intervalID = d.draw2dBoard();
-	    };
-
+	    clearInterval(intervalID);
+            d.board = rule.board;
+            d.scale = rule.scale;
+	    d.setRate(RATE);
+	    
+            intervalID = d.draw2dBoard();
+	};
+	
 	reset.click(function(){
 	    d.board.reset();
-	    });
+	});
 
-      modify.click(function(){
-      console.log('hello');
-      d.setRate(0);
-    });
+
+	modify.click(function(){
+	    console.log("huh");
+	    //d.setRate(0);
+	    $("#modify-options").show();
 	    
+	});
 
-      $("#cyclic").click(function(){
-	  setRule(map.cyclic);
-      });
+	hideshow.click(function(){
+	    if ($(this).html() == '-'){
+		$(this).html('+');
+		$(".toggled").hide();
+		} else {
+		$(this).html('-');
+		$(".toggled").show();
+		    
+		    }
+	});
+	
 
-      $("#dayAndNight").click(function(){
-	  setRule(map.dayAndNight);
-      });
-
-      $("#fire").click(function(){
-	  setRule(map.fire);
-      });
-
-      $("#life").click(function(){
-	  setRule(map.life);
-      });
-
-      $("#gnarl").click(function(){
-	  setRule(map.gnarl);
-      });
-
-      $("#serviettes").click(function(){
-	  setRule(map.serviettes);
-      });
-
-      $("#walledCities").click(function(){
-	  setRule(map.walledCities);
-      });
-
-      $("#amoeba").click(function(){
-	  setRule(map.amoeba);
-      });
-
-      $("#life").click();
-
-
+	$("#cyclic").click(function(){
+	    setRule(map.cyclic);
+	});
+	
+	$("#dayAndNight").click(function(){
+	    setRule(map.dayAndNight);
+	});
+	
+	$("#fire").click(function(){
+	    setRule(map.fire);
+	});
+	
+	$("#life").click(function(){
+	    setRule(map.life);
+	});
+	
+	$("#gnarl").click(function(){
+	    setRule(map.gnarl);
+	});
+	
+	$("#serviettes").click(function(){
+	    setRule(map.serviettes);
+	});
+	
+	$("#walledCities").click(function(){
+	    setRule(map.walledCities);
+	});
+	
+	$("#amoeba").click(function(){
+	    setRule(map.amoeba);
+	});
+	
+	$("#life").click();
+	
     });
   </script>
 
@@ -165,35 +180,44 @@
 
 <body class="home">
 
-<div>
-
 <div class="box">
   <canvas id="board" width="1280" height="640"></canvas>
 </div>
 
 <div id="menu">
 
-<p>a generic cellular automata simulator in javascript</p>
-<p>code on <a href="http://github.com/chirs/cellular_automata">github</a></p>
+  <div class="hide-show">-</div>
 
+  <div class="toggled">
 
-<ul>
-  <li><a id="life">life</a></li>
-  <li><a id="cyclic">cyclic</a></li>
-  <li><a id="fire">forest fire</a></li>
-  <li><a id="dayAndNight">day and night</a></li>
-  <li><a id="gnarl">gnarl</a></li>
-  <li><a id="serviettes">serviettes</a></li>
-  <li><a id="walledCities">walled cities</a></li>
-  <li><a id="amoeba">amoeba</a></li>
-</ul>
+    <p>a generic cellular automata simulator in js (<a href="about.html">what's that?</a>)</p>
+    <p><a href="http://github.com/chirs/cellular_automata">github repo</a></p>
+    <p><em>examples</em></p>
 
-<div id="rate">
-<div id="slider"></div>
+    <ul>
+      <li><a id="life">life</a></li>
+      <li><a id="cyclic">cyclic</a></li>
+      <li><a id="fire">forest fire</a></li>
+      <li><a id="dayAndNight">day and night</a></li>
+      <li><a id="gnarl">gnarl</a></li>
+      <li><a id="serviettes">serviettes</a></li>
+      <li><a id="walledCities">walled cities</a></li>
+      <li><a id="amoeba">amoeba</a></li>
+    </ul>
+    
+    <div id="rate">
+      <div id="slider"></div>
+    </div>
+
+    <div id="reset">reset</div>
+    <div id="modify">modify</div>
+
+    <div id="modify-options">
+      <p>this is modify text</p>
+      </div>
+  </div>
+
 </div>
-<div id="reset">reset</div>
-<div id="modify">modify</div>
-
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

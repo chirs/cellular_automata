@@ -31,6 +31,8 @@ li {
 }
 
 
+
+
 #menu {
     margin-top: 10px;
     width: 15%;
@@ -41,12 +43,18 @@ li {
     background:rgba(255,255,255,0.95);
     font-family: courier;
     font-size: .7em;
-    padding: 10px;
+    padding: 30px;
     }
 
 
 .box { 
     /* display: inline-block; */
+}
+
+
+
+#modify-options {
+    display: none;
 }
 
 
