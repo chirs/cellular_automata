@@ -1,25 +1,25 @@
-## [structures](http://structures.edgemon.org)
+## [ca](http://ca.edgemon.org)
 
 ### about
 
-structures is a framework for simulating [cellular automata](http://en.wikipedia.org/wiki/Cellular_automaton). You can simulate any cellular automata by passing in an appropriate function.
+ca is a framework for simulating [cellular automata](http://en.wikipedia.org/wiki/Cellular_automaton). You can simulate any cellular automata by passing in an appropriate function.
 
-Tested automata include:
+Possible automata include, but are not limited to:
 
 * Game of life and game of life variants.
 * Elementary cellular automata
 * Langton's ant-style automata (can be used in conjunction with other board rules or ants.)
 * Cyclic automata
 * Forest fire simulation automata.
-* Most other cellular automata can be simulated.
+* Anything else you can imagine.
 
 ### quick start
 
 To simulate an automaton, include the draw.js and automata.js files.
 
 automata.js exposes a Board object and objects defining frequently used rules and neighborhoods.
-#### Conway's Game of Life
 
+#### Conway's Game of Life
 
       // Life-like game.
 
@@ -74,8 +74,9 @@ automata.js exposes a Board object and objects defining frequently used rules an
 
 #### Elementary cellular automaton
 
+This is a 1-dimensional cellular automata.
 
-
+Consider the famous Rule 37 [right one?]
 
 
 ### Todo
@@ -95,6 +96,3 @@ Unimplemented automata:
 * CoDi
 * Langton's loops
 * Greenberg Hastings cellular automaton
-
-
-
