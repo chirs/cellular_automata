@@ -43,7 +43,9 @@ li {
     background:rgba(255,255,255,0.95);
     font-family: courier;
     font-size: .7em;
-    padding: 30px;
+    padding: 16px;
+    border: 4px solid #999;
+    
     }
 
 

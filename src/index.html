@@ -17,16 +17,18 @@
   <script type="text/javascript" src="/js/automata.js"></script>
 
 
-
   <script type="text/javascript">
     $(document).ready(function() {
 	
-	var SCALE = 6;
-	var RATE = .05;
+	var SCALE = 3;
+	var RATE = .25;
 	intervalID = null;
 	
 	var width = $(window).width()
 	var height = $(window).height()
+
+	var wf = width / SCALE;
+	var hf = height / SCALE;
 	
 	var simple_mapping = function(states, neighborhood, distribution, rule){
             return {
@@ -39,10 +41,17 @@
             life: simple_mapping(2, neighborhoods.moore, [.7,.3], rules.gameOfLife),
             cyclic: {
 		scale: SCALE,
-		board: new Board([width/SCALE, height/SCALE], 5, neighborhoods.moore, 10).setRule(rules.makeCyclic(10))
+		board: new Board([width/SCALE, height/SCALE], 12, neighborhoods.moore, 10).setRule(rules.makeCyclic(9))
             },
-	}
-	/*
+
+	  
+          fire: {
+          scale: SCALE,
+          board: new Board([width/SCALE, height/SCALE], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
+    },
+
+
+
           dayAndNight: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
@@ -59,18 +68,16 @@
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.serviettes)
           },
+
+            coral: {
+          scale: SCALE,
+          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.coral)
+          },	    
 	  
           amoeba: simple_mapping(2, neighborhoods.moore, 2, rules.amoeba),
 	  
-          fire: {
-          scale: SCALE,
-          board: new Board([width/SCALE, height/SCALE], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
-          }
-	  
-	  
 	  }
-	*/
-	
+
 	
 	var slider = $( "#rate #slider" ).slider({ min: 0, max: 20, value: RATE * 20});
 	
@@ -128,10 +135,10 @@
 
 	hideshow.click(function(){
 	    if ($(this).html() == '-'){
-		$(this).html('+');
+		$(this).html('+ expand');
 		$(".toggled").hide();
 		} else {
-		$(this).html('-');
+		$(this).html('- minimize');
 		$(".toggled").show();
 		    
 		    }
@@ -169,8 +176,25 @@
 	$("#amoeba").click(function(){
 	    setRule(map.amoeba);
 	});
+
+	$("#coral").click(function(){
+	    setRule(map.coral);
+	});	
 	
 	$("#life").click();
+	
+	// figure out how to figure out x/y cell from screen position.
+
+	/*
+
+	$("#board").click(function(e){
+	    console.log(hf);
+	    console.log(wf);
+	    var x = Math.floor((e.pageX-$(this).offset().left))
+	    var y = Math.floor((e.pageY-$(this).offset().top));
+	    alert(x + " " + y);
+	    })
+	*/
 	
     });
   </script>
@@ -186,12 +210,12 @@
 
 <div id="menu">
 
-  <div class="hide-show">-</div>
+  <div class="hide-show">- minimize</div>
 
   <div class="toggled">
 
-    <p>a generic cellular automata simulator in js (<a href="about.html">what's that?</a>)</p>
-    <p><a href="http://github.com/chirs/cellular_automata">github repo</a></p>
+    <p>a generic cellular automata simulator in js (<a href="about.html">¿huh?</a>)</p>
+    <p><a href="http://github.com/chirs/cellular_automata">on github</a></p>
     <p><em>examples</em></p>
 
     <ul>
@@ -202,7 +226,8 @@
       <li><a id="gnarl">gnarl</a></li>
       <li><a id="serviettes">serviettes</a></li>
       <li><a id="walledCities">walled cities</a></li>
-      <li><a id="amoeba">amoeba</a></li>
+    <li><a id="amoeba">amoeba</a></li>
+      <li><a id="coral">coral</a></li>    
     </ul>
     
     <div id="rate">
