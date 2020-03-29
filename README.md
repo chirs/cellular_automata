@@ -1,8 +1,8 @@
-## [ca](http://ca.edgemon.org)
+# [ca](http://ca.edgemon.org)
 
-### about
+A framework for simulating [cellular automata](http://en.wikipedia.org/wiki/Cellular_automaton).
 
-ca is a framework for simulating [cellular automata](http://en.wikipedia.org/wiki/Cellular_automaton). You can simulate any cellular automata by passing in an appropriate function.
+You can simulate any discrete cellular automata by passing a function.
 
 Possible automata include, but are not limited to:
 
@@ -13,6 +13,8 @@ Possible automata include, but are not limited to:
 * Forest fire simulation automata.
 * Anything else you can imagine.
 
+(function examples?)
+
 ### quick start
 
 To simulate an automaton, include the draw.js and automata.js files.
@@ -21,8 +23,7 @@ automata.js exposes a Board object and objects defining frequently used rules an
 
 #### Conway's Game of Life
 
-      // Life-like game.
-
+(Is this up to date?)
 
       var draw2dBoard = function(canvasId, board, scale){
         var canvas = document.getElementById(canvasId);
@@ -76,7 +77,12 @@ automata.js exposes a Board object and objects defining frequently used rules an
 
 This is a 1-dimensional cellular automata.
 
-Consider the famous Rule 37 [right one?]
+Consider the famous Rule 30 (00011110)
+
+The binary numbers define the 8 possible states for the candidate cell and its two neighbors.
+A 1 means the cell's value in the next iteration is 1 (alive, presumably), 0 means the opposite.
+"Rule 30 is of special interest because it is chaotic" (http://mathworld.wolfram.com/Rule30.html)
+
 
 
 ### Todo
@@ -84,7 +90,7 @@ Consider the famous Rule 37 [right one?]
 * Add 3-d support (three.js?) [http://cubes.io/]
 * improve Langton's ant.
 
-Unimplemented automata:
+### Other postential automata to implement
 
 * asynchronous cellular automata
 * hexagonal
