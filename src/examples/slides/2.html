@@ -7,41 +7,30 @@
   <meta name="description" content="Game of Life">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, neighborhoods, rules } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
-      var SCALE = 4
+    var SCALE = 4
 
-      var lifeCanvas = document.getElementById("lifeBoard");
-      var ctx = lifeCanvas.getContext("2d");
+    var lifeCanvas = document.getElementById("lifeBoard");
+    var ctx = lifeCanvas.getContext("2d");
 
+    var board = new Board([240, 160], 2, neighborhoods.vonNeumann, [.5, .5])
 
-      var board = new Board([240, 160], 2, neighborhoods.vonNeumann, [.5, .5])
+    board.setRule(rules.gameOfLife)
 
-      board.setRule(rules.gameOfLife)
+    var d = new Drawer(ctx, board, SCALE)
+    d.drawTableNext(board.state())
+    setInterval(function(){
+      d.drawTableNext()
+    }, 1000 / 60)
 
-      var d = new Drawer(ctx, board, SCALE)
-      d.drawTableNext(board.state())
-      setInterval(function(){
-        d.drawTableNext()
-      }, 1000 / 60)
-
-      //$("#rule").html(board.getRuleNumber());
-      $(lifeCanvas).click(function(){
-        board.setRandomRule();
-        board.reset();
-      })
-    
-      //setInterval(function(){ $("#rule").click() }, 1000)
-
-    });
+    lifeCanvas.addEventListener('click', function(){
+      board.setRandomRule();
+      board.reset();
+    })
   </script>
 
 </head>

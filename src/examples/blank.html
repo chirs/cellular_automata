@@ -7,30 +7,23 @@
   <meta name="description" content="Cellular automata sandbox">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, neighborhoods, rules } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
+    var blankCanvas = document.getElementById("blankBoard");
+    var context = blankCanvas.getContext("2d");
 
-      var blankCanvas = document.getElementById("blankBoard");
-      var context = blankCanvas.getContext("2d");
+    var board = new Board([180, 80], 2, neighborhoods.moore, false)
+    board.setRule(rules.twoByTwo)
+    var drawer = new Drawer(context, board, 10)
 
-      var board = new Board([180, 80], 2, neighborhoods.moore, false)
-      board.setRule(rules.twoByTwo)
-      var drawer = new Drawer(context, board, 10)
-    
-      $("canvas").click(drawer.changeSquare)
-      $("#next").click(function(){ drawer.drawTableNext(); console.log(board.state()) })
-      $("#play").click(function(){ 
-        setInterval(function(){ drawer.drawTable(board); board.next() }, 1000)
-      })
-      });
+    document.querySelector('canvas').addEventListener('click', drawer.changeSquare)
+    document.getElementById("next").addEventListener('click', function(){ drawer.drawTableNext(); console.log(board.state()) })
+    document.getElementById("play").addEventListener('click', function(){
+      setInterval(function(){ drawer.drawTable(board); board.next() }, 1000)
+    })
   </script>
 
 </head>

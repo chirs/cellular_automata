@@ -7,42 +7,31 @@
   <meta name="description" content="Cyclic cellular automata">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, neighborhoods, rules } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
+    var canvas = document.getElementById("board");
+    var ctx = canvas.getContext("2d");
 
-      var canvas = document.getElementById("board");
-      var ctx = canvas.getContext("2d");
+    // 12 seems the magic number of states - before this, a single state usually overwhelms.
+    // at 12 or greater, the behavior is almost always cyclic.
+    var board = new Board([450, 200], 12, neighborhoods.vonNeumann, 12)
+    board.setRule(rules.makeCyclic(12))
 
-      // 12 seems the magic number of states - before this, a single state usually overwhelms.
-      // at 12 or greater, the behavior is almost always cyclic.
-      var board = new Board([450, 200], 12, neighborhoods.vonNeumann, 12)
-      board.setRule(rules.makeCyclic(12))
+    var d = new Drawer(ctx, board, 4)
+    d.drawTable()
 
-      var d = new Drawer(ctx, board, 4)
-      d.drawTable()
+    setInterval(function(){
+      board.next()
+      d.drawTableDiff()
+    }, 100)
 
-      setInterval(function(){
-        board.next()
-        d.drawTableDiff()
-      }, 100)
-
-      //$("#rule").html(board.getRuleNumber());
-      $(canvas).click(function(){
-        board.setRandomRule();
-        board.reset();
-      })
-    
-      //setInterval(function(){ $("#rule").click() }, 1000)
-
-    });
+    canvas.addEventListener('click', function(){
+      board.setRandomRule();
+      board.reset();
+    })
   </script>
 
 </head>

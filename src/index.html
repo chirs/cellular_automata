@@ -16,25 +16,23 @@
     import { Board, neighborhoods, rules } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
-	
 	var SCALE = 6;
 	var RATE = .25;
 	var intervalID = null;
-	
-	var width = $(window).width()
-	var height = $(window).height()
+
+	var width = window.innerWidth
+	var height = window.innerHeight
 
 	var wf = width / SCALE;
 	var hf = height / SCALE;
-	
+
 	var simple_mapping = function(states, neighborhood, distribution, rule){
             return {
-		scale: SCALE, 
+		scale: SCALE,
 		board: new Board([width/SCALE, height/SCALE], states, neighborhood, distribution).setRule(rule),
             }
 	};
-	
+
 	var map = {
             life: simple_mapping(2, neighborhoods.moore, [.7,.3], rules.gameOfLife),
             cyclic: {
@@ -42,7 +40,7 @@
 		board: new Board([width/SCALE, height/SCALE], 12, neighborhoods.moore, 10).setRule(rules.makeCyclic(9))
             },
 
-	  
+
           fire: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
@@ -70,131 +68,112 @@
             coral: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.coral)
-          },	    
-	  
+          },
+
           amoeba: simple_mapping(2, neighborhoods.moore, 2, rules.amoeba),
-	  
+
 	  }
 
-	
+
 	var slider = $( "#rate #slider" ).slider({ min: 0, max: 20, value: RATE * 20});
-	
+
 	// stops functioning when rule is changed.
-	
+
 	slider.on("slidestop", function(event, ui) {
             RATE = ui.value / 20;
 	    console.log(RATE);
 	    clearInterval(intervalID);
-	    
+
 	    if (RATE > 0){
 		d.setRate(RATE);
 		intervalID = d.draw2dBoard();
 	    }
-	    
+
 	});
-	
-	$("#scale").on('change', function(){
-	    console.log($(this).val());
-	    d.scale = $(this).val();
-	    
+
+	document.getElementById("scale").addEventListener('change', function(){
+	    console.log(this.value);
+	    d.scale = this.value;
+
             intervalID = d.draw2dBoard();
 	});
-	
-	
-	var reset = $("#reset");
-	var modify = $("#modify");
 
-	var hideshow = $(".hide-show");
 
 	var canvas = document.getElementById("board");
 	var context = canvas.getContext("2d");
 	var d = new Drawer(context, map.life.board, map.life.scale, RATE)
-	
+
 	var setRule = function(rule){
 	    clearInterval(intervalID);
             d.board = rule.board;
             d.scale = rule.scale;
 	    d.setRate(RATE);
-	    
+
             intervalID = d.draw2dBoard();
 	};
-	
-	reset.click(function(){
+
+	document.getElementById("reset").addEventListener('click', function(){
 	    d.board.reset();
 	});
 
 
-	modify.click(function(){
+	document.getElementById("modify").addEventListener('click', function(){
 	    console.log("huh");
 	    //d.setRate(0);
-	    $("#modify-options").show();
-	    
+	    document.getElementById("modify-options").style.display = 'block';
+
 	});
 
-	hideshow.click(function(){
-	    if ($(this).html() == '-'){
-		$(this).html('+ expand');
-		$(".toggled").hide();
+	document.querySelectorAll(".hide-show").forEach(function(el){
+	    el.addEventListener('click', function(){
+		if (this.textContent == '-'){
+		    this.textContent = '+ expand';
+		    document.querySelectorAll(".toggled").forEach(function(t){ t.style.display = 'none'; });
 		} else {
-		$(this).html('- minimize');
-		$(".toggled").show();
-		    
-		    }
+		    this.textContent = '- minimize';
+		    document.querySelectorAll(".toggled").forEach(function(t){ t.style.display = ''; });
+		}
+	    });
 	});
-	
 
-	$("#cyclic").click(function(){
+
+	document.getElementById("cyclic").addEventListener('click', function(){
 	    setRule(map.cyclic);
 	});
-	
-	$("#dayAndNight").click(function(){
+
+	document.getElementById("dayAndNight").addEventListener('click', function(){
 	    setRule(map.dayAndNight);
 	});
-	
-	$("#fire").click(function(){
+
+	document.getElementById("fire").addEventListener('click', function(){
 	    setRule(map.fire);
 	});
-	
-	$("#life").click(function(){
+
+	document.getElementById("life").addEventListener('click', function(){
 	    setRule(map.life);
 	});
-	
-	$("#gnarl").click(function(){
+
+	document.getElementById("gnarl").addEventListener('click', function(){
 	    setRule(map.gnarl);
 	});
-	
-	$("#serviettes").click(function(){
+
+	document.getElementById("serviettes").addEventListener('click', function(){
 	    setRule(map.serviettes);
 	});
-	
-	$("#walledCities").click(function(){
+
+	document.getElementById("walledCities").addEventListener('click', function(){
 	    setRule(map.walledCities);
 	});
-	
-	$("#amoeba").click(function(){
+
+	document.getElementById("amoeba").addEventListener('click', function(){
 	    setRule(map.amoeba);
 	});
 
-	$("#coral").click(function(){
+	document.getElementById("coral").addEventListener('click', function(){
 	    setRule(map.coral);
-	});	
-	
-	$("#life").click();
-	
-	// figure out how to figure out x/y cell from screen position.
+	});
 
-	/*
-
-	$("#board").click(function(e){
-	    console.log(hf);
-	    console.log(wf);
-	    var x = Math.floor((e.pageX-$(this).offset().left))
-	    var y = Math.floor((e.pageY-$(this).offset().top));
-	    alert(x + " " + y);
-	    })
-	*/
-	
-    });
+	document.getElementById("life").click();
   </script>
 
 </head>

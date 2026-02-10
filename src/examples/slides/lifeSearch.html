@@ -7,18 +7,12 @@
   <meta name="description" content="Life rule search">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, neighborhoods, rules, entropy } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
-
-      var SCALE = 20
+    var SCALE = 20
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
       var board = new Board([100, 48], 3, NEIGHBORHOODS.MOORE, true, .5)
@@ -78,10 +72,7 @@
 
       }
 
-      setInterval(findNeighbor, 200)
-
-
-    });
+    setInterval(findNeighbor, 200)
   </script>
 
 </head>

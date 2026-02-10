@@ -7,37 +7,29 @@
   <meta name="description" content="Conway's Game of Life">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, neighborhoods, rules } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
+    var canvas = document.getElementById("board");
+    var ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    var scale = 2;
 
-      var canvas = document.getElementById("board");
-      var ctx = canvas.getContext("2d");
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-      var scale = 2;
+    var board = new Board([canvas.width / scale, canvas.height / scale], 2, neighborhoods.moore, [0.6, 0.4])
+    board.setRule(rules.gameOfLife)
 
-      var board = new Board([canvas.width / scale, canvas.height / scale], 2, neighborhoods.moore, [0.6, 0.4])
-      board.setRule(rules.gameOfLife)
-      
-      var d = new Drawer(ctx, board, scale)
-      d.drawTable(board.getState())
-      setInterval(function(){
-        var diff = board.next();
-        d.drawTableDiff();
-        
-      }, 1000 / 60)
+    var d = new Drawer(ctx, board, scale)
+    d.drawTable(board.getState())
+    setInterval(function(){
+      var diff = board.next();
+      d.drawTableDiff();
 
-      $("#rule").click(board.reset);
+    }, 1000 / 60)
 
-    });
+    document.getElementById("rule").addEventListener('click', board.reset);
   </script>
 
 </head>

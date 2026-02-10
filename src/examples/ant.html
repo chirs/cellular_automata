@@ -7,37 +7,25 @@
   <meta name="description" content="Langton's Ant">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, Ant, neighborhoods, rules } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
-
     // Something is wrong with ant...
-      var lifeCanvas = document.getElementById("lifeBoard");
-      var ctx = lifeCanvas.getContext("2d");
+    var lifeCanvas = document.getElementById("lifeBoard");
+    var ctx = lifeCanvas.getContext("2d");
 
-      var board = new Board([900, 400], 2, neighborhoods.moore, false)
-      var a1 = new Ant([450,200], rules.langtonsAnt, board)
-      var d = new Drawer(ctx, board, 2)
+    var board = new Board([900, 400], 2, neighborhoods.moore, false)
+    var a1 = new Ant([450,200], rules.langtonsAnt, board)
+    var d = new Drawer(ctx, board, 2)
 
+    d.drawTable()
+    setInterval(function(){
+      a1.move(100)
       d.drawTable()
-      setInterval(function(){
-        a1.move(100)
-        d.drawTable()
-        d.fillCoord(a1.position, "red")
-      }, 100)
-
-      //$("#next").click(function(){ drawTable(ctx, g.next(), SCALE) })
-      //$("#reset").click(function(){g.reset(); drawTable(ctx, g.state(), SCALE) })
-      //$("#lifeBoard").click(changeSquare(ctx, g, SCALE))
-
-    });
+      d.fillCoord(a1.position, "red")
+    }, 100)
   </script>
 
 </head>

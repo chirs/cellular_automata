@@ -7,41 +7,32 @@
   <meta name="description" content="Elementary cellular automata">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, neighborhoods } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
+    // Elementary cellular automata
+    var elemCanvas = document.getElementById("elemBoard");
+    var elemContext = elemCanvas.getContext("2d");
 
-      // Elementary cellular automata
-      var elemCanvas = document.getElementById("elemBoard");
-      var elemContext = elemCanvas.getContext("2d");
+    var rows = 0
+    var elemScale = 3
 
-      var rows = 0
-      var elemScale = 3
+    var elemBoards = []
+    var elemDrawers = []
+    //for (var i=0; i < rows; i++){
+    //  var b = new Board([rows], 2, neighborhoods.elementary, [.5, .5]).setRuleByNumber(i)
+    //  elemBoards.push(b)
+    //  elemDrawers.push(new Drawer(elemContext, b, elemScale))
+    //}
 
-      var elemBoards = []
-      var elemDrawers = []
-      //for (var i=0; i < rows; i++){
-      //  var b = new Board([rows], 2, neighborhoods.elementary, [.5, .5]).setRuleByNumber(i)
-      //  elemBoards.push(b)
-      //  elemDrawers.push(new Drawer(elemContext, b, elemScale))
-      //}
-
-      setInterval(function(){
-        for (var i=0; i < rows; i++){
-          elemDrawers[i].drawRow(i);
-          elemBoards[i].next()
-       }
-      })
-
-
-});
+    setInterval(function(){
+      for (var i=0; i < rows; i++){
+        elemDrawers[i].drawRow(i);
+        elemBoards[i].next()
+      }
+    })
   </script>
 
 </head>

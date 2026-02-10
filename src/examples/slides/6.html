@@ -7,49 +7,39 @@
   <meta name="description" content="Forest fire simulation">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, neighborhoods, rules } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
+    var lifeCanvas = document.getElementById("lifeBoard");
+    var ctx = lifeCanvas.getContext("2d");
 
-      var lifeCanvas = document.getElementById("lifeBoard");
-      var ctx = lifeCanvas.getContext("2d");
+    var board = new Board([250, 150], 3, neighborhoods.moore, [0.70, 0.3, 0])
 
-      var board = new Board([250, 150], 3, neighborhoods.moore, [0.70, 0.3, 0])
+    var d = new Drawer(ctx, board, 4)
+    d.drawTable(board.state())
 
-      //board.setRule(makeTreeRule(.05, .01))
+    var getRule = function(){
+      var g = parseFloat(document.getElementById("growProb").value);
+      var b = parseFloat(document.getElementById("burnProb").value);
+      return rules.makeTree(g, b);
+    }
 
-      var d = new Drawer(ctx, board, 4)
-      d.drawTable(board.state())
-
-      var getRule = function(){
-        var g = parseFloat($("#growProb").val());
-        var b = parseFloat($("#burnProb").val());
-        return rules.makeTree(g, b);
-      }
-
-      $("#restart").click(function(){
-        board.reset();
-        board.setRule(getRule());
-      });
-      $("#rule").click(board.reset);
-      
-      $("#restart").click();
-      setInterval(function(){
-        d.drawTable()
-        board.next()
-        var counts = board.getPopulationCount()
-        $("#tree_number").html(counts[1]);
-        $("#burntree_number").html(counts[2])
-      }, 1000 / 60)
-
+    document.getElementById("restart").addEventListener('click', function(){
+      board.reset();
+      board.setRule(getRule());
     });
+    document.getElementById("rule").addEventListener('click', board.reset);
+
+    document.getElementById("restart").click();
+    setInterval(function(){
+      d.drawTable()
+      board.next()
+      var counts = board.getPopulationCount()
+      document.getElementById("tree_number").textContent = counts[1];
+      document.getElementById("burntree_number").textContent = counts[2]
+    }, 1000 / 60)
   </script>
 
 </head>

@@ -7,68 +7,32 @@
   <meta name="description" content="Elementary cellular automata">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, neighborhoods } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
 
-    $(document).ready(function() {
-      var iID = null
+    var elemCanvas = document.getElementById("elemBoard");
+    var ctx = elemCanvas.getContext("2d");
 
-      var elemCanvas = document.getElementById("elemBoard");
-      var ctx = elemCanvas.getContext("2d");
+    var reset = function(){
+      var SCALE = 2
+      var cellCount = elemCanvas.width / SCALE
+      var board = new Board([cellCount], 2, neighborhoods.elementary)
+      board.setRuleByNumber(195)
 
-      var reset = function(){
+      var rd = new Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
+      setInterval(function(){
+        rd.drawRows(1)
+      }, 1000 / 60)
 
-        var SCALE = 2
-        var cellCount = elemCanvas.width / SCALE 
-        var board = new Board([cellCount], 2, neighborhoods.elementary)
-        //board.setRandomRule()
-        board.setRuleByNumber(195)
-        //board.setRule(cyclicRule(4))
-
-        var rd = new Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
-        setInterval(function(){ 
-          rd.drawRows(1) 
-        }, 1000 / 60)
-
-        $(elemCanvas).click(function(){
-          board.setRandomRule()
-          rd.reset();
-          //board.setRandomRule();
-        });
-
-        //$("#eid").html(ruleNumber);
-      }
-      
-
-      $('html').keydown(function (e) {
-        var keyCode = e.keyCode || e.which,
-        arrow = {left: 37, up: 38, right: 39, down: 40 };
-
-        switch (keyCode) {
-        case arrow.left: reset(getNum()-1); break;
-        case arrow.right: reset(getNum()+1); break;
-        }
+      elemCanvas.addEventListener('click', function(){
+        board.setRandomRule()
+        rd.reset();
       });
+    }
 
-      $("#populationSlider").slider({
-        max: 1, min: 0, value: .5, step: .01,
-        change: function(){ 
-          if (getRandom()){ reset(getNum()) }
-          }
-      });
-
-      $("#eid").click(function(){ reset() });
-      $("#randomCheckbox").change(function(){ reset(getNum()) });
-      
-      reset();
-
-});
+    reset();
   </script>
 
 </head>
