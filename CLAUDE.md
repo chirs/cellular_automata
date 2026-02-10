@@ -10,13 +10,13 @@ A vanilla JavaScript framework for simulating cellular automata (Game of Life, e
 
 **Running locally:** Serve the `src/` directory with any static file server (e.g., `python3 -m http.server -d src`). The nginx config in `etc/nginx/` shows the production setup with document root at `src/`.
 
-**Tests:** `src/tests/test.js` contains mocha-style tests, but the test setup is incomplete — the code uses IIFEs that attach to `window`/global scope, not CommonJS modules, so `require('./automata.js')` won't work without adaptation.
+**Tests:** Run with Node's built-in test runner: `node --test src/tests/test.js`. Tests use ES module imports directly from `src/js/automata.js`.
 
 ## Architecture
 
 ### Core Engine (`src/js/automata.js`)
 
-Exposes globals via an IIFE wrapping `this`:
+ES module exporting: `Board`, `Ant`, `Matrix`, `neighborhoods`, `rules`, and utility functions (`makeArray`, `canonicalStart`, `blankStart`, `getIndexes`, `entropy`, `flatten`, `sum`, `hammingDistance`).
 
 - **`Board(dimensions, cellStates, neighbors, initial_distribution)`** — The main simulation object. `dimensions` is an array (e.g., `[50, 50]` for 2D), `cellStates` is the number of states, `neighbors` defines the neighborhood topology, and `initial_distribution` sets random start probabilities. Call `.setRule(fn)` to assign a rule function, or `.setRuleByNumber(n)` for elementary CA rule numbers. `.next()` advances one generation using double-buffering (swaps `matrix` and `otherMatrix`).
 
@@ -32,11 +32,13 @@ Rule functions receive an array of neighbor states (first element is the cell it
 
 ### Renderer (`src/js/draw.js`)
 
+ES module exporting: `Drawer`, `getURLHash`.
+
 - **`Drawer(context, board, scale, rate)`** — Renders a Board onto an HTML5 Canvas. `.draw2dBoard()` starts an animation loop. `.drawTableDiff()` does incremental rendering using `board.diff()`. `.changeSquare()` handles click-to-toggle interaction.
 
 ### Example Pages (`src/examples/`)
 
-Each HTML file is a standalone demo that loads jQuery (CDN), `automata.js`, and `draw.js`, then wires up a specific automaton. The main `src/index.html` is a multi-automaton demo with a sidebar menu to switch between rules.
+Each HTML file is a standalone demo that loads jQuery (CDN) and imports from `automata.js` and `draw.js` via `<script type="module">`, then wires up a specific automaton. The main `src/index.html` is a multi-automaton demo with a sidebar menu to switch between rules.
 
 ## Git
 
@@ -44,7 +46,8 @@ Do not add a Co-Authored-By line to commit messages.
 
 ## Key Patterns
 
-- All JS uses IIFEs attached to global scope — no module system.
+- JS files are ES modules with named exports.
+- HTML files use `<script type="module">` with `import` statements.
 - Boards are toroidal (edges wrap) via `Matrix.move()`.
 - Double-buffering in `Board.next()`: computes new state into `otherMatrix`, then swaps.
 - Color generation uses golden-ratio-based HSV distribution for >3 states.
