@@ -40,10 +40,9 @@ Possible automata include, but are not limited to:
 
 ### Roadmap
 
-* Drop jQuery dependency — replace with vanilla JS
 * Board integration tests — verify known patterns (blinker, glider, block)
-* Replace `setInterval` with `requestAnimationFrame` for smoother rendering
 * Pause/resume/step controls
+* Remove jQuery slider?
 * URL-based state sharing — encode rule + grid state in the URL hash
 * Unified demo page — switch rules, adjust parameters, and draw on the grid from a single page
 * Performance tuning — typed arrays, Web Workers for large grids
