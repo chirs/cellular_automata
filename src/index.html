@@ -91,14 +91,6 @@
 
 	});
 
-	document.getElementById("scale").addEventListener('change', function(){
-	    console.log(this.value);
-	    d.scale = this.value;
-
-            intervalID = d.draw2dBoard();
-	});
-
-
 	var canvas = document.getElementById("board");
 	var context = canvas.getContext("2d");
 	var d = new Drawer(context, map.life.board, map.life.scale, RATE)
