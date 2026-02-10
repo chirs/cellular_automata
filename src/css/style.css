@@ -23,6 +23,14 @@ ul {
 
 li {
     padding-top: 5px;
+    padding-left: 8px;
+    border-left: 3px solid transparent;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+li.active {
+    border-left: 3px solid #333;
+    background-color: rgba(0, 0, 0, 0.07);
 }
 
 

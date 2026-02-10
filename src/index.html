@@ -94,13 +94,16 @@
 	var context = canvas.getContext("2d");
 	var d = new Drawer(context, map.life.board, map.life.scale, RATE)
 
-	var setRule = function(rule){
+	var setRule = function(rule, el){
 	    d.stop();
             d.board = rule.board;
             d.scale = rule.scale;
 	    d.setRate(RATE);
 
             d.draw2dBoard();
+
+	    document.querySelectorAll("#menu li").forEach(function(li){ li.classList.remove("active"); });
+	    if (el) el.closest("li").classList.add("active");
 	};
 
 	document.getElementById("reset").addEventListener('click', function(){
@@ -129,39 +132,39 @@
 
 
 	document.getElementById("cyclic").addEventListener('click', function(){
-	    setRule(map.cyclic);
+	    setRule(map.cyclic, this);
 	});
 
 	document.getElementById("dayAndNight").addEventListener('click', function(){
-	    setRule(map.dayAndNight);
+	    setRule(map.dayAndNight, this);
 	});
 
 	document.getElementById("fire").addEventListener('click', function(){
-	    setRule(map.fire);
+	    setRule(map.fire, this);
 	});
 
 	document.getElementById("life").addEventListener('click', function(){
-	    setRule(map.life);
+	    setRule(map.life, this);
 	});
 
 	document.getElementById("gnarl").addEventListener('click', function(){
-	    setRule(map.gnarl);
+	    setRule(map.gnarl, this);
 	});
 
 	document.getElementById("serviettes").addEventListener('click', function(){
-	    setRule(map.serviettes);
+	    setRule(map.serviettes, this);
 	});
 
 	document.getElementById("walledCities").addEventListener('click', function(){
-	    setRule(map.walledCities);
+	    setRule(map.walledCities, this);
 	});
 
 	document.getElementById("amoeba").addEventListener('click', function(){
-	    setRule(map.amoeba);
+	    setRule(map.amoeba, this);
 	});
 
 	document.getElementById("coral").addEventListener('click', function(){
-	    setRule(map.coral);
+	    setRule(map.coral, this);
 	});
 
 	document.getElementById("life").click();
