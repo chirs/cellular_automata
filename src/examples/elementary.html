@@ -23,14 +23,16 @@
       var rowIndex = 0;
 
       var rd = new Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
-      setInterval(function(){
+      function animate() {
+        requestAnimationFrame(animate);
         rd.drawRow(rowIndex);
         board.next();
         rowIndex = (rowIndex + 1) % 500;
         if (rowIndex == 0){
           board.setRandomRule();
         }
-      }, 1000 / 60)
+      }
+      requestAnimationFrame(animate);
     }
 
     reset();

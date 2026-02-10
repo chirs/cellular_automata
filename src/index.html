@@ -18,7 +18,6 @@
 
 	var SCALE = 6;
 	var RATE = .25;
-	var intervalID = null;
 
 	var width = window.innerWidth
 	var height = window.innerHeight
@@ -82,11 +81,11 @@
 	slider.on("slidestop", function(event, ui) {
             RATE = ui.value / 20;
 	    console.log(RATE);
-	    clearInterval(intervalID);
+	    d.stop();
 
 	    if (RATE > 0){
 		d.setRate(RATE);
-		intervalID = d.draw2dBoard();
+		d.draw2dBoard();
 	    }
 
 	});
@@ -96,12 +95,12 @@
 	var d = new Drawer(context, map.life.board, map.life.scale, RATE)
 
 	var setRule = function(rule){
-	    clearInterval(intervalID);
+	    d.stop();
             d.board = rule.board;
             d.scale = rule.scale;
 	    d.setRate(RATE);
 
-            intervalID = d.draw2dBoard();
+            d.draw2dBoard();
 	};
 
 	document.getElementById("reset").addEventListener('click', function(){

@@ -33,15 +33,16 @@
     document.getElementById("rule").addEventListener('click', board.reset);
 
     document.getElementById("restart").click();
-    setInterval(function(){
-
+    function animate() {
+      requestAnimationFrame(animate);
       board.next()
       d.drawTableDiff()
       var counts = board.getPopulationCount()
       document.getElementById("dead_count").textContent = counts[0];
       document.getElementById("tree_count").textContent = counts[1];
       document.getElementById("fire_count").textContent = counts[2]
-    }, 1000 / 60)
+    }
+    requestAnimationFrame(animate);
   </script>
 
 </head>

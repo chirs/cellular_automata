@@ -83,14 +83,28 @@ var Drawer = function(context, board, scale, rate){
   }
 
 
+  Drawer.prototype.stop = function(){
+    if (this._animFrameId) {
+      cancelAnimationFrame(this._animFrameId);
+      this._animFrameId = null;
+    }
+  };
+
   Drawer.prototype.draw2dBoard = function(){
+    this.stop();
     var d = this;
+    var interval = (1000 / 60) / this.rate;
+    var lastTime = 0;
     this.drawTable(this.board.getState())
-    console.log(this.rate)
-    return setInterval(function(){
-      d.board.next();
-      d.drawTableDiff();
-    }, (1000 / 60) / this.rate )
+    function loop(timestamp) {
+      d._animFrameId = requestAnimationFrame(loop);
+      if (timestamp - lastTime >= interval) {
+        lastTime = timestamp;
+        d.board.next();
+        d.drawTableDiff();
+      }
+    }
+    this._animFrameId = requestAnimationFrame(loop);
   };
 
 
