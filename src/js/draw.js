@@ -1,12 +1,9 @@
-
-!function(scope){
-
 //"use strict";
 
 // From http://martin.ankerl.com/2009/12/09/how-to-create-random-colors-programmatically/
 
 
-  var Drawer = function(context, board, scale, rate){
+var Drawer = function(context, board, scale, rate){
     this.context = context
     this.board = board
     this.scale = scale
@@ -108,6 +105,4 @@ var getURLHash = function(w, deflt){
 };
 
 
-this.Drawer = Drawer
-
-}(this);
+export { Drawer, getURLHash };

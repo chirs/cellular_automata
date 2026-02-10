@@ -13,11 +13,10 @@
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="/js/automata.js"></script>
-  <script type="text/javascript" src="/js/draw.js"></script>
+  <script type="module">
+    import { Board, neighborhoods, rules } from '/js/automata.js';
+    import { Drawer } from '/js/draw.js';
 
-
-  <script type="text/javascript">
     $(document).ready(function() {
 
       var blankCanvas = document.getElementById("blankBoard");

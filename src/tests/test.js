@@ -1,9 +1,9 @@
-var assert = require('assert');
-var automata = require('./automata.js');
+import assert from 'assert';
+import { rules } from '../js/automata.js';
 
 
 describe('cyclicRule', function(){
-  var rule = automata.cyclicRule(4);
+  var rule = rules.makeCyclic(4);
 
   // 1-d tests.
   it("test 0 with 1 first neighbor -> 1", function(){ assert.equal(rule([0,1,0,0]), 1) })

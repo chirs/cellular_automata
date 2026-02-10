@@ -1,5 +1,3 @@
-!function(scope){
-
 //"use strict";
 // A program that models multi-dimensional cellular automata.
 // Capable of representing Elementary cellular automata,
@@ -614,18 +612,16 @@ var hammingNeighbors = function(xs, states){
   return a;
 };
   
-  this.Ant = Ant
-  this.Board = Board
-  this.neighborhoods = {
+var neighborhoods = {
     elementary: [[0], [-1], [1]],
     elementary2: [[-2],[-1], [0], [1],[2]],
     elementary3: [[-3], [-2], [-1], [0], [1], [2], [3]],
     vonNeumann: [[0,0], [0,1], [-1,0], [0,-1], [1,0]],
     moore: [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
     // margolis...
-  }
+};
 
-  this.rules = {
+var rules = {
     makeCyclic: makeCyclicRule,
     makeTree: makeTreeRule,
     langtonsAnt: langtonsAntRule,
@@ -642,6 +638,6 @@ var hammingNeighbors = function(xs, states){
     coral: makeLifeFamilyRule([3], [4,5,6,7,8]),
     morley: makeLifeFamilyRule([3,6,8], [2,4,5]), // Named after Stephen Morley; also called Move. Supports very high-period and slow spaceships
     vote: makeLifeFamilyRule([5,6,7,8], [4,5,6,7,8]),
-  }
-    
-}(this);
+};
+
+export { Board, Ant, Matrix, neighborhoods, rules, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance };

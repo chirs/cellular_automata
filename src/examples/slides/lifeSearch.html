@@ -13,14 +13,13 @@
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="/js/automata.js"></script>
-  <script type="text/javascript" src="/js/draw.js"></script>
+  <script type="module">
+    import { Board, neighborhoods, rules, entropy } from '/js/automata.js';
+    import { Drawer } from '/js/draw.js';
 
-
-  <script type="text/javascript">
     $(document).ready(function() {
 
-      SCALE = 20
+      var SCALE = 20
       var lifeCanvas = document.getElementById("lifeBoard");
       var ctx = lifeCanvas.getContext("2d");
       var board = new Board([100, 48], 3, NEIGHBORHOODS.MOORE, true, .5)
@@ -45,10 +44,10 @@
         }
       }
 
-      ENTROPY_MAX = 6.63
-      ENTROPY_MIN = 0.1
-      RUNS = 0
-      DISTANCE = 1
+      var ENTROPY_MAX = 6.63
+      var ENTROPY_MIN = 0.1
+      var RUNS = 0
+      var DISTANCE = 1
 
       var findNeighbor = function(){
 

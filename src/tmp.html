@@ -5,8 +5,8 @@
     </head>
   <body>
     <script src="js/three.min.js"></script>
-    <script type="text/javascript" src="/js/automata.js"></script>
-    <script>
+    <script type="module">
+    import { Board, neighborhoods, rules } from '/js/automata.js';
   var scene = new THREE.Scene();
 
 var renderer = new THREE.WebGLRenderer();

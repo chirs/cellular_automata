@@ -13,20 +13,19 @@
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
-  <script type="text/javascript" src="/js/automata.js"></script>
-  <script type="text/javascript" src="/js/draw.js"></script>
+  <script type="module">
+    import { Board, neighborhoods } from '/js/automata.js';
+    import { Drawer } from '/js/draw.js';
 
-
-  <script type="text/javascript">
     $(document).ready(function() {
-      iID = null
+      var iID = null
 
       var elemCanvas = document.getElementById("elemBoard");
       var ctx = elemCanvas.getContext("2d");
 
       var reset = function(){
 
-        SCALE = 2
+        var SCALE = 2
         var cellCount = elemCanvas.width / SCALE 
         var board = new Board([cellCount], 2, neighborhoods.elementary)
         //board.setRandomRule()
