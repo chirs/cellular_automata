@@ -53,12 +53,12 @@ var generateColors = function(n){
   }
 
 
-  var help = function(e){ 
+  var help = (e) => {
     var s = Math.floor(e).toString(16);
     if (s.length === 1){ s = "0" + s; }
     return s;
   };
-  var rgb2css = function(l){ return "#" + help(l[0]) + help(l[1]) + help(l[2]); };
+  var rgb2css = (l) => "#" + help(l[0]) + help(l[1]) + help(l[2]);
 
   var goldenRatioConjugate = 0.618033988749895;
   var hue = Math.random();
@@ -77,7 +77,7 @@ var generateColors = function(n){
 
 // 2-Dimensional
 var makeCyclicRule = function(modulus){
-  return function(states){
+  return (states) => {
     var currentState = states[0];
     for (var i=1, l=states.length; i < l; i++){
       var s = (states[i] - currentState + modulus) % modulus;
@@ -91,12 +91,12 @@ var makeCyclicRule = function(modulus){
 
 
 var makeTreeRule = function(growProb, burnProb){
-  return function(states){
+  return (states) => {
     var currentState = states[0];
     var neighbors = states.slice(1);
 
     if (currentState === 0 && Math.random() <growProb) {return 1;}
-    if (currentState === 1 && neighbors.indexOf(2)> -1) {return 2;}
+    if (currentState === 1 && neighbors.includes(2)) {return 2;}
     if (currentState === 1 && Math.random() <burnProb ) {return 2;}
 
     if (currentState === 2) {return 0;}
@@ -108,11 +108,11 @@ var makeTreeRule = function(growProb, burnProb){
 // Family: Life
 var makeLifeFamilyRule = function(deadStates, liveStates){
 
-  return function(states){
+  return (states) => {
     var state = states[0];
     var neighbors = sum(states.slice(1));
-    if (state === 0 && deadStates.indexOf(neighbors) > -1){ return 1; }
-    if (state === 1 && liveStates.indexOf(neighbors) > -1){ return 1; }
+    if (state === 0 && deadStates.includes(neighbors)){ return 1; }
+    if (state === 1 && liveStates.includes(neighbors)){ return 1; }
     return 0;
   };
 };
@@ -196,7 +196,7 @@ var Board = function(dimensions, cellStates, neighbors, initial_distribution){
   this.neighborStates = Math.pow(cellStates, neighbors.length); // Number of possible cell arrangements.
   this.ruleSets = Math.pow(2, this.neighborStates);
 
-  this.startFunc = function() { return new Matrix(initial_distribution ? randomStart(dimensions, initial_distribution) : canonicalStart(dimensions)); };
+  this.startFunc = () => new Matrix(initial_distribution ? randomStart(dimensions, initial_distribution) : canonicalStart(dimensions));
   this.matrix = this.startFunc();
   this.otherMatrix = new Matrix(canonicalStart(this.dimensions));
 
@@ -215,7 +215,7 @@ Board.prototype.generateNeighbors = function(){
   var m = new Matrix(blankStart(this.dimensions));
   for (var i=0, l=this.indexes.length; i<l; i++){
     var p = this.indexes[i]
-    var n = this.neighbors.map(function(v){ return m.move(v, p) });
+    var n = this.neighbors.map(v => m.move(v, p));
     m.set(p, n);
   }
   return m;
@@ -242,7 +242,7 @@ Board.prototype.setRandomRule = function(){
 
 Board.prototype.createRuleTable = function(n){
     // Fix this.
-  var arr = n.toString(2).split("").map( function(s){ return parseInt(s, 10); } );
+  var arr = n.toString(2).split("").map(s => parseInt(s, 10));
   var l = arr.length
   while (l < this.neighborStates){ arr.unshift(0); } // left-fill with zeros.
   return arr;
@@ -384,10 +384,10 @@ var randomStart = function (dimensions, distribution) {
 
   if (typeof(distribution) === "number"){
     var val = 1 / distribution;
-    var distribution = makeArray([distribution], function(){ return val });
+    var distribution = makeArray([distribution], () => val);
   }
  
-  var f = function(){
+  var f = () => {
     var cutoff = 0;
     var r = Math.random();
     for (var i=0, l=distribution.length; i < l; i++){
@@ -404,19 +404,19 @@ var randomStart = function (dimensions, distribution) {
 
 var canonicalStart = function(dimensions) {
   var a = blankStart(dimensions);
-  var center = dimensions.map(function(e){ return Math.floor((e-1)/2); });
+  var center = dimensions.map(e => Math.floor((e-1)/2));
   var m = new Matrix(a);
   m.set(center, 1)
   return m.state()
 };
 
 var blankStart = function(dimensions) {
-  return makeArray(dimensions, function(){ return 0; });
+  return makeArray(dimensions, () => 0);
 };
 
 var getDimensions = function(table){
   var D = []
-  while (isArray(table)){
+  while (Array.isArray(table)){
     D.push(table.length)
     table = table[0]
   }
@@ -489,10 +489,6 @@ var Matrix = function(matrix){
 
 // Utility functions.
 
-var isArray = function (o) {
-  return (o instanceof Array) ||
-    (Object.prototype.toString.apply(o) === '[object Array]');
-};
 
 var sum = function(xs){
   var r = 0;
@@ -505,7 +501,7 @@ var sum = function(xs){
 var flatten = function(arr){
   var A = [];
   for (var i=0,l=arr.length; i < l; i++){
-    if (isArray(arr[i])){
+    if (Array.isArray(arr[i])){
       A = A.concat(flatten(arr[i]));
     } else {
       A.push(arr[i]);
