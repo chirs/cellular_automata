@@ -336,9 +336,9 @@ Board.prototype.diff = function()  {
   }
 
 
-// not working.
-Board.prototype.reset = function() { 
-    this.matrix = new Matrix(randomStart(this.dimensions, initial_distribution));
+Board.prototype.reset = function() {
+    this.matrix = this.startFunc();
+    this.otherMatrix = new Matrix(canonicalStart(this.dimensions));
     this.static = false;
 };
 

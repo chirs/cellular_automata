@@ -44,10 +44,6 @@ Each HTML file is a standalone demo that loads jQuery (CDN) and imports from `au
 
 Do not add a Co-Authored-By line to commit messages.
 
-## Known Bugs
-
-- `Board.reset` references an undefined `initial_distribution` variable (should use `this.startFunc` or store the distribution on the instance).
-
 ## Key Patterns
 
 - JS files are ES modules with named exports.
