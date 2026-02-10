@@ -1,0 +1,10 @@
+{
+  "name": "cellular-automata",
+  "version": "1.0.0",
+  "description": "A framework for simulating cellular automata",
+  "type": "module",
+  "scripts": {
+    "test": "node --test src/tests/test.js"
+  },
+  "license": "MIT"
+}
