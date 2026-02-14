@@ -81,13 +81,13 @@
 	var play = function() {
 	    playing = true;
 	    d.draw2dBoard();
-	    document.getElementById("play").textContent = '⏸';
+	    document.getElementById("play").textContent = '⏸ Pause';
 	};
 
 	var pause = function() {
 	    playing = false;
 	    d.stop();
-	    document.getElementById("play").textContent = '►';
+	    document.getElementById("play").textContent = '▶ Play';
 	};
 
 	document.getElementById("play").addEventListener('click', function() {
@@ -209,9 +209,9 @@
     </ul>
     
     <div id="controls">
-      <div id="reset">↻</div>
-      <div id="play">►</div>
-      <div id="forward">⏭</div>
+      <div id="reset">⟲ Reset</div>
+      <div id="play">▶ Play</div>
+      <div id="forward">▸▸ Step</div>
     </div>
   </div>
 

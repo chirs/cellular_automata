@@ -63,21 +63,26 @@ li.active {
 #controls > div {
     flex: 1;
     text-align: center;
-    padding: 6px 0;
-    font-size: 1.4em;
+    padding: 8px 4px;
+    font-size: 1.1em;
     cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+    background-color: #f5f5f5;
+    border: 1px solid #bbb;
+    border-bottom: 2px solid #999;
+    border-radius: 4px;
     user-select: none;
-    transition: background-color 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
 }
 
 #controls > div:hover {
-    background-color: rgba(0, 0, 0, 0.08);
+    background-color: #e8e8e8;
+    border-color: #999;
 }
 
 #controls > div:active {
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: #ddd;
+    border-bottom-width: 1px;
+    transform: translateY(1px);
 }
 
 .box {
