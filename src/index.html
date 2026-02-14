@@ -7,10 +7,6 @@
   <meta name="description" content="Cellular automata simulator">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css">
-
-  <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
 
   <script type="module">
     import { Board, neighborhoods, rules } from '/js/automata.js';
@@ -74,33 +70,50 @@
 	  }
 
 
-	var slider = $( "#rate #slider" ).slider({ min: 0, max: 20, value: RATE * 20});
-
-	// stops functioning when rule is changed.
-
-	slider.on("slidestop", function(event, ui) {
-            RATE = ui.value / 20;
-	    console.log(RATE);
-	    d.stop();
-
-	    if (RATE > 0){
-		d.setRate(RATE);
-		d.draw2dBoard();
-	    }
-
-	});
-
 	var canvas = document.getElementById("board");
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
 	var context = canvas.getContext("2d");
 	var d = new Drawer(context, map.life.board, map.life.scale, RATE)
+
+	var playing = false;
+
+	var play = function() {
+	    playing = true;
+	    d.draw2dBoard();
+	    document.getElementById("play").textContent = '⏸';
+	};
+
+	var pause = function() {
+	    playing = false;
+	    d.stop();
+	    document.getElementById("play").textContent = '►';
+	};
+
+	document.getElementById("play").addEventListener('click', function() {
+	    playing ? pause() : play();
+	});
+
+	document.getElementById("forward").addEventListener('click', function() {
+	    if (playing) pause();
+	    d.board.next();
+	    d.drawTableDiff();
+	});
+
+	canvas.addEventListener('click', function(e) { d.changeSquare(e); });
+
+	window.addEventListener('resize', function() {
+	    canvas.width = window.innerWidth;
+	    canvas.height = window.innerHeight;
+	    d.drawTable();
+	});
 
 	var setRule = function(rule, el){
 	    d.stop();
             d.board = rule.board;
             d.scale = rule.scale;
 	    d.setRate(RATE);
-
-            d.draw2dBoard();
+	    play();
 
 	    document.querySelectorAll("#menu li").forEach(function(li){ li.classList.remove("active"); });
 	    if (el) el.closest("li").classList.add("active");
@@ -108,15 +121,9 @@
 
 	document.getElementById("reset").addEventListener('click', function(){
 	    d.board.reset();
+	    d.drawTable();
 	});
 
-
-	document.getElementById("modify").addEventListener('click', function(){
-	    console.log("huh");
-	    //d.setRate(0);
-	    document.getElementById("modify-options").style.display = 'block';
-
-	});
 
 	document.querySelectorAll(".hide-show").forEach(function(el){
 	    el.addEventListener('click', function(){
@@ -176,7 +183,7 @@
 <body class="home">
 
 <div class="box">
-  <canvas id="board" width="1280" height="640"></canvas>
+  <canvas id="board"></canvas>
 </div>
 
 <div id="menu">
@@ -201,21 +208,9 @@
       <li><a id="coral">coral</a></li>    
     </ul>
     
-    <div id="rate">
-      <div id="slider"></div>
-    </div>
-
-
-    <div id="resetx">hello⏸▶ world</div>
-    <div id="reset">↻</div>    
-    <div id="play">►</div>    
-    <div id="back">⏮</div>
+    <div id="reset">↻</div>
+    <div id="play">►</div>
     <div id="forward">⏭</div>
-    <div id="modify">✎</div>
-
-    <div id="modify-options">
-      <p>this is modify text</p>
-      </div>
   </div>
 
 </div>

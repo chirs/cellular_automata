@@ -4,13 +4,10 @@
 }
 */
 
-#pause, #play {
-    display: none;
-}
-
 html, body {
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 ul {
@@ -61,10 +58,5 @@ li.active {
     /* display: inline-block; */
 }
 
-
-
-#modify-options {
-    display: none;
-}
 
 
