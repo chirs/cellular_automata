@@ -315,7 +315,7 @@ Board.prototype.diff = function()  {
     return [];
   }
   var d = matrixDiff(this.indexes, this.matrix, this.otherMatrix)
-  if (d.length === 1){
+  if (d.length === 0){
     this.static = true;
     console.log('static');
   }

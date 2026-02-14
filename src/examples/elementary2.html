@@ -16,23 +16,25 @@
     var elemCanvas = document.getElementById("elemBoard");
     var elemContext = elemCanvas.getContext("2d");
 
-    var rows = 0
+    var rows = 256
     var elemScale = 3
 
     var elemBoards = []
     var elemDrawers = []
-    //for (var i=0; i < rows; i++){
-    //  var b = new Board([rows], 2, neighborhoods.elementary, [.5, .5]).setRuleByNumber(i)
-    //  elemBoards.push(b)
-    //  elemDrawers.push(new Drawer(elemContext, b, elemScale))
-    //}
+    for (var i=0; i < rows; i++){
+      var b = new Board([rows], 2, neighborhoods.elementary, [.5, .5]).setRuleByNumber(i)
+      elemBoards.push(b)
+      elemDrawers.push(new Drawer(elemContext, b, elemScale))
+    }
 
-    setInterval(function(){
+    function loop() {
+      requestAnimationFrame(loop);
       for (var i=0; i < rows; i++){
         elemDrawers[i].drawRow(i);
         elemBoards[i].next()
       }
-    })
+    }
+    requestAnimationFrame(loop)
   </script>
 
 </head>

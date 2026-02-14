@@ -16,7 +16,7 @@
     var ctx = lifeCanvas.getContext("2d");
 
     var board = new Board([800, 400], 2, neighborhoods.moore, [0.6, 0.4])
-    board.setRule(rules.gnarl)
+    board.setRule(rules.gameOfLife)
 
     var d = new Drawer(ctx, board, 2)
     d.drawTable(board.getState())
@@ -27,7 +27,7 @@
     }
     requestAnimationFrame(animate);
 
-    document.getElementById("rule").addEventListener('click', board.reset);
+    document.getElementById("rule").addEventListener('click', () => { board.reset(); d.drawTable(); });
   </script>
 
 </head>

@@ -19,10 +19,29 @@
     board.setRule(rules.twoByTwo)
     var drawer = new Drawer(context, board, 10)
 
+    drawer.drawTable();
+
+    var playing = false;
     document.querySelector('canvas').addEventListener('click', (e) => drawer.changeSquare(e))
-    document.getElementById("next").addEventListener('click', function(){ drawer.drawTableNext(); console.log(board.state()) })
-    document.getElementById("play").addEventListener('click', function(){
-      setInterval(function(){ drawer.drawTable(board); board.next() }, 1000)
+    document.getElementById("next").addEventListener('click', function() {
+      board.next();
+      drawer.drawTable();
+    })
+    document.getElementById("play").addEventListener('click', function() {
+      if (playing) {
+        drawer.stop();
+        playing = false;
+      } else {
+        drawer.rate = 1;
+        drawer.draw2dBoard();
+        playing = true;
+      }
+    })
+    document.getElementById("reset").addEventListener('click', function() {
+      drawer.stop();
+      playing = false;
+      board.reset();
+      drawer.drawTable();
     })
   </script>
 

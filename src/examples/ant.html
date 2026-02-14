@@ -21,11 +21,33 @@
     var d = new Drawer(ctx, board, 2)
 
     d.drawTable()
-    setInterval(function(){
-      a1.move(100)
-      d.drawTable()
-      d.fillCoord(a1.position, "red")
-    }, 100)
+
+    var playing = true;
+    var lastTime = 0;
+    function loop(timestamp) {
+      if (!playing) return;
+      requestAnimationFrame(loop);
+      if (timestamp - lastTime >= 100) {
+        lastTime = timestamp;
+        a1.move(100);
+        d.drawTable();
+        d.fillCoord(a1.position, "red");
+      }
+    }
+    requestAnimationFrame(loop);
+
+    document.getElementById("next").addEventListener('click', function() {
+      a1.move(1);
+      d.drawTable();
+      d.fillCoord(a1.position, "red");
+    });
+
+    document.getElementById("reset").addEventListener('click', function() {
+      board.reset();
+      a1.position = [450, 200];
+      a1.internalState = 0;
+      d.drawTable();
+    });
   </script>
 
 </head>

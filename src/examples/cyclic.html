@@ -23,10 +23,16 @@
     var d = new Drawer(ctx, board, 4)
     d.drawTable()
 
-    setInterval(function(){
-      board.next()
-      d.drawTableDiff()
-    }, 100)
+    var lastTime = 0;
+    function loop(timestamp) {
+      requestAnimationFrame(loop);
+      if (timestamp - lastTime >= 100) {
+        lastTime = timestamp;
+        board.next();
+        d.drawTableDiff();
+      }
+    }
+    requestAnimationFrame(loop)
 
     canvas.addEventListener('click', function(){
       board.setRandomRule();
