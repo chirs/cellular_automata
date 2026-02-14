@@ -19,8 +19,7 @@
 // 1-Dimenisonal
 
 
-  var point2index = function(p,dimensions){
-  }
+
 
 
 var hsv2rgb = function(h, s, v){
@@ -257,13 +256,6 @@ Board.prototype.getPopulationCount = function(){
   return counts;
 };
 
-Board.prototype.areClean = function(points){
-  for (var i=0,l=points.length; i<l; i++){
-    if (this.cleanMap.get(points[i]) === true){
-      
-    }
-  }
-}
 
 Board.prototype.calculateStateB = function(cell){
   var states = [];
@@ -279,10 +271,6 @@ Board.prototype.calculateStateB = function(cell){
 Board.prototype.calculateState = function(p){
   var m = this.matrix;
   var neighbors = this.neighborMatrix.get(p);
-  //bypass state if no neighbors have changed since last round. (right? right.)
-  //if (this.areClean(neighbors)){
-  //  return m.get(p);
-  //}
   var states = []
   for (var i=0,l=neighbors.length; i<l; i++){
     states.push(m.get(neighbors[i]))
@@ -479,8 +467,8 @@ var Matrix = function(matrix){
 
   var product = function(arr){
     var prod = 1
-    for (i = 0; i < arr.length; i += 1) {
-      prod *= array[i];
+    for (var i = 0; i < arr.length; i += 1) {
+      prod *= arr[i];
     }
     return prod;
   }

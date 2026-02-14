@@ -68,7 +68,7 @@ var Drawer = function(context, board, scale, rate){
       this.drawRowHelper(this.board.getState(), row);
     }
 
-  Drawer.prototype.changeSquare = function(){
+  Drawer.prototype.changeSquare = function(event){
       var point = [Math.floor(event.offsetX / this.scale), Math.floor(event.offsetY / this.scale)];
       var nstate = this.board.updateValue(point);
       this.fillCoord(point, this.board.state2color(nstate));

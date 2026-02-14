@@ -19,7 +19,7 @@
     board.setRule(rules.twoByTwo)
     var drawer = new Drawer(context, board, 10)
 
-    document.querySelector('canvas').addEventListener('click', drawer.changeSquare)
+    document.querySelector('canvas').addEventListener('click', (e) => drawer.changeSquare(e))
     document.getElementById("next").addEventListener('click', function(){ drawer.drawTableNext(); console.log(board.state()) })
     document.getElementById("play").addEventListener('click', function(){
       setInterval(function(){ drawer.drawTable(board); board.next() }, 1000)
