@@ -243,7 +243,7 @@ Board.prototype.createRuleTable = function(n){
     // Fix this.
   var arr = n.toString(2).split("").map(s => parseInt(s, 10));
   var l = arr.length
-  while (l < this.neighborStates){ arr.unshift(0); } // left-fill with zeros.
+  while (arr.length < this.neighborStates){ arr.unshift(0); } // left-fill with zeros.
   return arr;
 };
 

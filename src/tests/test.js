@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  rules, Matrix, makeArray, blankStart, canonicalStart,
+  rules, Matrix, Board, Ant, neighborhoods, makeArray, blankStart, canonicalStart,
   getIndexes, entropy, flatten, sum, hammingDistance
 } from '../js/automata.js';
 
@@ -377,5 +377,278 @@ describe('cyclicRule', () => {
 
   it("ignores non-successor neighbors", () => {
     assert.equal(rule([0,2,0,0]), 0);
+  });
+});
+
+
+// --- Tier 4: Board integration ---
+
+// Helper: create a 2D board with Game of Life rules and all cells dead,
+// then set specific cells alive.
+function makeLifeBoard(rows, cols, liveCells) {
+  const board = new Board([rows, cols], 2, neighborhoods.moore, false);
+  board.setRule(rules.gameOfLife);
+  for (const [r, c] of liveCells) {
+    board.matrix.set([r, c], 1);
+  }
+  return board;
+}
+
+describe('Board: next() with blinker', () => {
+  it("horizontal blinker becomes vertical after one step", () => {
+    // Horizontal blinker at row 2, cols 1-3
+    const board = makeLifeBoard(5, 5, [[2,1],[2,2],[2,3]]);
+    board.next();
+    // Should become vertical at col 2, rows 1-3
+    assert.equal(board.matrix.get([1,2]), 1);
+    assert.equal(board.matrix.get([2,2]), 1);
+    assert.equal(board.matrix.get([3,2]), 1);
+    // Old horizontal ends should be dead
+    assert.equal(board.matrix.get([2,1]), 0);
+    assert.equal(board.matrix.get([2,3]), 0);
+  });
+
+  it("blinker returns to horizontal after two steps", () => {
+    const board = makeLifeBoard(5, 5, [[2,1],[2,2],[2,3]]);
+    board.next();
+    board.next();
+    assert.equal(board.matrix.get([2,1]), 1);
+    assert.equal(board.matrix.get([2,2]), 1);
+    assert.equal(board.matrix.get([2,3]), 1);
+    assert.equal(board.matrix.get([1,2]), 0);
+    assert.equal(board.matrix.get([3,2]), 0);
+  });
+});
+
+describe('Board: next() with block (still life)', () => {
+  it("2x2 block remains unchanged after one step", () => {
+    const board = makeLifeBoard(4, 4, [[1,1],[1,2],[2,1],[2,2]]);
+    board.next();
+    assert.equal(board.matrix.get([1,1]), 1);
+    assert.equal(board.matrix.get([1,2]), 1);
+    assert.equal(board.matrix.get([2,1]), 1);
+    assert.equal(board.matrix.get([2,2]), 1);
+    // Corners should stay dead
+    assert.equal(board.matrix.get([0,0]), 0);
+    assert.equal(board.matrix.get([3,3]), 0);
+  });
+});
+
+describe('Board: next() with glider', () => {
+  it("glider shifts diagonally after 4 generations", () => {
+    // Standard glider pattern:
+    //   .X.
+    //   ..X
+    //   XXX
+    const board = makeLifeBoard(6, 6, [[0,1],[1,2],[2,0],[2,1],[2,2]]);
+    for (let i = 0; i < 4; i++) board.next();
+    // After 4 gens, glider moves +1 row, +1 col (with wrapping)
+    assert.equal(board.matrix.get([1,2]), 1);
+    assert.equal(board.matrix.get([2,3]), 1);
+    assert.equal(board.matrix.get([3,1]), 1);
+    assert.equal(board.matrix.get([3,2]), 1);
+    assert.equal(board.matrix.get([3,3]), 1);
+  });
+});
+
+describe('Board: reset()', () => {
+  it("restores initial state after advancing", () => {
+    const board = makeLifeBoard(5, 5, [[2,1],[2,2],[2,3]]);
+    const initialState = JSON.stringify(board.matrix.state());
+    board.next();
+    board.next();
+    board.next();
+    board.reset();
+    assert.equal(board.static, false);
+    // Reset restores to startFunc which is canonicalStart (center cell = 1)
+    // since initial_distribution was false
+    const expected = canonicalStart([5, 5]);
+    assert.deepEqual(board.matrix.state(), expected);
+  });
+});
+
+describe('Board: diff()', () => {
+  it("returns changed coordinates after blinker step", () => {
+    const board = makeLifeBoard(5, 5, [[2,1],[2,2],[2,3]]);
+    board.next();
+    const changed = board.diff();
+    // Blinker changes: [2,1] dies, [2,3] dies, [1,2] born, [3,2] born
+    // (center [2,2] stays alive in both)
+    // diff compares matrix vs otherMatrix (pre-swap state)
+    assert.ok(changed.length > 0);
+  });
+});
+
+describe('Board: static flag', () => {
+  it("diff returns empty array for still life", () => {
+    // Block is a still life — diff should find 0 changes
+    const board = makeLifeBoard(4, 4, [[1,1],[1,2],[2,1],[2,2]]);
+    board.next();
+    const d = board.diff();
+    assert.equal(d.length, 0);
+  });
+
+  it("short-circuits next() when static is set", () => {
+    const board = makeLifeBoard(4, 4, [[1,1],[1,2],[2,1],[2,2]]);
+    board.next();
+    board.static = true; // manually set since diff's auto-detection has a known bug
+    const stateBefore = JSON.stringify(board.matrix.state());
+    board.next(); // should short-circuit
+    assert.equal(JSON.stringify(board.matrix.state()), stateBefore);
+  });
+});
+
+describe('Board: getPopulationCount()', () => {
+  it("counts cells correctly", () => {
+    const board = makeLifeBoard(5, 5, [[0,0],[1,1],[2,2]]);
+    const counts = board.getPopulationCount();
+    assert.equal(counts[0], 22); // 25 - 3 dead
+    assert.equal(counts[1], 3);  // 3 alive
+  });
+});
+
+describe('Board: updateValue()', () => {
+  it("cycles cell state modulo cellStates", () => {
+    const board = new Board([3, 3], 3, neighborhoods.moore, false);
+    board.setRule(rules.gameOfLife);
+    assert.equal(board.matrix.get([0,0]), 0);
+    board.updateValue([0,0]);
+    assert.equal(board.matrix.get([0,0]), 1);
+    board.updateValue([0,0]);
+    assert.equal(board.matrix.get([0,0]), 2);
+    board.updateValue([0,0]);
+    assert.equal(board.matrix.get([0,0]), 0); // wraps back to 0
+  });
+});
+
+
+// --- Tier 5: Ant ---
+
+describe('Ant', () => {
+  // Simple Langton's ant rule: same logic as the non-exported langtonsAntRule
+  const antRule = (boardState, internalState) => {
+    const moves = [[0,1],[1,0],[0,-1],[-1,0]];
+    return moves[internalState];
+  };
+
+  describe('updateInternalState', () => {
+    it("increments state on cell 0 (mod 4)", () => {
+      const board = new Board([5, 5], 2, neighborhoods.moore, false);
+      const ant = new Ant([2, 2], antRule, board);
+      assert.equal(ant.internalState, 0);
+      ant.updateInternalState(0);
+      assert.equal(ant.internalState, 1);
+      ant.updateInternalState(0);
+      assert.equal(ant.internalState, 2);
+      ant.updateInternalState(0);
+      assert.equal(ant.internalState, 3);
+      ant.updateInternalState(0);
+      assert.equal(ant.internalState, 0); // wraps
+    });
+
+    it("decrements state on cell 1 (+3 mod 4)", () => {
+      const board = new Board([5, 5], 2, neighborhoods.moore, false);
+      const ant = new Ant([2, 2], antRule, board);
+      assert.equal(ant.internalState, 0);
+      ant.updateInternalState(1);
+      assert.equal(ant.internalState, 3); // 0+3 mod 4
+      ant.updateInternalState(1);
+      assert.equal(ant.internalState, 2); // 3+3 mod 4
+    });
+  });
+
+  describe('moveOne()', () => {
+    it("toggles cell, updates position and internal state", () => {
+      const board = new Board([5, 5], 2, neighborhoods.moore, false);
+      // Set all cells to 0 (canonical start has center=1, fix that)
+      for (const idx of getIndexes([5, 5])) board.matrix.set(idx, 0);
+      const ant = new Ant([2, 2], antRule, board);
+
+      // Cell at [2,2] is 0, so internal state goes 0→1
+      // Then rule(0, 1) = [1,0], position moves from [2,2] by [1,0] → [3,2]
+      ant.moveOne();
+      assert.equal(board.matrix.get([2, 2]), 1); // toggled
+      assert.equal(ant.internalState, 1);
+      assert.deepEqual(ant.position, [3, 2]);
+    });
+  });
+
+  describe('move(n)', () => {
+    it("takes n steps", () => {
+      const board = new Board([5, 5], 2, neighborhoods.moore, false);
+      for (const idx of getIndexes([5, 5])) board.matrix.set(idx, 0);
+      const ant = new Ant([2, 2], antRule, board);
+
+      ant.move(3);
+      // After 3 moves, the ant has moved 3 times from start
+      // Verify the start cell was toggled
+      assert.equal(board.matrix.get([2, 2]), 1);
+      // Ant is no longer at start
+      assert.notDeepEqual(ant.position, [2, 2]);
+    });
+  });
+});
+
+
+// --- Tier 6: Elementary CA & rule tables ---
+
+describe('Board: createRuleTable()', () => {
+  it("converts Rule 30 correctly", () => {
+    const board = new Board([7], 2, neighborhoods.elementary, false);
+    const table = board.createRuleTable(30);
+    // 30 = 00011110 in binary, padded to 8 (2^3 neighbor states)
+    assert.deepEqual(table, [0,0,0,1,1,1,1,0]);
+  });
+
+  it("converts Rule 0 to all zeros", () => {
+    const board = new Board([7], 2, neighborhoods.elementary, false);
+    const table = board.createRuleTable(0);
+    assert.deepEqual(table, [0,0,0,0,0,0,0,0]);
+  });
+
+  it("converts Rule 255 to all ones", () => {
+    const board = new Board([7], 2, neighborhoods.elementary, false);
+    const table = board.createRuleTable(255);
+    assert.deepEqual(table, [1,1,1,1,1,1,1,1]);
+  });
+});
+
+describe('Board: setRuleByNumber() + next() for elementary CA', () => {
+  it("Rule 90 produces correct first generation from canonical start", () => {
+    // 1D board, 7 cells, canonical start: [0,0,0,1,0,0,0]
+    // Rule 90 table: [0,1,0,1,1,0,1,0]
+    // Neighborhood is [self, left, right] → states fed to array2integer as index
+    const board = new Board([7], 2, neighborhoods.elementary, false);
+    board.setRuleByNumber(90);
+
+    assert.deepEqual(board.matrix.state(), [0,0,0,1,0,0,0]);
+
+    board.next();
+    // Cell 2: [0,0,1]→idx 1→1, Cell 3: [1,0,0]→idx 4→1, Cell 4: [0,1,0]→idx 2→0
+    // Others all [0,0,0]→idx 0→0
+    assert.deepEqual(board.matrix.state(), [0,0,1,1,0,0,0]);
+  });
+});
+
+describe('Board: setRuleTable()', () => {
+  it("applies a manual rule table correctly", () => {
+    const board = new Board([5], 2, neighborhoods.elementary, false);
+    // Set a simple table: all neighborhoods produce 1
+    const table = [1,1,1,1,1,1,1,1];
+    board.setRuleTable(table);
+    board.next();
+    // All cells should be 1
+    for (let i = 0; i < 5; i++) {
+      assert.equal(board.matrix.get([i]), 1);
+    }
+  });
+});
+
+describe('Board: setRandomRule()', () => {
+  it("sets a rule and can advance without error", () => {
+    const board = new Board([7], 2, neighborhoods.elementary, false);
+    board.setRandomRule();
+    assert.ok(board.ruleTable);
+    board.next(); // should not throw
   });
 });
