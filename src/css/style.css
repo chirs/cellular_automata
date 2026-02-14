@@ -54,7 +54,33 @@ li.active {
     }
 
 
-.box { 
+#controls {
+    display: flex;
+    gap: 4px;
+    margin-top: 12px;
+}
+
+#controls > div {
+    flex: 1;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 1.4em;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    user-select: none;
+    transition: background-color 0.15s;
+}
+
+#controls > div:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+#controls > div:active {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+.box {
     /* display: inline-block; */
 }
 
