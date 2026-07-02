@@ -37,9 +37,9 @@ Prerequisite work before building new features.
 
 ## Phase 3: URL State Sharing
 
-- [ ] Encode current rule + parameters in URL hash
-- [ ] Leverage existing `getURLHash()` utility (currently unused)
-- [ ] Load rule from URL on page init
+- [x] Encode current rule + parameters in URL hash
+- [x] Leverage existing `getURLHash()` utility (currently unused)
+- [x] Load rule from URL on page init
 - [ ] Pattern import/export (RLE or similar format)
 
 ## Phase 4: Performance

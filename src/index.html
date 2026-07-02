@@ -10,7 +10,7 @@
 
   <script type="module">
     import { Board, neighborhoods, rules } from '/js/automata.js';
-    import { Drawer } from '/js/draw.js';
+    import { Drawer, getURLHash } from '/js/draw.js';
 
 	var SCALE = 6;
 	var RATE = .25;
@@ -112,7 +112,13 @@
 	    d.drawTable();
 	});
 
-	var setRule = function(rule, el){
+	var currentRule = null;
+
+	var setRule = function(name){
+	    if (name === currentRule) { return; }
+	    currentRule = name;
+	    var rule = map[name];
+
 	    d.stop();
             d.board = rule.board;
             d.scale = rule.scale;
@@ -120,7 +126,9 @@
 	    play();
 
 	    document.querySelectorAll("#menu li").forEach(function(li){ li.classList.remove("active"); });
-	    if (el) el.closest("li").classList.add("active");
+	    document.getElementById(name).closest("li").classList.add("active");
+
+	    if (getURLHash(window, null) !== name) { window.location.hash = name; }
 	};
 
 	document.getElementById("reset").addEventListener('click', function(){
@@ -142,43 +150,19 @@
 	});
 
 
-	document.getElementById("cyclic").addEventListener('click', function(){
-	    setRule(map.cyclic, this);
+	Object.keys(map).forEach(function(name){
+	    document.getElementById(name).addEventListener('click', function(){
+		setRule(name);
+	    });
 	});
 
-	document.getElementById("dayAndNight").addEventListener('click', function(){
-	    setRule(map.dayAndNight, this);
-	});
+	var ruleFromHash = function(){
+	    var name = getURLHash(window, 'life');
+	    setRule(map[name] ? name : 'life');
+	};
 
-	document.getElementById("fire").addEventListener('click', function(){
-	    setRule(map.fire, this);
-	});
-
-	document.getElementById("life").addEventListener('click', function(){
-	    setRule(map.life, this);
-	});
-
-	document.getElementById("gnarl").addEventListener('click', function(){
-	    setRule(map.gnarl, this);
-	});
-
-	document.getElementById("serviettes").addEventListener('click', function(){
-	    setRule(map.serviettes, this);
-	});
-
-	document.getElementById("walledCities").addEventListener('click', function(){
-	    setRule(map.walledCities, this);
-	});
-
-	document.getElementById("amoeba").addEventListener('click', function(){
-	    setRule(map.amoeba, this);
-	});
-
-	document.getElementById("coral").addEventListener('click', function(){
-	    setRule(map.coral, this);
-	});
-
-	document.getElementById("life").click();
+	window.addEventListener('hashchange', ruleFromHash);
+	ruleFromHash();
   </script>
 
 </head>
