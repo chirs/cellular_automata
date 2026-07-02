@@ -202,7 +202,7 @@ var Drawer3d = function(context, board, scale, rate){
   this.rate = rate;     // generations per second
   this.theta = Math.PI / 6;
   this.spin = 0.004;    // radians per frame while not dragging
-  this.alpha = 0.7;     // cube face opacity; overlaps build up toward opaque
+  this.alpha = 0.5;     // cube face opacity; overlaps build up toward opaque
   this.running = true;
   this.dragging = false;
   this.faceColors = this.makeFaceColors();
@@ -257,6 +257,33 @@ var Drawer3d = function(context, board, scale, rate){
     ctx.fill();
   };
 
+  // Wireframe of the (toroidal) domain's bounding box, drawn behind the
+  // cells as a spatial reference.
+  Drawer3d.prototype.drawFrame = function(cos, sin){
+    var ctx = this.context;
+    var canvas = ctx.canvas;
+    var dims = this.board.matrix.dimensions;
+    var w = this.scale, h = this.scale;
+    var ox = canvas.width / 2, oy = canvas.height / 2;
+    var hx = dims[0]/2, hy = dims[1]/2, hz = dims[2]/2;
+    var corners = [];
+    for (var i=0; i < 8; i++){
+      var dx = i & 1 ? hx : -hx, dy = i & 2 ? hy : -hy, dz = i & 4 ? hz : -hz;
+      var rx = dx*cos - dy*sin;
+      var ry = dx*sin + dy*cos;
+      corners.push([ox + (rx - ry) * w, oy + (rx + ry) * w/2 - dz * h]);
+    }
+    var edges = [[0,1],[0,2],[1,3],[2,3],[4,5],[4,6],[5,7],[6,7],[0,4],[1,5],[2,6],[3,7]];
+    ctx.strokeStyle = "#ccc";
+    ctx.beginPath();
+    for (var i=0; i < edges.length; i++){
+      var a = corners[edges[i][0]], b = corners[edges[i][1]];
+      ctx.moveTo(a[0], a[1]);
+      ctx.lineTo(b[0], b[1]);
+    }
+    ctx.stroke();
+  };
+
   Drawer3d.prototype.render = function(){
     var ctx = this.context;
     var canvas = ctx.canvas;
@@ -266,6 +293,7 @@ var Drawer3d = function(context, board, scale, rate){
     var dims = m.dimensions;
     var cells = m.cells;
     var cos = Math.cos(this.theta), sin = Math.sin(this.theta);
+    this.drawFrame(cos, sin);
     var cx = (dims[0]-1)/2, cy = (dims[1]-1)/2, cz = (dims[2]-1)/2;
     var w = this.scale, h = this.scale;
     var ox = canvas.width / 2, oy = canvas.height / 2;

@@ -15,7 +15,7 @@
     var canvas = document.getElementById("board3d");
     var context = canvas.getContext("2d");
 
-    var SIZE = 30;
+    var SIZE = 20;
 
     var randomBlob = function(radius, fill){
       var points = [];
@@ -56,7 +56,7 @@
     };
 
     var board = new Board([SIZE, SIZE, SIZE], 2, neighborhoods.moore3d, false);
-    var drawer = new Drawer3d(context, board, 10, 6);
+    var drawer = new Drawer3d(context, board, 20, 6);
 
     var setRule = function(name){
       var spec = ruleSpecs[name];
@@ -92,8 +92,6 @@
 
 <body class="home">
 
-<canvas id="board3d" width="900" height="700"></canvas>
-
 <div id="rules">
   <a id="4555">4555</a>
   <a id="5766">5766</a>
@@ -109,6 +107,8 @@
 </div>
 
 <p>drag to rotate</p>
+
+<canvas id="board3d" width="900" height="880"></canvas>
 
 </body>
 </html>
