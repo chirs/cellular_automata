@@ -26,13 +26,90 @@ var Drawer = function(context, board, scale, rate){
       this.context.fillRect(x,y,this.scale,this.scale);
     };
 
+  // --- ImageData rendering (2D boards) ---
+  // Cells are painted into a persistent 1px-per-cell ImageData, put on an
+  // offscreen canvas, then scaled onto the main canvas in one drawImage.
+
+  // (Re)build buffers when the board or scale changes. Returns false for
+  // non-2D boards, which fall back to per-cell fillRect.
+  Drawer.prototype.prepareBuffers = function(){
+    var dims = this.board.matrix.dimensions;
+    if (dims.length !== 2){ return false; }
+    if (this.bufferBoard === this.board && this.bufferScale === this.scale){ return true; }
+    this.bufferBoard = this.board;
+    this.bufferScale = this.scale;
+    this.boardWidth = dims[0];
+    this.boardHeight = dims[1];
+    this.offscreen = document.createElement('canvas');
+    this.offscreen.width = dims[0];
+    this.offscreen.height = dims[1];
+    this.offscreenContext = this.offscreen.getContext('2d');
+    this.imageData = this.offscreenContext.createImageData(dims[0], dims[1]);
+    this.pixels = new Uint32Array(this.imageData.data.buffer);
+    this.palette = this.makePalette();
+    return true;
+  };
+
+  // state -> pixel value (RGBA bytes read as little-endian uint32). Colors
+  // are normalized through a scratch canvas so named colors and short hex
+  // both come back as #rrggbb.
+  Drawer.prototype.makePalette = function(){
+    var colors = this.board.colorMap;
+    var scratch = document.createElement('canvas').getContext('2d');
+    var palette = new Uint32Array(colors.length);
+    for (var i=0; i < colors.length; i++){
+      scratch.fillStyle = colors[i];
+      var hex = scratch.fillStyle;
+      var r = parseInt(hex.slice(1,3), 16);
+      var g = parseInt(hex.slice(3,5), 16);
+      var b = parseInt(hex.slice(5,7), 16);
+      palette[i] = (255 << 24) | (b << 16) | (g << 8) | r;
+    }
+    return palette;
+  };
+
+  Drawer.prototype.blit = function(){
+    this.offscreenContext.putImageData(this.imageData, 0, 0);
+    this.context.imageSmoothingEnabled = false;
+    this.context.drawImage(this.offscreen, 0, 0, this.boardWidth * this.scale, this.boardHeight * this.scale);
+  };
+
   Drawer.prototype.drawTable = function(){
+    if (!this.prepareBuffers()){ return this.drawTableRects(); }
+    var cells = this.board.matrix.cells;
+    var pix = this.pixels, pal = this.palette;
+    var w = this.boardWidth, h = this.boardHeight;
+    for (var x=0; x < w; x++){
+      var base = x * h;
+      for (var y=0; y < h; y++){
+        pix[y*w + x] = pal[cells[base + y]];
+      }
+    }
+    this.blit();
+  };
+
+  Drawer.prototype.drawIndexes = function(indexes){
+    if (indexes.length === 0){ return; }
+    if (!this.prepareBuffers()){ return this.drawIndexesRects(indexes); }
+    var cells = this.board.matrix.cells;
+    var pix = this.pixels, pal = this.palette;
+    var w = this.boardWidth, h = this.boardHeight;
+    for (var i=0, l=indexes.length; i < l; i++){
+      var p = indexes[i];
+      pix[p[1]*w + p[0]] = pal[cells[p[0]*h + p[1]]];
+    }
+    this.blit();
+  };
+
+  // fillRect fallbacks for non-2D boards.
+
+  Drawer.prototype.drawTableRects = function(){
       var boardState = this.board.getState();
       var rows = boardState.length;
       if (rows === 0) { return; }
-  
+
       var cols = boardState[0].length;
-  
+
       for (var i=0; i < rows; i++){
         for (var j=0; j < cols; j++){
           var state = boardState[i][j];
@@ -42,7 +119,7 @@ var Drawer = function(context, board, scale, rate){
       }
     };
 
-  Drawer.prototype.drawIndexes = function(indexes){
+  Drawer.prototype.drawIndexesRects = function(indexes){
     var boardState = this.board.getState();
     for (var i=0, l=indexes.length; i<l; i++){
       var p = indexes[i];
@@ -72,8 +149,8 @@ var Drawer = function(context, board, scale, rate){
       var point = [Math.floor(event.offsetX / this.scale), Math.floor(event.offsetY / this.scale)];
       var dims = this.board.matrix.dimensions;
       if (point[0] < 0 || point[1] < 0 || point[0] >= dims[0] || point[1] >= dims[1]) { return; }
-      var nstate = this.board.updateValue(point);
-      this.fillCoord(point, this.board.state2color(nstate));
+      this.board.updateValue(point);
+      this.drawIndexes([point]);
   }
 
   Drawer.prototype.clearCanvas = function(canvas){

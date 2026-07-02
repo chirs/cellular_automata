@@ -92,12 +92,14 @@ var makeCyclicRule = function(modulus){
 var makeTreeRule = function(growProb, burnProb){
   return (states) => {
     var currentState = states[0];
-    var neighbors = states.slice(1);
 
-    if (currentState === 0 && Math.random() <growProb) {return 1;}
-    if (currentState === 1 && neighbors.includes(2)) {return 2;}
-    if (currentState === 1 && Math.random() <burnProb ) {return 2;}
-
+    if (currentState === 0 && Math.random() < growProb) {return 1;}
+    if (currentState === 1){
+      for (var i=1, l=states.length; i < l; i++){
+        if (states[i] === 2) {return 2;}
+      }
+      if (Math.random() < burnProb) {return 2;}
+    }
     if (currentState === 2) {return 0;}
     return currentState;
   }
@@ -107,13 +109,21 @@ var makeTreeRule = function(growProb, burnProb){
 // Family: Life
 var makeLifeFamilyRule = function(deadStates, liveStates){
 
-  return (states) => {
+  var rule = (states) => {
     var state = states[0];
-    var neighbors = sum(states.slice(1));
+    var neighbors = 0;
+    for (var i=1, l=states.length; i < l; i++){ neighbors += states[i]; }
     if (state === 0 && deadStates.includes(neighbors)){ return 1; }
     if (state === 1 && liveStates.includes(neighbors)){ return 1; }
     return 0;
   };
+
+  // Lookup table indexed [state << 4 | neighborSum], letting Board.next()
+  // skip the per-cell function call for 2-state life-family rules.
+  rule.lifeTable = new Uint8Array(2 * 16);
+  deadStates.forEach(s => { rule.lifeTable[s] = 1; });
+  liveStates.forEach(s => { rule.lifeTable[16 + s] = 1; });
+  return rule;
 };
 
 
@@ -187,37 +197,53 @@ Ant.prototype.move = function(n){
 
 var Board = function(dimensions, cellStates, neighbors, initial_distribution){
 
-  this.dimensions = dimensions
+  this.dimensions = dimensions.map(Math.ceil); // callers may pass fractional sizes like width/scale
   this.cellStates = cellStates
   this.neighbors = neighbors
-  this.indexes = getIndexes(dimensions);
+  this.indexes = getIndexes(this.dimensions);
 
   this.neighborStates = Math.pow(cellStates, neighbors.length); // Number of possible cell arrangements.
   this.ruleSets = Math.pow(2, this.neighborStates);
 
-  this.startFunc = () => new Matrix(initial_distribution ? randomStart(dimensions, initial_distribution) : canonicalStart(dimensions));
+  this.startFunc = () => {
+    var m = new FlatMatrix(this.dimensions);
+    if (initial_distribution){
+      var sample = makeSampler(initial_distribution);
+      for (var i=0, l=m.cells.length; i < l; i++){ m.cells[i] = sample(); }
+    } else {
+      m.set(this.dimensions.map(e => Math.floor((e-1)/2)), 1); // canonical start: single live center cell
+    }
+    return m;
+  };
   this.matrix = this.startFunc();
-  this.otherMatrix = new Matrix(canonicalStart(this.dimensions));
+  this.otherMatrix = new FlatMatrix(this.dimensions);
 
   this.rule = undefined
   this.ruleTable = null;
 
-  this.static = false // Set when matrix == otherMatrix - not working yet. 
+  this.static = false // Set when matrix == otherMatrix - not working yet.
 
   this.colorMap = generateColors(cellStates);
-  this.neighborMatrix = this.generateNeighbors();
+  this.neighborFlat = this.generateNeighbors();
+  this.scratch = new Array(neighbors.length); // reusable states buffer for next()
 }
 
 Board.prototype.state2color = function(state){ return this.colorMap[state]; }
 
+// Precompute each cell's neighbor cells as flat indexes into matrix.cells,
+// laid out as k consecutive entries per cell.
 Board.prototype.generateNeighbors = function(){
-  var m = new Matrix(blankStart(this.dimensions));
-  for (var i=0, l=this.indexes.length; i<l; i++){
-    var p = this.indexes[i]
-    var n = this.neighbors.map(v => m.move(v, p));
-    m.set(p, n);
+  var m = this.matrix;
+  var k = this.neighbors.length;
+  var n = m.cells.length;
+  var nf = new Int32Array(n * k);
+  for (var c=0; c < n; c++){
+    var p = m.point(c);
+    for (var j=0; j < k; j++){
+      nf[c*k + j] = m.index(m.move(this.neighbors[j], p));
+    }
   }
-  return m;
+  return nf;
 }
 
 Board.prototype.setRule = function(r){ 
@@ -229,8 +255,8 @@ Board.prototype.setRule = function(r){
 
 Board.prototype.setRuleByNumber = function(n){ return this.setRuleTable(this.createRuleTable(n)); };
 
-Board.prototype.setRuleTable = function(t){ 
-  this.setRule(function(a){ return this.ruleTable[array2integer(a, 10)] });
+Board.prototype.setRuleTable = function(t){
+  this.setRule(function(a){ return t[array2integer(a, 10)] });
   this.ruleTable = t;
   return this;
 };
@@ -249,36 +275,12 @@ Board.prototype.createRuleTable = function(n){
 
 Board.prototype.getPopulationCount = function(){
   var counts = blankStart([this.cellStates]);
-
-  for (var i=0, l=this.indexes.length; i < l; i++){
-    counts[this.matrix.get(this.indexes[i])] += 1;
+  var cells = this.matrix.cells;
+  for (var i=0, l=cells.length; i < l; i++){
+    counts[cells[i]] += 1;
   }
   return counts;
 };
-
-
-Board.prototype.calculateStateB = function(cell){
-  var states = [];
-  for (var i=0, l=this.neighbors.length; i < l; i++){
-    var n = this.matrix.move(cell, this.neighbors[i])
-    var v = this.matrix.get(n)
-    states.push(v);
-  }
-  return this.rule(states);
-};
-
-
-Board.prototype.calculateState = function(p){
-  var m = this.matrix;
-  var neighbors = this.neighborMatrix.get(p);
-  var states = []
-  for (var i=0,l=neighbors.length; i<l; i++){
-    states.push(m.get(neighbors[i]))
-  }
-  //this seems to be slower?
-  //var states = neighbors.map(function(n){ return m.get(n); });
-  return this.rule(states); // memoize this?
-}
 
 
 Board.prototype.updateValue = function(point){
@@ -294,7 +296,7 @@ Board.prototype.updateValue = function(point){
 
 Board.prototype.exportPattern = function(){
   var dims = this.matrix.dimensions;
-  return dims[0] + "x" + dims[1] + ";" + encodeRLE(flatten(this.matrix.state()));
+  return dims[0] + "x" + dims[1] + ";" + encodeRLE(this.matrix.cells);
 };
 
 Board.prototype.importPattern = function(str){
@@ -320,14 +322,32 @@ Board.prototype.importPattern = function(str){
   return this;
 };
 
+// Allocation-free hot loop: gather each cell's neighbor states into the
+// shared scratch buffer, apply the rule, write into the back buffer, swap.
 Board.prototype.next = function(){
   if (this.static === true){
     return this.matrix;
   }
 
-  for (var i=0, l=this.indexes.length; i < l; i++){
-    var p = this.indexes[i]
-    this.step(p);
+  var cells = this.matrix.cells;
+  var out = this.otherMatrix.cells;
+  var nf = this.neighborFlat;
+  var k = this.neighbors.length;
+  var scratch = this.scratch;
+  var rule = this.rule;
+  var lt = rule.lifeTable;
+  if (lt && this.cellStates === 2 && k <= 16){
+    for (var c=0, n=cells.length; c < n; c++){
+      var b = c * k;
+      var s = 0;
+      for (var j=1; j < k; j++){ s += cells[nf[b + j]]; }
+      out[c] = lt[(cells[nf[b]] << 4) + s];
+    }
+  } else {
+    for (var c=0, n=cells.length, b=0; c < n; c++){
+      for (var j=0; j < k; j++, b++){ scratch[j] = cells[nf[b]]; }
+      out[c] = rule(scratch);
+    }
   }
 
   var tmp = this.matrix
@@ -336,48 +356,36 @@ Board.prototype.next = function(){
   return this.matrix
 }
 
-Board.prototype.step = function(p){
-  this.otherMatrix.set(p, this.calculateState(p));
-}
-
 // When is this called? This is the only time static is set.
 Board.prototype.diff = function()  {
 
   if (this.static === true) {
     return [];
   }
-  var d = matrixDiff(this.indexes, this.matrix, this.otherMatrix)
+  var a = this.matrix.cells;
+  var b = this.otherMatrix.cells;
+  var d = [];
+  for (var i=0, l=a.length; i < l; i++){
+    if (a[i] !== b[i]){
+      d.push(this.matrix.point(i));
+    }
+  }
   if (d.length === 0){
     this.static = true;
-    console.log('static');
   }
   return d
-  // diff seems to be missing the final item?
   }
 
 
 Board.prototype.reset = function() {
     this.matrix = this.startFunc();
-    this.otherMatrix = new Matrix(canonicalStart(this.dimensions));
+    this.otherMatrix = new FlatMatrix(this.dimensions);
     this.static = false;
 };
 
 			     
 
 Board.prototype.getState = function() { return this.matrix.state(); }
-
-
-var matrixDiff = function(indexes, m1, m2){
-  var p;
-  var d = [];
-  for (var i=0, l=indexes.length; i<l; i++){
-    p = indexes[i];
-    if (m1.get(p) != m2.get(p)){
-      d.push(p)
-    }
-  }
-  return d;
-}
 
 
 // Functions for making and manipulating the matrixes.
@@ -400,14 +408,15 @@ var makeArray = function(dimensions, callback){
 };
 
 
-var randomStart = function (dimensions, distribution) {
-
+// Build a () => state sampler from a distribution: either an array of
+// probabilities per state, or a number n meaning uniform over n states.
+var makeSampler = function(distribution){
   if (typeof(distribution) === "number"){
     var val = 1 / distribution;
-    var distribution = makeArray([distribution], () => val);
+    distribution = makeArray([distribution], () => val);
   }
- 
-  var f = () => {
+
+  return () => {
     var cutoff = 0;
     var r = Math.random();
     for (var i=0, l=distribution.length; i < l; i++){
@@ -416,9 +425,12 @@ var randomStart = function (dimensions, distribution) {
         return i;
       }
     }
+    return 0;
   };
+};
 
-  return makeArray(dimensions, f);
+var randomStart = function (dimensions, distribution) {
+  return makeArray(dimensions, makeSampler(distribution));
 };
 
 
@@ -493,8 +505,64 @@ var Matrix = function(matrix){
     for (var i=0,l=key.length-1; i < l; i++){
       res = res[key[i]];
     }
-    res[key[i]] = value 
+    res[key[i]] = value
   }
+
+
+// Flat typed-array matrix used for Board cell storage. Same interface as
+// Matrix (get/set/move/state/dimensions) but backed by a single Uint8Array,
+// so cell states must be integers 0-255.
+var FlatMatrix = function(dimensions, cells){
+  this.dimensions = dimensions;
+  this.strides = new Array(dimensions.length);
+  var s = 1;
+  for (var i = dimensions.length - 1; i >= 0; i--){
+    this.strides[i] = s;
+    s *= dimensions[i];
+  }
+  this.cells = cells || new Uint8Array(s);
+};
+
+  FlatMatrix.prototype.index = function(point){
+    var idx = 0;
+    for (var i=0, l=point.length; i < l; i++){ idx += point[i] * this.strides[i]; }
+    return idx;
+  };
+
+  FlatMatrix.prototype.point = function(index){
+    var p = new Array(this.dimensions.length);
+    for (var i=0, l=this.dimensions.length; i < l; i++){
+      p[i] = Math.floor(index / this.strides[i]) % this.dimensions[i];
+    }
+    return p;
+  };
+
+  FlatMatrix.prototype.get = function(point){ return this.cells[this.index(point)]; };
+
+  FlatMatrix.prototype.set = function(point, value){ this.cells[this.index(point)] = value; };
+
+  FlatMatrix.prototype.move = function(p1, p2){
+    var arr = [];
+    for (var i=0, l=p1.length; i<l; i++){
+      var dimension = this.dimensions[i];
+      var v = (p1[i] + p2[i] + dimension) % dimension;
+      arr.push(v);
+    }
+    return arr;
+  };
+
+  FlatMatrix.prototype.state = function(){
+    var self = this;
+    var build = function(d, offset){
+      var arr = [];
+      var last = d === self.dimensions.length - 1;
+      for (var i=0; i < self.dimensions[d]; i++){
+        arr.push(last ? self.cells[offset + i] : build(d + 1, offset + i * self.strides[d]));
+      }
+      return arr;
+    };
+    return build(0, 0);
+  };
 
 
   var product = function(arr){
@@ -690,4 +758,4 @@ var rules = {
     vote: makeLifeFamilyRule([5,6,7,8], [4,5,6,7,8]),
 };
 
-export { Board, Ant, Matrix, neighborhoods, rules, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };
+export { Board, Ant, Matrix, FlatMatrix, neighborhoods, rules, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };

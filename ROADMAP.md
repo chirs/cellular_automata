@@ -44,11 +44,11 @@ Prerequisite work before building new features.
 
 ## Phase 4: Performance
 
-- [ ] Replace nested arrays with typed arrays (`Uint8Array`) for matrix storage
-- [ ] Web Workers for large grid computation
-- [ ] `ImageData` batch rendering — write pixel data directly instead of individual `fillRect` calls
-- [ ] Optimize hot path in `calculateState()` / `next()` — avoid array allocations per cell
-- [ ] Profile and reduce GC pressure
+- [x] Replace nested arrays with typed arrays (`Uint8Array`) for matrix storage (`FlatMatrix`)
+- [ ] Web Workers for large grid computation — deferred: after the typed-array rewrite a 960×540 grid runs at ~140 gens/sec single-threaded; not worth the message-passing complexity
+- [x] `ImageData` batch rendering — write pixel data directly instead of individual `fillRect` calls
+- [x] Optimize hot path in `next()` — precomputed flat neighbor indexes, reusable scratch buffer, table fast path for life-family rules (960×540 Life: 41 → 7 ms/gen)
+- [x] Profile and reduce GC pressure — zero allocations per cell per generation; `npm run bench` tracks it
 
 ## Phase 5: New Automata
 

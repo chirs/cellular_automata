@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  rules, Matrix, Board, Ant, neighborhoods, makeArray, blankStart, canonicalStart,
+  rules, Matrix, FlatMatrix, Board, Ant, neighborhoods, makeArray, blankStart, canonicalStart,
   getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE
 } from '../js/automata.js';
 
@@ -183,6 +183,46 @@ describe('Matrix', () => {
       const m = new Matrix([[0, 0], [0, 0], [0, 0]]);
       assert.deepEqual(m.dimensions, [3, 2]);
     });
+  });
+});
+
+describe('FlatMatrix', () => {
+  it("gets and sets values via points", () => {
+    const m = new FlatMatrix([3, 2]);
+    m.set([1, 0], 5);
+    m.set([2, 1], 7);
+    assert.equal(m.get([1, 0]), 5);
+    assert.equal(m.get([2, 1]), 7);
+    assert.equal(m.get([0, 0]), 0);
+  });
+
+  it("wraps moves toroidally like Matrix", () => {
+    const m = new FlatMatrix([3, 3]);
+    assert.deepEqual(m.move([1, 1], [1, 0]), [2, 1]);
+    assert.deepEqual(m.move([2, 2], [1, 1]), [0, 0]);
+    assert.deepEqual(m.move([0, 0], [-1, -1]), [2, 2]);
+  });
+
+  it("round-trips point <-> flat index in row-major order", () => {
+    const m = new FlatMatrix([3, 4]);
+    assert.equal(m.index([0, 0]), 0);
+    assert.equal(m.index([0, 3]), 3);
+    assert.equal(m.index([1, 0]), 4);
+    assert.deepEqual(m.point(m.index([2, 3])), [2, 3]);
+  });
+
+  it("reconstructs nested state() matching cell layout", () => {
+    const m = new FlatMatrix([2, 3]);
+    m.set([0, 1], 1);
+    m.set([1, 2], 9);
+    assert.deepEqual(m.state(), [[0, 1, 0], [0, 0, 9]]);
+  });
+
+  it("handles 1D", () => {
+    const m = new FlatMatrix([4]);
+    m.set([2], 3);
+    assert.deepEqual(m.state(), [0, 0, 3, 0]);
+    assert.deepEqual(m.move([3], [1]), [0]);
   });
 });
 
