@@ -34,7 +34,7 @@ Prerequisite work before building new features.
 - [x] Click-to-toggle on dashboard canvas (currently only works on `blank.html`)
 - [x] Improve dashboard rule lineup — added Brian's Brain and seeded maze, fixed serviettes (birth/survival were swapped; now grows persian rugs from a 2×2 seed), dropped gnarl and walled cities
 - [ ] Responsive canvas — resize canvas on viewport change
-- [ ] Clean up `#modify` panel or implement it
+- [x] Clean up `#modify` panel or implement it — implemented as a B/S rule editor: checkbox grid on the panel edits the active 2-state rule live, custom rules get shareable `#b36s23`-style hashes; fixed swapped birth/survival in `maze` and `walledCities` found via the editor
 
 ## Phase 3: URL State Sharing
 

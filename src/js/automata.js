@@ -779,10 +779,10 @@ var rules = {
     gameOfLife: makeLifeFamilyRule([3], [2,3]),
     highLife: makeLifeFamilyRule([3,6], [2,3]),
     twoByTwo: makeLifeFamilyRule([3,6], [1,2,5]),
-    walledCities: makeLifeFamilyRule([2,3,4,5], [4,5,6,7,8]),
+    walledCities: makeLifeFamilyRule([4,5,6,7,8], [2,3,4,5]),
     seeds: makeLifeFamilyRule([2], []),
     dayAndNight: makeLifeFamilyRule([3,6,7,8], [3,4,6,7,8]),
-    maze: makeLifeFamilyRule([1,2,3,4,5], [3]),
+    maze: makeLifeFamilyRule([3], [1,2,3,4,5]),
     serviettes: makeLifeFamilyRule([2,3,4], []), // B234/S — "Persian rugs"
     amoeba: makeLifeFamilyRule([3,5,7], [1,3,5,8]),
     coral: makeLifeFamilyRule([3], [4,5,6,7,8]),
@@ -790,4 +790,4 @@ var rules = {
     vote: makeLifeFamilyRule([5,6,7,8], [4,5,6,7,8]),
 };
 
-export { Board, Ant, Matrix, FlatMatrix, neighborhoods, rules, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };
+export { Board, Ant, Matrix, FlatMatrix, neighborhoods, rules, makeLifeFamilyRule, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };

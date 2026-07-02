@@ -9,7 +9,7 @@
   <link rel="stylesheet" type="text/css" href="/css/style.css">
 
   <script type="module">
-    import { Board, neighborhoods, rules } from '/js/automata.js';
+    import { Board, neighborhoods, rules, makeLifeFamilyRule } from '/js/automata.js';
     import { Drawer, getURLHash } from '/js/draw.js';
 
 	var SCALE = 6;
@@ -127,12 +127,15 @@
 	    play();
 
 	    document.querySelectorAll("#menu li").forEach(function(li){ li.classList.remove("active"); });
-	    document.getElementById(name).closest("li").classList.add("active");
+	    var el = document.getElementById(name);
+	    if (el) { el.closest("li").classList.add("active"); } // custom b/s rules have no menu entry
 
 	    // Only rewrite the hash when the rule part differs, so a
 	    // pattern segment (#life;WxH;data) survives the initial load.
 	    var hashRule = getURLHash(window, '').split(';')[0];
 	    if (hashRule !== name) { window.location.hash = name; }
+
+	    syncEditor();
 	};
 
 	document.getElementById("reset").addEventListener('click', function(){
@@ -176,11 +179,93 @@
 	    });
 	});
 
+	// --- Rule editor: birth/survival checkboxes for 2-state rules ---
+
+	var editorEl = document.getElementById("editor");
+	var editorBoxes = { b: [], s: [] };
+
+	[["b", "born with n neighbors"], ["s", "survives with n neighbors"]].forEach(function(pair){
+	    var row = document.createElement("div");
+	    row.className = "bs-row";
+	    var tag = document.createElement("span");
+	    tag.className = "tag";
+	    tag.textContent = pair[0].toUpperCase();
+	    tag.title = pair[1];
+	    row.appendChild(tag);
+	    for (var n = 0; n <= 8; n++){
+		var label = document.createElement("label");
+		var box = document.createElement("input");
+		box.type = "checkbox";
+		box.value = n;
+		box.addEventListener("change", function(){ applyEditor(); });
+		label.appendChild(box);
+		label.appendChild(document.createTextNode(n));
+		row.appendChild(label);
+		editorBoxes[pair[0]].push(box);
+	    }
+	    editorEl.appendChild(row);
+	});
+
+	// Reflect the active rule's B/S sets (readable off the lifeTable that
+	// makeLifeFamilyRule attaches); disable for multi-state rules.
+	var syncEditor = function(){
+	    var lt = d.board.rule && d.board.rule.lifeTable;
+	    var usable = !!lt && d.board.cellStates === 2;
+	    editorEl.classList.toggle("disabled", !usable);
+	    for (var n = 0; n <= 8; n++){
+		editorBoxes.b[n].checked = usable && !!lt[n];
+		editorBoxes.s[n].checked = usable && !!lt[16 + n];
+	    }
+	};
+
+	var checkedValues = function(boxes){
+	    return boxes.filter(function(b){ return b.checked; }).map(function(b){ return Number(b.value); });
+	};
+
+	var bsName = /^b([0-8]*)s([0-8]*)$/;
+	var digits = function(str){ return str.split("").map(Number); };
+
+	var applyEditor = function(){
+	    var birth = checkedValues(editorBoxes.b);
+	    var survive = checkedValues(editorBoxes.s);
+	    var name = "b" + birth.join("") + "s" + survive.join("");
+	    if (name === currentRule) { return; }
+
+	    if (document.getElementById(currentRule)) {
+		// Editing a named rule: fork the current grid onto a fresh board
+		// so the named rule's board stays intact.
+		var board = new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, [.7,.3]);
+		board.matrix.cells.set(d.board.matrix.cells);
+		d.board = board;
+	    } else {
+		delete map[currentRule]; // stale alias for the same board
+	    }
+	    d.board.setRule(makeLifeFamilyRule(birth, survive));
+	    d.board.static = false;
+	    map[name] = { scale: SCALE, board: d.board };
+	    currentRule = name;
+
+	    document.querySelectorAll("#menu li").forEach(function(li){ li.classList.remove("active"); });
+	    window.location.hash = name;
+	    if (!playing) { d.drawTable(); }
+	};
+
 	var ruleFromHash = function(){
 	    var hash = getURLHash(window, 'life');
 	    var sep = hash.indexOf(';');
 	    var name = sep === -1 ? hash : hash.slice(0, sep);
-	    setRule(map[name] ? name : 'life');
+	    if (!map[name]){
+		var m = bsName.exec(name);
+		if (m) {
+		    map[name] = {
+			scale: SCALE,
+			board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, [.7,.3]).setRule(makeLifeFamilyRule(digits(m[1]), digits(m[2])))
+		    };
+		} else {
+		    name = 'life';
+		}
+	    }
+	    setRule(name);
 	    if (sep !== -1){
 		// Load the shared pattern paused so it's visible before evolving.
 		pause();
@@ -229,6 +314,10 @@
       <button id="play">Play</button>
       <button id="forward">Step</button>
       <button id="share">Share</button>
+    </div>
+
+    <div id="editor">
+      <p><em>rule editor</em> — neighbors to be <strong>B</strong>orn / <strong>S</strong>urvive</p>
     </div>
   </div>
 

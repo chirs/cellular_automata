@@ -103,6 +103,44 @@ li.active {
     /* display: inline-block; */
 }
 
+#editor {
+    margin-top: 14px;
+    transition: opacity 0.2s;
+}
+
+#editor p {
+    margin: 0 0 4px;
+}
+
+#editor .bs-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-top: 2px;
+}
+
+#editor .bs-row .tag {
+    width: 14px;
+    font-weight: bold;
+}
+
+#editor label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+#editor input {
+    margin: 0;
+    cursor: pointer;
+}
+
+#editor.disabled {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
 /* About page: prose layout, overrides the fullscreen no-scroll defaults. */
 
 body.about {

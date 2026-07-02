@@ -396,6 +396,39 @@ describe('makeTreeRule (deterministic branches)', () => {
   });
 });
 
+describe('maze (B3/S12345)', () => {
+  const rule = rules.maze;
+
+  it("dead cell with exactly 3 neighbors is born", () => {
+    assert.equal(rule(mooreInput(0, 3)), 1);
+    assert.equal(rule(mooreInput(0, 2)), 0);
+    assert.equal(rule(mooreInput(0, 4)), 0);
+  });
+
+  it("live cell survives with 1-5 neighbors, dies otherwise", () => {
+    assert.equal(rule(mooreInput(1, 1)), 1);
+    assert.equal(rule(mooreInput(1, 5)), 1);
+    assert.equal(rule(mooreInput(1, 0)), 0);
+    assert.equal(rule(mooreInput(1, 6)), 0);
+  });
+});
+
+describe('walledCities (B45678/S2345)', () => {
+  const rule = rules.walledCities;
+
+  it("dead cell with 4-8 neighbors is born", () => {
+    assert.equal(rule(mooreInput(0, 4)), 1);
+    assert.equal(rule(mooreInput(0, 8)), 1);
+    assert.equal(rule(mooreInput(0, 3)), 0);
+  });
+
+  it("live cell survives with 2-5 neighbors", () => {
+    assert.equal(rule(mooreInput(1, 2)), 1);
+    assert.equal(rule(mooreInput(1, 5)), 1);
+    assert.equal(rule(mooreInput(1, 6)), 0);
+  });
+});
+
 describe('serviettes / persian rugs (B234/S)', () => {
   const rule = rules.serviettes;
 

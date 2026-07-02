@@ -53,7 +53,7 @@ Do not add a Co-Authored-By line to commit messages.
 - JS files are ES modules with named exports; HTML files use `<script type="module">`.
 - Boards are toroidal (edges wrap) via `move()`.
 - Double-buffering in `Board.next()`: computes new state into `otherMatrix`, then swaps.
-- URL hash grammar on the dashboard: `#<rule>` or `#<rule>;<w>x<h>;<rle data>` (rule-only autoplays; a pattern hash loads paused). RLE alphabet is `[0-9a-z]`: `<count><stateChar>` with count omitted when 1 and state = `'a' + state`.
+- URL hash grammar on the dashboard: `#<rule>` or `#<rule>;<w>x<h>;<rle data>` (rule-only autoplays; a pattern hash loads paused). `<rule>` is a menu name or a custom B/S rule like `b36s23` (from the panel's rule editor). RLE alphabet is `[0-9a-z]`: `<count><stateChar>` with count omitted when 1 and state = `'a' + state`.
 - Elementary CA rule tables are indexed by `[self, left, right]` (self is the high bit), so Wolfram rule numbers do NOT map over directly — e.g., true Wolfram rule 30 is the table `[0,1,1,0,1,1,0,0]` via `setRuleTable`, not `setRuleByNumber(30)`.
 - `Board.diff()` sets `static` when a generation changes nothing, short-circuiting `next()`; anything that mutates cells directly (`updateValue`, `importPattern`) must clear it.
 - Color generation uses golden-ratio-based HSV distribution for >3 states; boards can override `colorMap` with any CSS colors (the Drawer normalizes them).
