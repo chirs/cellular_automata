@@ -7,6 +7,10 @@
 html, body {
     margin: 0;
     padding: 0;
+}
+
+/* Fullscreen canvas pages: no scrollbars. */
+body.home {
     overflow: hidden;
 }
 
@@ -102,7 +106,6 @@ li.active {
 /* About page: prose layout, overrides the fullscreen no-scroll defaults. */
 
 body.about {
-    overflow: auto;
     font-family: courier;
     line-height: 1.5;
     background: #fafafa;
