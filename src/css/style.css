@@ -99,5 +99,38 @@ li.active {
     /* display: inline-block; */
 }
 
+/* About page: prose layout, overrides the fullscreen no-scroll defaults. */
+
+body.about {
+    overflow: auto;
+    font-family: courier;
+    line-height: 1.5;
+    background: #fafafa;
+}
+
+body.about main {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+}
+
+body.about h1, body.about h2 {
+    border-bottom: 2px solid #999;
+    padding-bottom: 4px;
+}
+
+body.about canvas {
+    display: block;
+    margin: 12px 0;
+    border: 1px solid #999;
+    image-rendering: pixelated;
+}
+
+body.about ul {
+    list-style-type: disc;
+    margin-left: 0;
+    padding-left: 24px;
+}
+
 
 

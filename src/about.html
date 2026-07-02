@@ -1,35 +1,139 @@
-<h2>What is this?</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>What is a cellular automaton?</title>
 
-<p>So you're asking the eternal question: What the heck is a generic cellular automata simulator?</p>
+  <meta charset="utf-8">
+  <meta name="description" content="A short explanation of cellular automata">
 
-<p>Great question! Here's the simplest explanation I can figure out.</p>
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
 
+  <script type="module">
+    import { Board, neighborhoods, rules } from '/js/automata.js';
+    import { Drawer } from '/js/draw.js';
 
-<p>A cellular automaton consists of a space and a rule.</p>
+    // Live glider: Conway's Game of Life on a small toroidal grid.
+    var gliderCanvas = document.getElementById("glider");
+    var gliderBoard = new Board([40, 20], 2, neighborhoods.moore, false);
+    gliderBoard.setRule(rules.gameOfLife);
+    gliderBoard.matrix.set([19, 9], 0); // clear the canonical center cell
+    [[2,1],[3,2],[1,3],[2,3],[3,3]].forEach(function(p){ gliderBoard.matrix.set(p, 1); });
+    var gliderDrawer = new Drawer(gliderCanvas.getContext("2d"), gliderBoard, 8, 0.15);
+    gliderDrawer.draw2dBoard();
 
-<p>A cellular automaton starts with a grid, usually (but not always) a two-dimensional grid.
+    // Live 1D elementary automaton: each row is one generation.
+    var elemCanvas = document.getElementById("elem");
+    var elemBoard = new Board([320], 2, neighborhoods.elementary, false);
+    // Wolfram rule 30, expressed in this engine's [self, left, right] table indexing.
+    elemBoard.setRuleTable([0,1,1,0,1,1,0,0]);
+    var elemDrawer = new Drawer(elemCanvas.getContext("2d"), elemBoard, 2, 1);
+    var row = 0;
+    function elemLoop(){
+      requestAnimationFrame(elemLoop);
+      elemDrawer.drawRow(row);
+      elemBoard.next();
+      row += 1;
+      if (row === 80){
+        row = 0;
+        elemBoard.reset();
+      }
+    }
+    requestAnimationFrame(elemLoop);
+  </script>
+</head>
 
-<p>Grid image</p>
+<body class="about">
+<main>
 
-<p>Second comes a rule. Every turn, the each cell on the grid gets a new state based on this rule.</p>
+<h1>What is this?</h1>
 
-<p>
+<p>So you're asking the eternal question: what the heck is a generic cellular
+automata simulator? Here's the simplest explanation I can figure out.</p>
 
-<p>The best known rule comes from John Conway. That rule is: any "live" cell lives if it has two or three live neighbors. Any dead cell that has three neighbors comes alive. Any other situation results in a dead cell.</p>
+<p>A cellular automaton has three parts:</p>
 
-<p>But wait, what does it mean to be "alive" or "dead"? It doesn't mean a lot, that is just an easy way of thinking about it. And in fact, it's possible to have more than two states.</p>
+<ul>
+  <li>a <strong>grid</strong> of cells, where each cell is in one of a small
+  number of states (the simplest case: alive or dead),</li>
+  <li>a <strong>neighborhood</strong> — which nearby cells each cell can
+  "see", and</li>
+  <li>a <strong>rule</strong> — a function that looks at a cell and its
+  neighbors and decides the cell's next state.</li>
+</ul>
 
-<p>How many different rules are there? Honestly, there's as many as you can imagine. But if you apply certain restrictions, you can count them.</p>
+<p>Time advances in generations. Every generation, the rule is applied to
+every cell <em>simultaneously</em>, producing the next grid. That's the whole
+machine. The surprise is how much behavior falls out of it.</p>
 
-<p>What are the limitations of this simulator?<p>
-<ol>
-  <li>Cells are squares, which means that each cell has four neighbors. If cells were hexagonal, each cell would have 6 neighbors. Adjacencies matter for cellular automata</li>
-  <li>Turns take place sequentially. That means that every cell changes at the same time. This is how pretty much all cellular automata function, but there are exceptions.</li>
-  <li>That's it I think.</li>
-</ol>
+<h2>Conway's Game of Life</h2>
 
+<p>The best-known rule comes from John Conway. Each cell looks at its eight
+surrounding neighbors:</p>
 
+<ul>
+  <li>A live cell with two or three live neighbors stays alive.</li>
+  <li>A dead cell with exactly three live neighbors becomes alive.</li>
+  <li>Every other cell dies (or stays dead).</li>
+</ul>
 
-<p>One-dimensional automata</p>
+<p>Those three lines are enough to produce gliders — patterns that move:</p>
 
-<p>It's easier to start by thinking about one-dimensional automata. A one dimensional automata just looks like a strip with alternating squares.</p>
+<canvas id="glider" width="320" height="160"></canvas>
+
+<p>The grid here wraps around at the edges (it's a torus), so the glider
+travels forever. "Alive" and "dead" don't mean anything deep — they're just
+names for states 1 and 0, and rules can use more than two states. In the
+<a href="/#fire">forest fire</a> rule, cells cycle through empty, tree, and
+burning. In the <a href="/#cyclic">cyclic</a> rule, twelve states chase each
+other in spirals.</p>
+
+<h2>One-dimensional automata</h2>
+
+<p>The simplest interesting automata live on a line instead of a grid: each
+cell sees only itself and its left and right neighbors. With two states and
+three visible cells there are only 2<sup>8</sup> = 256 possible rules, so
+they can all be numbered and studied exhaustively. Drawing each generation
+as a row, time flowing downward, you get pictures like this:</p>
+
+<canvas id="elem" width="640" height="160"></canvas>
+
+<p>This one is Wolfram's rule 30, starting from a single live cell — famous
+because such a tiny deterministic rule produces output chaotic enough to be
+used as a random number generator.</p>
+
+<h2>How this simulator works</h2>
+
+<p>Everything on this site runs on one generic engine: you give it grid
+dimensions, a number of states, a neighborhood, and a rule function, and it
+does the rest. A few notes on its shape:</p>
+
+<ul>
+  <li>Cells are squares, and the neighborhood is configurable — the von
+  Neumann neighborhood (4 neighbors) or the Moore neighborhood (8 neighbors,
+  used by Life).</li>
+  <li>All cells update synchronously, the standard convention for cellular
+  automata (asynchronous variants exist, but aren't supported here).</li>
+  <li>Grids are toroidal: edges wrap around, so there is no boundary.</li>
+  <li>Any rule you can write as a JavaScript function works. The
+  <a href="/">demo page</a> ships a menu of classics, and you can share a
+  drawing with the Share button, which encodes the whole grid in the URL.</li>
+</ul>
+
+<p>The code is <a href="http://github.com/chirs/cellular_automata">on
+GitHub</a>. Back to <a href="/">the simulator</a>.</p>
+
+</main>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-370829-11', 'edgemon.org');
+  ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
