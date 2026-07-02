@@ -29,9 +29,9 @@ Prerequisite work before building new features.
 
 ## Phase 2: UI Improvements
 
-- [x ] Wire up existing pause/resume/step buttons on dashboard (`#play`, `#back`, `#forward` are in HTML but not functional)
-- [ ] Remove jQuery dependency — replace slider with native `<input type="range">`
-- [ ] Click-to-toggle on dashboard canvas (currently only works on `blank.html`)
+- [x] Wire up existing pause/resume/step buttons on dashboard (`#play`, `#back`, `#forward` are in HTML but not functional)
+- [x] Remove jQuery dependency — replace slider with native `<input type="range">`
+- [x] Click-to-toggle on dashboard canvas (currently only works on `blank.html`)
 - [ ] Responsive canvas — resize canvas on viewport change
 - [ ] Clean up `#modify` panel or implement it
 

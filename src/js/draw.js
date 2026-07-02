@@ -70,6 +70,8 @@ var Drawer = function(context, board, scale, rate){
 
   Drawer.prototype.changeSquare = function(event){
       var point = [Math.floor(event.offsetX / this.scale), Math.floor(event.offsetY / this.scale)];
+      var dims = this.board.matrix.dimensions;
+      if (point[0] < 0 || point[1] < 0 || point[0] >= dims[0] || point[1] >= dims[1]) { return; }
       var nstate = this.board.updateValue(point);
       this.fillCoord(point, this.board.state2color(nstate));
   }

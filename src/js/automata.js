@@ -285,6 +285,7 @@ Board.prototype.updateValue = function(point){
   var s = this.matrix.get(point);
   var ns = (s + 1) % this.cellStates;
   this.matrix.set(point, ns);
+  this.static = false;
   return ns;
 }
 

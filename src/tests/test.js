@@ -519,6 +519,15 @@ describe('Board: updateValue()', () => {
     board.updateValue([0,0]);
     assert.equal(board.matrix.get([0,0]), 0); // wraps back to 0
   });
+
+  it("clears the static flag so the simulation resumes", () => {
+    const board = makeLifeBoard(4, 4, [[1,1],[1,2],[2,1],[2,2]]);
+    board.next();
+    board.diff(); // still life — sets static
+    assert.equal(board.static, true);
+    board.updateValue([0,0]);
+    assert.equal(board.static, false);
+  });
 });
 
 
