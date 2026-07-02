@@ -10,7 +10,7 @@ A vanilla JavaScript framework for simulating cellular automata (Game of Life, e
 
 **Running locally:** Serve the `src/` directory with any static file server (e.g., `python3 -m http.server -d src`). The nginx config in `etc/nginx/` shows the production setup with document root at `src/`.
 
-**Tests:** `npm test` (Node's built-in test runner; also runs in CI on push). Coverage: utility functions, Matrix and FlatMatrix, rule functions (Life family, cyclic, tree, brain, serviettes), Board integration (next/reset/diff/updateValue/setStartPattern, pattern export/import, elementary CA rule numbers, rule tables), and Ant. Drawer/rendering is not tested.
+**Tests:** `npm test` (Node's built-in test runner; also runs in CI on push). Coverage: utility functions, Matrix and FlatMatrix, rule functions (Life family, cyclic, tree, brain, serviettes), Board integration (next/reset/diff/updateValue/setStartPattern, pattern export/import, elementary CA rule numbers, rule tables), Ant, and 3D (neighborhoods, Bays rules, lifeTable fast-path equivalence against the raw rule function). Drawer/rendering is not tested.
 
 **Benchmarks:** `npm run bench` (`src/tests/bench.js`) — tracks engine throughput; a 960×540 Life grid should run at roughly 140 gens/sec.
 
@@ -40,7 +40,7 @@ ES module exporting: `Drawer`, `getURLHash`.
 
 - **`Drawer(context, board, scale, rate)`** — Renders a Board onto an HTML5 Canvas. 2D boards render through a persistent `ImageData` blitted via an offscreen canvas and one scaled `drawImage` (buffers and the color palette rebuild automatically when `board` or `scale` changes); 1D boards fall back to per-cell `fillRect`. `.draw2dBoard()` starts a rAF animation loop. `.drawTableDiff()` renders incrementally using `board.diff()`. `.changeSquare(event)` handles click-to-toggle (bounds-checked, clears the board's `static` flag).
 
-- **`Drawer3d(context, board, scale, rate)`** — Isometric voxel renderer for 3D boards (`rate` is generations/sec). Live cells are drawn as screen-aligned cube sprites shaded from `board.colorMap`, painter-sorted back-to-front; the cloud rotates about the vertical axis (drag to rotate, auto-spins otherwise). `.draw3dBoard()` renders every frame and ticks generations while `.running` is true.
+- **`Drawer3d(context, board, scale, rate)`** — Isometric voxel renderer for 3D boards (`rate` is generations/sec). Live cells are drawn as screen-aligned translucent cube sprites (`alpha`, default 0.5) shaded from `board.colorMap`, painter-sorted back-to-front inside a wireframe of the domain's bounding box; the cloud rotates about the vertical axis (drag to rotate, auto-spins otherwise). `.draw3dBoard()` renders every frame and ticks generations while `.running` is true.
 
 ### Example Pages (`src/examples/`, `src/index.html`, `src/about.html`)
 
