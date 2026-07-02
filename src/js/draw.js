@@ -202,6 +202,7 @@ var Drawer3d = function(context, board, scale, rate){
   this.rate = rate;     // generations per second
   this.theta = Math.PI / 6;
   this.spin = 0.004;    // radians per frame while not dragging
+  this.alpha = 0.7;     // cube face opacity; overlaps build up toward opaque
   this.running = true;
   this.dragging = false;
   this.faceColors = this.makeFaceColors();
@@ -214,6 +215,7 @@ var Drawer3d = function(context, board, scale, rate){
     var colors = this.board.colorMap;
     var scratch = document.createElement('canvas').getContext('2d');
     var faces = [null]; // state 0 is never drawn
+    var alpha = this.alpha;
     for (var s=1; s < colors.length; s++){
       scratch.fillStyle = colors[s];
       var hex = scratch.fillStyle;
@@ -221,7 +223,7 @@ var Drawer3d = function(context, board, scale, rate){
       var g = parseInt(hex.slice(3,5), 16);
       var b = parseInt(hex.slice(5,7), 16);
       var shade = function(f){
-        return "rgb(" + Math.round(r*f) + "," + Math.round(g*f) + "," + Math.round(b*f) + ")";
+        return "rgba(" + Math.round(r*f) + "," + Math.round(g*f) + "," + Math.round(b*f) + "," + alpha + ")";
       };
       faces.push([shade(1), shade(0.72), shade(0.5)]);
     }
