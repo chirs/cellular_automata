@@ -19,6 +19,7 @@ Open work only; completed items are removed as they land (see git history).
 
 ## 3D Visualization
 
+- [ ] Multi-color 3D automata in `life3d.html` — the renderer already shades per-state from `colorMap`, so multi-state rules (a 3D Brian's Brain / cyclic / generations-style rule with decay states) or coloring by cell age would light it up
 - [ ] Three.js or WebGL renderer (early experiments were in `tmp.html`/`three.html`, removed in cleanup — see git history; `examples/life3d.html` has a dependency-free isometric canvas renderer)
 
 ## New Automata
