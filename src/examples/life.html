@@ -30,7 +30,7 @@
     }
     requestAnimationFrame(animate);
 
-    document.getElementById("rule").addEventListener('click', board.reset);
+    document.getElementById("rule").addEventListener('click', () => { board.reset(); d.drawTable(); });
   </script>
 
 </head>

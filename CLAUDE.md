@@ -10,7 +10,7 @@ A vanilla JavaScript framework for simulating cellular automata (Game of Life, e
 
 **Running locally:** Serve the `src/` directory with any static file server (e.g., `python3 -m http.server -d src`). The nginx config in `etc/nginx/` shows the production setup with document root at `src/`.
 
-**Tests:** Run with Node's built-in test runner: `node --test src/tests/test.js`. Tests use ES module imports directly from `src/js/automata.js`. Current coverage: utility functions (sum, flatten, makeArray, etc.), Matrix (get/set/move/dimensions), and rule functions (Game of Life, Seeds, HighLife, Gnarl, Day and Night, cyclic, tree). Board integration tests are not yet written.
+**Tests:** Run with Node's built-in test runner: `node --test src/tests/test.js`. Tests use ES module imports directly from `src/js/automata.js`. Current coverage: utility functions (sum, flatten, makeArray, etc.), Matrix (get/set/move/dimensions), rule functions (Game of Life, Seeds, HighLife, Gnarl, Day and Night, cyclic, tree), Board integration (next/reset/diff/updateValue, elementary CA rule numbers, rule tables), and Ant. Drawer/rendering is not tested.
 
 ## Architecture
 
@@ -38,7 +38,7 @@ ES module exporting: `Drawer`, `getURLHash`.
 
 ### Example Pages (`src/examples/`)
 
-Each HTML file is a standalone demo that loads jQuery (CDN) and imports from `automata.js` and `draw.js` via `<script type="module">`, then wires up a specific automaton. The main `src/index.html` is a multi-automaton demo with a sidebar menu to switch between rules.
+Each HTML file is a standalone demo that imports from `automata.js` and `draw.js` via `<script type="module">`, then wires up a specific automaton. No external dependencies. The main `src/index.html` is a multi-automaton demo with a sidebar menu to switch between rules.
 
 ## Git
 

@@ -247,7 +247,7 @@ Returns `window.location.hash` (without `#`) or the provided default. Not curren
 
 ### Dashboard (`src/index.html`)
 
-Multi-rule switcher. Sidebar menu lets the user pick from 9 rules. Uses jQuery UI slider for speed control. Scale: 6px, dimensions fill the viewport.
+Multi-rule switcher. Sidebar menu lets the user pick from 9 rules. Play/pause, step, and reset buttons; click a cell to toggle it. Scale: 6px, dimensions fill the viewport.
 
 Rules available: Life, Cyclic (12 states, mod 9), Forest Fire, Day and Night, Walled Cities, Gnarl, Serviettes, Amoeba, Coral.
 
@@ -256,22 +256,18 @@ Rules available: Life, Cyclic (12 states, mod 9), Forest Fire, Day and Night, Wa
 | File | Title | Dimensions | States | Neighborhood | Rule | Animation | Controls |
 |---|---|---|---|---|---|---|---|
 | `life.html` | Conway's Game of Life | viewport / 2 | 2 | moore | gameOfLife | rAF loop | Reset button |
-| `life2.html` | "Conway's Game of Life" | 800 x 400 | 2 | moore | **gnarl** (mislabeled) | rAF loop | Reset button |
 | `elementary.html` | Elementary CA | 1D, 500 cells | 2 | elementary | Rule 145 (randomizes every 500 rows) | rAF loop | None |
-| `elementary2.html` | Elementary CA | 1D, `rows=0` | 2 | elementary | (none) | setInterval | **Non-functional — `rows` is 0, loops never execute** |
-| `cyclic.html` | Cyclic CA | 450 x 200 | 12 | vonNeumann | makeCyclic(12) | setInterval 100ms | Click to randomize + reset |
+| `elementary2.html` | Elementary CA | 1D, 256 cells | 2 | elementary | cycles through rule numbers | rAF loop | None |
+| `cyclic.html` | Cyclic CA | 450 x 200 | 12 | vonNeumann | makeCyclic(12) | rAF loop | Click to randomize + reset |
 | `forest.html` | Forest Fire | 900 x 400 | 3 | moore | makeTree(g, b) | rAF loop | Grow/burn prob inputs, restart, reset, population counts |
-| `ant.html` | Langton's Ant | 900 x 400 | 2 | moore | langtonsAnt | setInterval 100ms | next/reset buttons (not wired) |
-| `blank.html` | Sandbox | 180 x 80 | 2 | moore | twoByTwo | Manual step / setInterval 1s | Click to toggle, next, play |
+| `ant.html` | Langton's Ant | 900 x 400 | 2 | moore | langtonsAnt | rAF loop | next/reset buttons |
+| `blank.html` | Sandbox | 180 x 80 | 2 | moore | twoByTwo | Manual step / play | Click to toggle, next, play |
 
 ### Other Pages
 
 | File | Description |
 |---|---|
 | `about.html` | Explanatory text about cellular automata (no JS) |
-| `three.html` | Experimental Three.js page |
-| `tmp.html` | Temporary/scratch file |
-| `test.html` | Test page |
 
 ## 6. Tests
 
@@ -286,9 +282,9 @@ Rules available: Life, Cyclic (12 states, mod 9), Forest Fire, Day and Night, Wa
 | Life-family rules (gameOfLife, seeds, highLife, gnarl, dayAndNight) | Tested |
 | Cyclic rule | Tested |
 | Tree rule (deterministic edge cases) | Tested |
-| Board integration (next, reset, diff) | Not tested |
-| Ant | Not tested |
-| Elementary CA (rule numbers) | Not tested |
+| Board integration (next, reset, diff, static flag, updateValue) | Tested |
+| Ant (movement, internal state, cell toggling) | Tested |
+| Elementary CA (rule numbers, rule tables) | Tested |
 | Drawer / rendering | Not tested |
 
 ## 7. Configuration & Deployment
@@ -310,15 +306,4 @@ Rules available: Life, Cyclic (12 states, mod 9), Forest Fire, Day and Night, Wa
 
 ## 9. Known Issues
 
-| Issue | Location | Description |
-|---|---|---|
-| Empty `point2index()` | `automata.js:22-23` | Function body is empty. |
-| Buggy `product()` | `automata.js:480-486` | References `array[i]` instead of `arr[i]`. Missing `var` on loop variable. |
-| Incomplete `areClean()` | `automata.js:260-266` | Stub with empty `if` body. |
-| `diff()` static detection | `automata.js:331` | Sets `static = true` when `d.length === 1` (should be `0`). |
-| `changeSquare()` event | `draw.js:72` | Uses implicit global `event` instead of accepting an event parameter. |
-| `life2.html` mislabeled | `examples/life2.html` | Title says "Conway's Game of Life" but uses the `gnarl` rule. |
-| `elementary2.html` broken | `examples/elementary2.html` | `rows = 0` means loops never execute. Uses `setInterval` without delay. |
-| `ant.html` controls | `examples/ant.html:16` | Comment says "Something is wrong with ant." next/reset buttons are not wired up. Uses `setInterval`. |
-| `blank.html` event bug | `examples/blank.html:22` | `changeSquare` is called without binding, so `this` is wrong. |
-| Some examples use `setInterval` | `cyclic.html`, `ant.html`, `blank.html` | Not yet migrated to `requestAnimationFrame`. |
+The issues catalogued in the original audit (empty stubs, `diff()` static detection, `changeSquare()` event handling, broken example pages, `setInterval` loops) were fixed in ROADMAP Phase 0. See `ROADMAP.md` for current open work.

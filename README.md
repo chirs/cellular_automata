@@ -38,13 +38,14 @@ Possible automata include, but are not limited to:
 * Greenberg Hastings cellular automaton
 
 
-### Roadmap
+### Development
 
-* Board integration tests — verify known patterns (blinker, glider, block)
-* Pause/resume/step controls
-* Remove jQuery slider?
-* URL-based state sharing — encode rule + grid state in the URL hash
-* Unified demo page — switch rules, adjust parameters, and draw on the grid from a single page
-* Performance tuning — typed arrays, Web Workers for large grids
-* 3-d support
-* additional models + improved Langton's ant
+Serve the `src/` directory with any static file server:
+
+    python3 -m http.server -d src
+
+Run tests with Node's built-in test runner:
+
+    node --test src/tests/test.js
+
+See [ROADMAP.md](ROADMAP.md) for planned work.

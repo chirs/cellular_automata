@@ -63,15 +63,15 @@ Prerequisite work before building new features.
 
 - [ ] Stacked generation view for 1D automata (time as vertical axis, already done in `elementary.html`)
 - [ ] True 3D cellular automata with 3D neighborhoods
-- [ ] Three.js or WebGL renderer (experimental `three.html` exists)
+- [ ] Three.js or WebGL renderer (early experiments were in `tmp.html`/`three.html`, removed in cleanup — see git history)
 
 ## Phase 7: Project Organization
 
-- [ ] Consolidate examples into fewer pages or a unified demo
-- [ ] Clean up experimental files (`tmp.html`, `test.html`, `three.html`)
+- [ ] Consolidate examples into fewer pages or a unified demo (partial: removed duplicate `life2.html`)
+- [x] Clean up experimental files (`tmp.html`, `test.html`, `three.html`)
 - [ ] Add JSDoc comments to public API
 - [ ] Add method chaining to more Board methods
-- [ ] Review and update `README.md`
+- [x] Review and update `README.md`
 
 ## Phase 8: Applications (Exploratory)
 
