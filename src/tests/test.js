@@ -396,6 +396,52 @@ describe('makeTreeRule (deterministic branches)', () => {
   });
 });
 
+describe('serviettes / persian rugs (B234/S)', () => {
+  const rule = rules.serviettes;
+
+  it("dead cell with 2, 3, or 4 neighbors is born", () => {
+    assert.equal(rule(mooreInput(0, 2)), 1);
+    assert.equal(rule(mooreInput(0, 3)), 1);
+    assert.equal(rule(mooreInput(0, 4)), 1);
+  });
+
+  it("dead cell with 1 or 5 neighbors stays dead", () => {
+    assert.equal(rule(mooreInput(0, 1)), 0);
+    assert.equal(rule(mooreInput(0, 5)), 0);
+  });
+
+  it("live cell always dies (no survival states)", () => {
+    assert.equal(rule(mooreInput(1, 2)), 0);
+    assert.equal(rule(mooreInput(1, 3)), 0);
+  });
+});
+
+describe('brain (Brian\'s Brain)', () => {
+  const rule = rules.brain;
+
+  it("off cell with exactly 2 firing neighbors fires", () => {
+    assert.equal(rule([0, 1, 1, 0, 0, 0, 0, 0, 0]), 1);
+  });
+
+  it("refractory neighbors don't count as firing", () => {
+    assert.equal(rule([0, 1, 2, 2, 2, 0, 0, 0, 0]), 0);
+    assert.equal(rule([0, 1, 1, 2, 2, 0, 0, 0, 0]), 1);
+  });
+
+  it("off cell with 3 firing neighbors stays off", () => {
+    assert.equal(rule([0, 1, 1, 1, 0, 0, 0, 0, 0]), 0);
+  });
+
+  it("firing cell always becomes refractory", () => {
+    assert.equal(rule([1, 1, 1, 0, 0, 0, 0, 0, 0]), 2);
+    assert.equal(rule([1, 0, 0, 0, 0, 0, 0, 0, 0]), 2);
+  });
+
+  it("refractory cell always turns off", () => {
+    assert.equal(rule([2, 1, 1, 1, 1, 1, 1, 1, 1]), 0);
+  });
+});
+
 describe('cyclicRule', () => {
   const rule = rules.makeCyclic(4);
 
@@ -488,6 +534,34 @@ describe('Board: next() with glider', () => {
     assert.equal(board.matrix.get([3,1]), 1);
     assert.equal(board.matrix.get([3,2]), 1);
     assert.equal(board.matrix.get([3,3]), 1);
+  });
+});
+
+describe('Board: setStartPattern()', () => {
+  it("places the pattern relative to the board center", () => {
+    const board = new Board([5, 5], 2, neighborhoods.moore, false);
+    board.setRule(rules.gameOfLife).setStartPattern([[0, 0], [1, 0], [-1, 0]]);
+    assert.equal(board.matrix.get([2, 2]), 1);
+    assert.equal(board.matrix.get([3, 2]), 1);
+    assert.equal(board.matrix.get([1, 2]), 1);
+    assert.equal(board.getPopulationCount()[1], 3);
+  });
+
+  it("reset() restores the seed pattern", () => {
+    const board = new Board([5, 5], 2, neighborhoods.moore, false);
+    board.setRule(rules.gameOfLife).setStartPattern([[0, -1], [0, 0], [0, 1]]);
+    const seeded = JSON.stringify(board.matrix.state());
+    board.next();
+    board.next();
+    board.reset();
+    assert.equal(JSON.stringify(board.matrix.state()), seeded);
+  });
+
+  it("wraps offsets that fall off the board edge", () => {
+    const board = new Board([4, 4], 2, neighborhoods.moore, false);
+    board.setRule(rules.gameOfLife).setStartPattern([[3, 0]]);
+    // center [1,1] + [3,0] wraps to [0,1]
+    assert.equal(board.matrix.get([0, 1]), 1);
   });
 });
 

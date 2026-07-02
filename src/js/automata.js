@@ -106,6 +106,21 @@ var makeTreeRule = function(growProb, burnProb){
 }
 
 
+// Brian's Brain: 0 = off, 1 = firing, 2 = refractory. An off cell fires
+// when exactly two neighbors are firing; firing cells always become
+// refractory, refractory cells always turn off.
+var brainRule = function(states){
+  var currentState = states[0];
+  if (currentState === 1){ return 2; }
+  if (currentState === 2){ return 0; }
+  var firing = 0;
+  for (var i=1, l=states.length; i < l; i++){
+    if (states[i] === 1){ firing += 1; }
+  }
+  return firing === 2 ? 1 : 0;
+};
+
+
 // Family: Life
 var makeLifeFamilyRule = function(deadStates, liveStates){
 
@@ -381,6 +396,22 @@ Board.prototype.reset = function() {
     this.matrix = this.startFunc();
     this.otherMatrix = new FlatMatrix(this.dimensions);
     this.static = false;
+};
+
+// Start from a fixed seed pattern instead of a random soup: points are
+// [dx, dy] offsets from the board center, set to state 1. Replaces
+// startFunc so reset() restores the same seed.
+Board.prototype.setStartPattern = function(points){
+  var center = this.dimensions.map(e => Math.floor((e-1)/2));
+  this.startFunc = () => {
+    var m = new FlatMatrix(this.dimensions);
+    for (var i=0, l=points.length; i < l; i++){
+      m.set(m.move(center, points[i]), 1);
+    }
+    return m;
+  };
+  this.reset();
+  return this;
 };
 
 			     
@@ -743,6 +774,7 @@ var rules = {
     makeCyclic: makeCyclicRule,
     makeTree: makeTreeRule,
     langtonsAnt: langtonsAntRule,
+    brain: brainRule,
     gnarl: makeLifeFamilyRule([1], [1]),
     gameOfLife: makeLifeFamilyRule([3], [2,3]),
     highLife: makeLifeFamilyRule([3,6], [2,3]),
@@ -751,7 +783,7 @@ var rules = {
     seeds: makeLifeFamilyRule([2], []),
     dayAndNight: makeLifeFamilyRule([3,6,7,8], [3,4,6,7,8]),
     maze: makeLifeFamilyRule([1,2,3,4,5], [3]),
-    serviettes: makeLifeFamilyRule([], [2,3,4]),
+    serviettes: makeLifeFamilyRule([2,3,4], []), // B234/S — "Persian rugs"
     amoeba: makeLifeFamilyRule([3,5,7], [1,3,5,8]),
     coral: makeLifeFamilyRule([3], [4,5,6,7,8]),
     morley: makeLifeFamilyRule([3,6,8], [2,4,5]), // Named after Stephen Morley; also called Move. Supports very high-period and slow spaceships

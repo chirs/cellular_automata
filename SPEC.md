@@ -249,7 +249,7 @@ Returns `window.location.hash` (without `#`) or the provided default. Not curren
 
 Multi-rule switcher. Sidebar menu lets the user pick from 9 rules. Play/pause, step, and reset buttons; click a cell to toggle it. Scale: 6px, dimensions fill the viewport.
 
-Rules available: Life, Cyclic (12 states, mod 9), Forest Fire, Day and Night, Walled Cities, Gnarl, Serviettes, Amoeba, Coral.
+Rules available: Life, Brian's Brain (3 states), Cyclic (12 states, mod 9), Forest Fire, Day and Night, Maze (seeded), Persian Rugs (serviettes, seeded), Amoeba, Coral.
 
 ### Standalone Examples (`src/examples/`)
 

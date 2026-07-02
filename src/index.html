@@ -28,36 +28,37 @@
             }
 	};
 
+	var brainBoard = new Board([width/SCALE, height/SCALE], 3, neighborhoods.moore, [0.85, 0.15, 0]).setRule(rules.brain);
+	brainBoard.colorMap = ["#000000", "#ffffff", "#5588ff"];
+
 	var map = {
             life: simple_mapping(2, neighborhoods.moore, [.7,.3], rules.gameOfLife),
+
+            brain: { scale: SCALE, board: brainBoard },
+
             cyclic: {
 		scale: SCALE,
 		board: new Board([width/SCALE, height/SCALE], 12, neighborhoods.moore, 10).setRule(rules.makeCyclic(9))
             },
-
 
           fire: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 3, neighborhoods.moore, [0.70, 0.3, .0]).setRule(rules.makeTree(.05, .003))
     },
 
-
-
           dayAndNight: {
           scale: SCALE,
           board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.dayAndNight)
           },
-          walledCities: {
+
+          // Seeded rules: grown from a small pattern, not a random soup.
+          maze: {
           scale: SCALE,
-          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.walledCities)
-          },
-          gnarl: {
-          scale: SCALE,
-          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.gnarl)
+          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, false).setRule(rules.maze).setStartPattern([[0,-1],[1,-1],[-1,0],[0,0],[0,1]])
           },
           serviettes: {
           scale: SCALE,
-          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, 2).setRule(rules.serviettes)
+          board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, false).setRule(rules.serviettes).setStartPattern([[0,0],[0,1],[1,0],[1,1]])
           },
 
             coral: {
@@ -213,14 +214,14 @@
 
     <ul>
       <li><a id="life">life</a></li>
+      <li><a id="brain">brian's brain</a></li>
       <li><a id="cyclic">cyclic</a></li>
       <li><a id="fire">forest fire</a></li>
       <li><a id="dayAndNight">day and night</a></li>
-      <li><a id="gnarl">gnarl</a></li>
-      <li><a id="serviettes">serviettes</a></li>
-      <li><a id="walledCities">walled cities</a></li>
-    <li><a id="amoeba">amoeba</a></li>
-      <li><a id="coral">coral</a></li>    
+      <li><a id="maze">maze</a></li>
+      <li><a id="serviettes">persian rugs</a></li>
+      <li><a id="amoeba">amoeba</a></li>
+      <li><a id="coral">coral</a></li>
     </ul>
     
     <div id="controls">
