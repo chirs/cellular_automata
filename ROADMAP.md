@@ -32,6 +32,7 @@ Prerequisite work before building new features.
 - [x] Wire up existing pause/resume/step buttons on dashboard (`#play`, `#back`, `#forward` are in HTML but not functional)
 - [x] Remove jQuery dependency — replace slider with native `<input type="range">`
 - [x] Click-to-toggle on dashboard canvas (currently only works on `blank.html`)
+- [x] Improve dashboard rule lineup — added Brian's Brain and seeded maze, fixed serviettes (birth/survival were swapped; now grows persian rugs from a 2×2 seed), dropped gnarl and walled cities
 - [ ] Responsive canvas — resize canvas on viewport change
 - [ ] Clean up `#modify` panel or implement it
 
@@ -69,8 +70,9 @@ Prerequisite work before building new features.
 
 - [ ] Consolidate examples into fewer pages or a unified demo (partial: removed duplicate `life2.html`)
 - [x] Clean up experimental files (`tmp.html`, `test.html`, `three.html`)
+- [x] Rewrite `about.html` — live embedded glider and rule 30 demos, corrected explanation
 - [ ] Add JSDoc comments to public API
-- [ ] Add method chaining to more Board methods
+- [x] Add method chaining to more Board methods (`setRule`, `setRuleTable`, `setRuleByNumber`, `setRandomRule`, `setStartPattern`, `importPattern` all chain)
 - [x] Review and update `README.md`
 
 ## Phase 8: Applications (Exploratory)
