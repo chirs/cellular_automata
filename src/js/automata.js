@@ -289,6 +289,37 @@ Board.prototype.updateValue = function(point){
   return ns;
 }
 
+// Pattern export/import for URL sharing. Format: "<w>x<h>;<rle data>".
+// 2D boards only.
+
+Board.prototype.exportPattern = function(){
+  var dims = this.matrix.dimensions;
+  return dims[0] + "x" + dims[1] + ";" + encodeRLE(flatten(this.matrix.state()));
+};
+
+Board.prototype.importPattern = function(str){
+  var parts = str.split(";");
+  var pdims = parts[0].split("x").map(Number);
+  var cells = decodeRLE(parts[1]);
+  var pw = pdims[0], ph = pdims[1];
+  var bw = this.matrix.dimensions[0], bh = this.matrix.dimensions[1];
+
+  // Center the pattern on the board; offsets go negative when the
+  // pattern is larger than the board, clipping its edges.
+  var ox = Math.floor((bw - pw) / 2);
+  var oy = Math.floor((bh - ph) / 2);
+
+  for (var i=0; i < bw; i++){
+    for (var j=0; j < bh; j++){
+      var pi = i - ox, pj = j - oy;
+      var inside = pi >= 0 && pi < pw && pj >= 0 && pj < ph;
+      this.matrix.set([i, j], inside ? (cells[pi * ph + pj] || 0) : 0);
+    }
+  }
+  this.static = false;
+  return this;
+};
+
 Board.prototype.next = function(){
   if (this.static === true){
     return this.matrix;
@@ -563,6 +594,40 @@ var array2integer = function(arr){
 };
 
 
+// Run-length encoding for pattern sharing. Each run is <count><stateChar>
+// with the count omitted when 1 and the state encoded as a letter ('a' + state).
+// Alphabet is [0-9a-z], so the result is URL-safe without escaping.
+
+var encodeRLE = function(arr){
+  var s = "";
+  var i = 0;
+  while (i < arr.length){
+    var j = i;
+    while (j < arr.length && arr[j] === arr[i]){ j++; }
+    var count = j - i;
+    s += (count > 1 ? count : "") + String.fromCharCode(97 + arr[i]);
+    i = j;
+  }
+  return s;
+};
+
+var decodeRLE = function(str){
+  var arr = [];
+  var count = 0;
+  for (var i=0, l=str.length; i < l; i++){
+    var c = str.charCodeAt(i);
+    if (c >= 48 && c <= 57){
+      count = count * 10 + (c - 48);
+    } else {
+      var state = c - 97;
+      for (var k=0, n=count || 1; k < n; k++){ arr.push(state); }
+      count = 0;
+    }
+  }
+  return arr;
+};
+
+
 var hammingDistance = function(xs, ys){
   var n = 0;
   for (var i=0,l=xs.length; i < l; i++){
@@ -625,4 +690,4 @@ var rules = {
     vote: makeLifeFamilyRule([5,6,7,8], [4,5,6,7,8]),
 };
 
-export { Board, Ant, Matrix, neighborhoods, rules, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance };
+export { Board, Ant, Matrix, neighborhoods, rules, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };

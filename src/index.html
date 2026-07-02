@@ -128,12 +128,31 @@
 	    document.querySelectorAll("#menu li").forEach(function(li){ li.classList.remove("active"); });
 	    document.getElementById(name).closest("li").classList.add("active");
 
-	    if (getURLHash(window, null) !== name) { window.location.hash = name; }
+	    // Only rewrite the hash when the rule part differs, so a
+	    // pattern segment (#life;WxH;data) survives the initial load.
+	    var hashRule = getURLHash(window, '').split(';')[0];
+	    if (hashRule !== name) { window.location.hash = name; }
 	};
 
 	document.getElementById("reset").addEventListener('click', function(){
 	    d.board.reset();
 	    d.drawTable();
+	});
+
+	document.getElementById("share").addEventListener('click', function(){
+	    if (playing) { pause(); }
+	    window.location.hash = currentRule + ';' + d.board.exportPattern();
+	    var btn = this;
+	    var flash = function(msg){
+		btn.textContent = msg;
+		setTimeout(function(){ btn.textContent = 'Share'; }, 1200);
+	    };
+	    if (navigator.clipboard) {
+		navigator.clipboard.writeText(window.location.href)
+		    .then(function(){ flash('Copied!'); }, function(){ flash('In URL'); });
+	    } else {
+		flash('In URL');
+	    }
 	});
 
 
@@ -157,8 +176,16 @@
 	});
 
 	var ruleFromHash = function(){
-	    var name = getURLHash(window, 'life');
+	    var hash = getURLHash(window, 'life');
+	    var sep = hash.indexOf(';');
+	    var name = sep === -1 ? hash : hash.slice(0, sep);
 	    setRule(map[name] ? name : 'life');
+	    if (sep !== -1){
+		// Load the shared pattern paused so it's visible before evolving.
+		pause();
+		d.board.importPattern(hash.slice(sep + 1));
+		d.drawTable();
+	    }
 	};
 
 	window.addEventListener('hashchange', ruleFromHash);
@@ -200,6 +227,7 @@
       <button id="reset">Reset</button>
       <button id="play">Play</button>
       <button id="forward">Step</button>
+      <button id="share">Share</button>
     </div>
   </div>
 

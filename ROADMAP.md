@@ -40,7 +40,7 @@ Prerequisite work before building new features.
 - [x] Encode current rule + parameters in URL hash
 - [x] Leverage existing `getURLHash()` utility (currently unused)
 - [x] Load rule from URL on page init
-- [ ] Pattern import/export (RLE or similar format)
+- [x] Pattern import/export (custom run-length format in URL hash; Golly RLE interop not yet supported)
 
 ## Phase 4: Performance
 

@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   rules, Matrix, Board, Ant, neighborhoods, makeArray, blankStart, canonicalStart,
-  getIndexes, entropy, flatten, sum, hammingDistance
+  getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE
 } from '../js/automata.js';
 
 
@@ -526,6 +526,69 @@ describe('Board: updateValue()', () => {
     board.diff(); // still life — sets static
     assert.equal(board.static, true);
     board.updateValue([0,0]);
+    assert.equal(board.static, false);
+  });
+});
+
+describe('encodeRLE / decodeRLE', () => {
+  it("encodes runs with counts, omitting count 1", () => {
+    assert.equal(encodeRLE([0,0,0,1,0,0]), '3ab2a');
+  });
+
+  it("round-trips multi-digit counts and multi-state values", () => {
+    const arr = Array(12).fill(0).concat([1, 11, 11]);
+    assert.equal(encodeRLE(arr), '12ab2l');
+    assert.deepEqual(decodeRLE(encodeRLE(arr)), arr);
+  });
+
+  it("handles empty array", () => {
+    assert.equal(encodeRLE([]), '');
+    assert.deepEqual(decodeRLE(''), []);
+  });
+});
+
+describe('Board: exportPattern() / importPattern()', () => {
+  it("round-trips board state on a same-size board", () => {
+    const src = makeLifeBoard(6, 5, [[0,1],[1,2],[2,0],[4,4],[5,3]]);
+    const dst = makeLifeBoard(6, 5, []);
+    dst.importPattern(src.exportPattern());
+    assert.deepEqual(dst.matrix.state(), src.matrix.state());
+  });
+
+  it("centers a smaller pattern on a larger board and zeroes the rest", () => {
+    const src = makeLifeBoard(4, 4, [[1,1],[1,2],[2,1],[2,2]]);
+    const dst = makeLifeBoard(8, 8, []);
+    dst.importPattern(src.exportPattern());
+    // Pattern cell [i][j] lands at [i+2][j+2]
+    const expected = blankStart([8, 8]);
+    const srcState = src.matrix.state();
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        expected[i + 2][j + 2] = srcState[i][j];
+      }
+    }
+    assert.deepEqual(dst.matrix.state(), expected);
+  });
+
+  it("clips a larger pattern to a smaller board without throwing", () => {
+    const src = makeLifeBoard(8, 8, [[0,0],[3,3],[4,4],[7,7]]);
+    const dst = makeLifeBoard(4, 4, []);
+    dst.importPattern(src.exportPattern());
+    // Board cell [i][j] shows pattern cell [i+2][j+2]
+    const srcState = src.matrix.state();
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        assert.equal(dst.matrix.get([i, j]), srcState[i + 2][j + 2]);
+      }
+    }
+  });
+
+  it("clears the static flag on import", () => {
+    const board = makeLifeBoard(4, 4, [[1,1],[1,2],[2,1],[2,2]]);
+    board.next();
+    board.diff(); // still life — sets static
+    assert.equal(board.static, true);
+    board.importPattern(board.exportPattern());
     assert.equal(board.static, false);
   });
 });
