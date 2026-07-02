@@ -871,3 +871,76 @@ describe('Board: setRandomRule()', () => {
     board.next(); // should not throw
   });
 });
+
+
+// --- 3D automata ---
+
+describe('3D neighborhoods', () => {
+  it("moore3d has 27 offsets, self first, all unique", () => {
+    const n = neighborhoods.moore3d;
+    assert.equal(n.length, 27);
+    assert.deepEqual(n[0], [0, 0, 0]);
+    assert.equal(new Set(n.map(o => o.join(','))).size, 27);
+    n.forEach(o => o.forEach(v => assert.ok(v >= -1 && v <= 1)));
+  });
+
+  it("vonNeumann3d has 7 offsets, self first, all unique", () => {
+    const n = neighborhoods.vonNeumann3d;
+    assert.equal(n.length, 7);
+    assert.deepEqual(n[0], [0, 0, 0]);
+    assert.equal(new Set(n.map(o => o.join(','))).size, 7);
+    n.slice(1).forEach(o => assert.equal(Math.abs(o[0]) + Math.abs(o[1]) + Math.abs(o[2]), 1));
+  });
+});
+
+describe('3D life rules', () => {
+  it("a lone live cell dies under 4555", () => {
+    const board = new Board([5, 5, 5], 2, neighborhoods.moore3d, false);
+    board.setRule(rules.bays4555);
+    board.next();
+    assert.equal(sum(flatten(board.matrix.state())), 0);
+  });
+
+  it("a dead cell with exactly 5 live neighbors is born under 4555", () => {
+    const board = new Board([5, 5, 5], 2, neighborhoods.moore3d, false);
+    board.setRule(rules.bays4555);
+    board.matrix.set([2, 2, 2], 0); // clear the canonical center cell
+    [[1,2,2], [3,2,2], [2,1,2], [2,3,2], [2,2,1]].forEach(p => board.matrix.set(p, 1));
+    board.next();
+    assert.equal(board.matrix.get([2, 2, 2]), 1);
+  });
+
+  it("a dead cell with 6 live neighbors stays dead under 4555", () => {
+    const board = new Board([5, 5, 5], 2, neighborhoods.moore3d, false);
+    board.setRule(rules.bays4555);
+    board.matrix.set([2, 2, 2], 0);
+    [[1,2,2], [3,2,2], [2,1,2], [2,3,2], [2,2,1], [2,2,3]].forEach(p => board.matrix.set(p, 1));
+    board.next();
+    assert.equal(board.matrix.get([2, 2, 2]), 0);
+  });
+});
+
+describe('lifeTable fast path equivalence', () => {
+  // next() uses the widened lifeTable ((state << 5) + sum); verify it matches
+  // applying the rule function directly, in 3D and 2D.
+  const check = (dims, neighbors, rule) => {
+    const board = new Board(dims, 2, neighbors, [0.5, 0.5]);
+    board.setRule(rule);
+    const expected = getIndexes(board.dimensions).map(p =>
+      rule(neighbors.map(o => board.matrix.get(board.matrix.move(o, p)))));
+    board.next();
+    assert.deepEqual(Array.from(board.matrix.cells), expected);
+  };
+
+  it("matches the rule function on a random 3D moore board", () => {
+    check([6, 6, 6], neighborhoods.moore3d, rules.bays4555);
+  });
+
+  it("matches the rule function on a random 3D board with a dense rule (clouds)", () => {
+    check([6, 6, 6], neighborhoods.moore3d, rules.clouds);
+  });
+
+  it("matches the rule function on a random 2D moore board", () => {
+    check([8, 8], neighborhoods.moore, rules.gameOfLife);
+  });
+});

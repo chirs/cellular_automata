@@ -10,7 +10,8 @@ Any discrete cellular automaton can be simulated by passing a rule function: Gam
 * **Dashboard** ([index.html](src/index.html)) — nine rules with play/pause/step/reset controls and click-to-draw.
 * **Shareable URLs** — `#cyclic` links to a rule; the Share button encodes the entire grid state in the URL (run-length encoded), so a drawing can be sent as a link.
 * **Fast engine** — typed-array storage, precomputed neighbor indexes, and an allocation-free update loop; a 960×540 Game of Life grid runs at ~140 generations/sec (`npm run bench`).
-* **Toroidal grids** with configurable neighborhoods (von Neumann, Moore, 1D elementary).
+* **Toroidal grids** with configurable neighborhoods (von Neumann, Moore, 1D elementary, and their 3D counterparts).
+* **3D automata** ([life3d.html](src/examples/life3d.html)) — Bays' 3D Life rules and clouds, rendered as rotating voxels on a plain 2D canvas.
 * **[About page](src/about.html)** with live embedded demos explaining how it all works.
 
 ### Elementary cellular automata
@@ -31,4 +32,4 @@ Benchmark the engine:
 
     npm run bench
 
-See [ROADMAP.md](ROADMAP.md) for planned work — hexagonal grids, Wireworld, multi-ant turmites, 3D visualization, and more.
+See [ROADMAP.md](ROADMAP.md) for planned work — hexagonal grids, Wireworld, multi-ant turmites, a WebGL renderer, and more.

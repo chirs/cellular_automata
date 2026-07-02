@@ -189,6 +189,147 @@ var Drawer = function(context, board, scale, rate){
 
 
 
+// --- 3D isometric renderer ---
+// Live cells are drawn as screen-aligned isometric cube sprites, painter-
+// sorted back-to-front. The voxel cloud rotates about the vertical axis;
+// the sprites keep a fixed screen orientation, which sidesteps per-face
+// visibility math while still reading clearly as rotation.
+
+var Drawer3d = function(context, board, scale, rate){
+  this.context = context;
+  this.board = board;
+  this.scale = scale;   // half-width of a cube sprite in pixels
+  this.rate = rate;     // generations per second
+  this.theta = Math.PI / 6;
+  this.spin = 0.004;    // radians per frame while not dragging
+  this.running = true;
+  this.dragging = false;
+  this.faceColors = this.makeFaceColors();
+  this.bindPointer();
+};
+
+  // Per state: [top, left, right] face colors shaded from board.colorMap,
+  // normalized through a scratch canvas like Drawer.makePalette.
+  Drawer3d.prototype.makeFaceColors = function(){
+    var colors = this.board.colorMap;
+    var scratch = document.createElement('canvas').getContext('2d');
+    var faces = [null]; // state 0 is never drawn
+    for (var s=1; s < colors.length; s++){
+      scratch.fillStyle = colors[s];
+      var hex = scratch.fillStyle;
+      var r = parseInt(hex.slice(1,3), 16);
+      var g = parseInt(hex.slice(3,5), 16);
+      var b = parseInt(hex.slice(5,7), 16);
+      var shade = function(f){
+        return "rgb(" + Math.round(r*f) + "," + Math.round(g*f) + "," + Math.round(b*f) + ")";
+      };
+      faces.push([shade(1), shade(0.72), shade(0.5)]);
+    }
+    return faces;
+  };
+
+  // (x, y) is the top corner of the cube's top face.
+  Drawer3d.prototype.drawCube = function(x, y, faces){
+    var w = this.scale, h = this.scale;
+    var ctx = this.context;
+    ctx.fillStyle = faces[0]; // top
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w, y + w/2);
+    ctx.lineTo(x, y + w);
+    ctx.lineTo(x - w, y + w/2);
+    ctx.fill();
+    ctx.fillStyle = faces[1]; // left
+    ctx.beginPath();
+    ctx.moveTo(x - w, y + w/2);
+    ctx.lineTo(x, y + w);
+    ctx.lineTo(x, y + w + h);
+    ctx.lineTo(x - w, y + w/2 + h);
+    ctx.fill();
+    ctx.fillStyle = faces[2]; // right
+    ctx.beginPath();
+    ctx.moveTo(x + w, y + w/2);
+    ctx.lineTo(x, y + w);
+    ctx.lineTo(x, y + w + h);
+    ctx.lineTo(x + w, y + w/2 + h);
+    ctx.fill();
+  };
+
+  Drawer3d.prototype.render = function(){
+    var ctx = this.context;
+    var canvas = ctx.canvas;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    var m = this.board.matrix;
+    var dims = m.dimensions;
+    var cells = m.cells;
+    var cos = Math.cos(this.theta), sin = Math.sin(this.theta);
+    var cx = (dims[0]-1)/2, cy = (dims[1]-1)/2, cz = (dims[2]-1)/2;
+    var w = this.scale, h = this.scale;
+    var ox = canvas.width / 2, oy = canvas.height / 2;
+
+    // Rotate about the vertical axis, then project isometrically. Depth is
+    // rx+ry (viewer distance) with z as a tie-break so stacked cubes paint
+    // bottom-up within a column.
+    var live = [];
+    for (var i=0, l=cells.length; i < l; i++){
+      var state = cells[i];
+      if (state === 0){ continue; }
+      var p = m.point(i);
+      var dx = p[0]-cx, dy = p[1]-cy, dz = p[2]-cz;
+      var rx = dx*cos - dy*sin;
+      var ry = dx*sin + dy*cos;
+      live.push([(rx + ry) + dz*1e-3,
+                 ox + (rx - ry) * w,
+                 oy + (rx + ry) * w/2 - dz * h,
+                 state]);
+    }
+    live.sort(function(a, b){ return a[0] - b[0]; });
+    for (var i=0, l=live.length; i < l; i++){
+      this.drawCube(live[i][1], live[i][2], this.faceColors[live[i][3]]);
+    }
+  };
+
+  Drawer3d.prototype.bindPointer = function(){
+    var d = this;
+    var canvas = this.context.canvas;
+    var lastX = 0;
+    canvas.addEventListener('pointerdown', function(e){
+      d.dragging = true;
+      lastX = e.clientX;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', function(e){
+      if (!d.dragging){ return; }
+      d.theta += (e.clientX - lastX) * 0.01;
+      lastX = e.clientX;
+    });
+    canvas.addEventListener('pointerup', function(){ d.dragging = false; });
+  };
+
+  // Render every frame so rotation stays smooth; advance generations on
+  // their own cadence, and only while running.
+  Drawer3d.prototype.draw3dBoard = function(){
+    this.stop();
+    var d = this;
+    var lastGen = 0;
+    function loop(timestamp){
+      d._animFrameId = requestAnimationFrame(loop);
+      if (d.running && timestamp - lastGen >= 1000 / d.rate){
+        lastGen = timestamp;
+        d.board.next();
+      }
+      if (!d.dragging){ d.theta += d.spin; }
+      d.render();
+    }
+    this._animFrameId = requestAnimationFrame(loop);
+  };
+
+  Drawer3d.prototype.setRate = function(rate){ this.rate = rate; };
+
+  Drawer3d.prototype.stop = Drawer.prototype.stop;
+
+
 // Utilities.
 
 var getURLHash = function(w, deflt){
@@ -198,4 +339,4 @@ var getURLHash = function(w, deflt){
 };
 
 
-export { Drawer, getURLHash };
+export { Drawer, Drawer3d, getURLHash };

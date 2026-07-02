@@ -133,11 +133,12 @@ var makeLifeFamilyRule = function(deadStates, liveStates){
     return 0;
   };
 
-  // Lookup table indexed [state << 4 | neighborSum], letting Board.next()
+  // Lookup table indexed [state << 5 | neighborSum], letting Board.next()
   // skip the per-cell function call for 2-state life-family rules.
-  rule.lifeTable = new Uint8Array(2 * 16);
+  // 5 bits covers sums up to 31, enough for a 3D Moore neighborhood (26).
+  rule.lifeTable = new Uint8Array(2 * 32);
   deadStates.forEach(s => { rule.lifeTable[s] = 1; });
-  liveStates.forEach(s => { rule.lifeTable[16 + s] = 1; });
+  liveStates.forEach(s => { rule.lifeTable[32 + s] = 1; });
   return rule;
 };
 
@@ -351,12 +352,12 @@ Board.prototype.next = function(){
   var scratch = this.scratch;
   var rule = this.rule;
   var lt = rule.lifeTable;
-  if (lt && this.cellStates === 2 && k <= 16){
+  if (lt && this.cellStates === 2 && k <= 32){
     for (var c=0, n=cells.length; c < n; c++){
       var b = c * k;
       var s = 0;
       for (var j=1; j < k; j++){ s += cells[nf[b + j]]; }
-      out[c] = lt[(cells[nf[b]] << 4) + s];
+      out[c] = lt[(cells[nf[b]] << 5) + s];
     }
   } else {
     for (var c=0, n=cells.length, b=0; c < n; c++){
@@ -761,12 +762,26 @@ var hammingNeighbors = function(xs, states){
   return a;
 };
   
+var moore3d = (function(){
+  var offsets = [[0,0,0]]; // self first, like the other neighborhoods
+  for (var x=-1; x <= 1; x++){
+    for (var y=-1; y <= 1; y++){
+      for (var z=-1; z <= 1; z++){
+        if (x !== 0 || y !== 0 || z !== 0){ offsets.push([x,y,z]); }
+      }
+    }
+  }
+  return offsets;
+})();
+
 var neighborhoods = {
     elementary: [[0], [-1], [1]],
     elementary2: [[-2],[-1], [0], [1],[2]],
     elementary3: [[-3], [-2], [-1], [0], [1], [2], [3]],
     vonNeumann: [[0,0], [0,1], [-1,0], [0,-1], [1,0]],
-    moore: [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]]
+    moore: [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]],
+    vonNeumann3d: [[0,0,0], [1,0,0], [-1,0,0], [0,1,0], [0,-1,0], [0,0,1], [0,0,-1]],
+    moore3d: moore3d
     // margolis...
 };
 
@@ -788,6 +803,11 @@ var rules = {
     coral: makeLifeFamilyRule([3], [4,5,6,7,8]),
     morley: makeLifeFamilyRule([3,6,8], [2,4,5]), // Named after Stephen Morley; also called Move. Supports very high-period and slow spaceships
     vote: makeLifeFamilyRule([5,6,7,8], [4,5,6,7,8]),
+    // 3D rules (moore3d neighborhood). Bays' notation is EbEhFbFh:
+    // survival Eb..Eh, birth Fb..Fh — so 4555 is B5/S45.
+    bays4555: makeLifeFamilyRule([5], [4,5]),
+    bays5766: makeLifeFamilyRule([6], [5,6,7]),
+    clouds: makeLifeFamilyRule([13,14,17,18,19], range(13, 27)),
 };
 
 export { Board, Ant, Matrix, FlatMatrix, neighborhoods, rules, makeLifeFamilyRule, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };

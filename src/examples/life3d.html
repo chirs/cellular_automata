@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>3D Life</title>
+
+  <meta charset="utf-8">
+  <meta name="description" content="3D cellular automata">
+
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+  <script type="module">
+    import { Board, neighborhoods, rules } from '/js/automata.js';
+    import { Drawer3d } from '/js/draw.js';
+
+    var canvas = document.getElementById("board3d");
+    var context = canvas.getContext("2d");
+
+    var SIZE = 30;
+
+    var randomBlob = function(radius, fill){
+      var points = [];
+      for (var x=-radius; x <= radius; x++){
+        for (var y=-radius; y <= radius; y++){
+          for (var z=-radius; z <= radius; z++){
+            if (Math.random() < fill){ points.push([x, y, z]); }
+          }
+        }
+      }
+      return points;
+    };
+
+    // Offsets covering every cell exactly once (-SIZE/2 .. SIZE/2-1).
+    var fullSoup = function(fill){
+      var points = [];
+      for (var x=-SIZE/2; x < SIZE/2; x++){
+        for (var y=-SIZE/2; y < SIZE/2; y++){
+          for (var z=-SIZE/2; z < SIZE/2; z++){
+            if (Math.random() < fill){ points.push([x, y, z]); }
+          }
+        }
+      }
+      return points;
+    };
+
+    // The Bays rules die or explode from full-grid soup, so they seed from a
+    // small center blob; clouds erodes away from anything less than a
+    // boundaryless soup, so it gets the whole grid at 50%.
+    var ruleSpecs = {
+      "4555": { rule: rules.bays4555, color: "#4a90d9", seed: () => randomBlob(3, 0.4) },
+      "5766": { rule: rules.bays5766, color: "#5cb85c", seed: () => randomBlob(3, 0.4) },
+      "clouds": { rule: rules.clouds, color: "#9370db", seed: () => fullSoup(0.5) },
+    };
+
+    var board = new Board([SIZE, SIZE, SIZE], 2, neighborhoods.moore3d, false);
+    var drawer = new Drawer3d(context, board, 7, 6);
+
+    var setRule = function(name){
+      var spec = ruleSpecs[name];
+      board.setRule(spec.rule).setStartPattern(spec.seed());
+      board.colorMap = ["#fff", spec.color];
+      drawer.faceColors = drawer.makeFaceColors();
+      document.querySelectorAll('#rules a').forEach(a => a.classList.toggle('selected', a.id === name));
+    };
+
+    document.querySelectorAll('#rules a').forEach(a =>
+      a.addEventListener('click', () => setRule(a.id)));
+
+    var playButton = document.getElementById("play");
+    playButton.addEventListener('click', function(){
+      drawer.running = !drawer.running;
+      playButton.textContent = drawer.running ? "pause" : "play";
+    });
+    document.getElementById("next").addEventListener('click', () => board.next());
+    document.getElementById("reset").addEventListener('click', () => board.reset());
+
+    setRule("4555");
+    drawer.draw3dBoard();
+  </script>
+
+  <style>
+    #rules a.selected { font-weight: bold; text-decoration: underline; }
+    #rules a { cursor: pointer; margin-right: 1em; }
+    #board3d { touch-action: none; }
+  </style>
+
+</head>
+
+
+<body class="home">
+
+<canvas id="board3d" width="900" height="700"></canvas>
+
+<div id="rules">
+  <a id="4555">4555</a>
+  <a id="5766">5766</a>
+  <a id="clouds">clouds</a>
+</div>
+
+<div id="controls">
+  <div id="next">next</div>
+  <div id="play">pause</div>
+  <div id="reset">reset</div>
+</div>
+
+<p>drag to rotate</p>
+
+</body>
+</html>

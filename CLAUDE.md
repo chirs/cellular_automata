@@ -28,9 +28,9 @@ ES module exporting: `Board`, `Ant`, `Matrix`, `FlatMatrix`, `neighborhoods`, `r
 
 - **`Ant(position, rule, board)`** — Turmite/Langton's Ant agent that walks on a Board, tracking internal state and updating cells.
 
-- **`neighborhoods`** — Predefined offset arrays: `elementary` (1D), `vonNeumann` (4+self), `moore` (8+self). Self is always first.
+- **`neighborhoods`** — Predefined offset arrays: `elementary` (1D), `vonNeumann` (4+self), `moore` (8+self), `vonNeumann3d` (6+self), `moore3d` (26+self). Self is always first.
 
-- **`rules`** — Predefined rule functions: `gameOfLife`, `highLife`, `dayAndNight`, `seeds`, `maze`, `serviettes` (B234/S — "persian rugs", grow it from a seed), `brain` (Brian's Brain, 3 states), `makeCyclic(mod)`, `makeTree(growProb, burnProb)`, and others. Life-family variants are built with `makeLifeFamilyRule(birthStates, survivalStates)` — note the order: birth first.
+- **`rules`** — Predefined rule functions: `gameOfLife`, `highLife`, `dayAndNight`, `seeds`, `maze`, `serviettes` (B234/S — "persian rugs", grow it from a seed), `brain` (Brian's Brain, 3 states), `makeCyclic(mod)`, `makeTree(growProb, burnProb)`, and others. Life-family variants are built with `makeLifeFamilyRule(birthStates, survivalStates)` — note the order: birth first. 3D rules for `moore3d`: `bays4555` (B5/S45), `bays5766` (B6/S567), `clouds` (B13,14,17-19/S13-26; needs a full-grid soup or it erodes away).
 
 Rule functions receive an array of neighbor states (first element is the cell itself) and return the new state.
 
@@ -39,6 +39,8 @@ Rule functions receive an array of neighbor states (first element is the cell it
 ES module exporting: `Drawer`, `getURLHash`.
 
 - **`Drawer(context, board, scale, rate)`** — Renders a Board onto an HTML5 Canvas. 2D boards render through a persistent `ImageData` blitted via an offscreen canvas and one scaled `drawImage` (buffers and the color palette rebuild automatically when `board` or `scale` changes); 1D boards fall back to per-cell `fillRect`. `.draw2dBoard()` starts a rAF animation loop. `.drawTableDiff()` renders incrementally using `board.diff()`. `.changeSquare(event)` handles click-to-toggle (bounds-checked, clears the board's `static` flag).
+
+- **`Drawer3d(context, board, scale, rate)`** — Isometric voxel renderer for 3D boards (`rate` is generations/sec). Live cells are drawn as screen-aligned cube sprites shaded from `board.colorMap`, painter-sorted back-to-front; the cloud rotates about the vertical axis (drag to rotate, auto-spins otherwise). `.draw3dBoard()` renders every frame and ticks generations while `.running` is true.
 
 ### Example Pages (`src/examples/`, `src/index.html`, `src/about.html`)
 
