@@ -9,7 +9,7 @@
   <link rel="stylesheet" type="text/css" href="/css/style.css">
 
   <script type="module">
-    import { Board, neighborhoods, rules } from '/js/automata.js';
+    import { Board, neighborhoods, rules, makeLifeFamilyRule } from '/js/automata.js';
     import { Drawer3d } from '/js/draw.js';
 
     var canvas = document.getElementById("board3d");
@@ -44,11 +44,15 @@
 
     // The Bays rules die or explode from full-grid soup, so they seed from a
     // small center blob; clouds erodes away from anything less than a
-    // boundaryless soup, so it gets the whole grid at 50%.
+    // boundaryless soup, so it gets the whole grid at 50%. The Bays rules are
+    // transient by nature (a burst of structure, then death); b67s567 and
+    // b45s5 sustain thousands of active cells indefinitely.
     var ruleSpecs = {
       "4555": { rule: rules.bays4555, color: "#4a90d9", seed: () => randomBlob(3, 0.4) },
       "5766": { rule: rules.bays5766, color: "#5cb85c", seed: () => randomBlob(3, 0.4) },
       "clouds": { rule: rules.clouds, color: "#9370db", seed: () => fullSoup(0.5) },
+      "b67s567": { rule: makeLifeFamilyRule([6,7], [5,6,7]), color: "#e0a030", seed: () => randomBlob(3, 0.4) },
+      "b45s5": { rule: makeLifeFamilyRule([4,5], [5]), color: "#d05050", seed: () => randomBlob(3, 0.4) },
     };
 
     var board = new Board([SIZE, SIZE, SIZE], 2, neighborhoods.moore3d, false);
@@ -94,6 +98,8 @@
   <a id="4555">4555</a>
   <a id="5766">5766</a>
   <a id="clouds">clouds</a>
+  <a id="b67s567">b67/s567</a>
+  <a id="b45s5">b45/s5</a>
 </div>
 
 <div id="controls">
