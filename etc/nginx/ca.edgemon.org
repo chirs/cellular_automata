@@ -5,7 +5,7 @@ server {
             server_name ca.edgemon.org;
 
             location / {
-                        root   /home/chris/www/cellular_automata/src/;
+                        root   /home/chris/www/cellular_automata/www/;
                         index  index.html;
                         }
 

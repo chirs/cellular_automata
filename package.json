@@ -4,8 +4,8 @@
   "description": "A framework for simulating cellular automata",
   "type": "module",
   "scripts": {
-    "test": "node --test src/tests/test.js",
-    "bench": "node src/tests/bench.js"
+    "test": "node --test www/tests/test.js",
+    "bench": "node www/tests/bench.js"
   },
   "license": "MIT"
 }

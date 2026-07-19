@@ -8,15 +8,15 @@ A vanilla JavaScript framework for simulating cellular automata (Game of Life, e
 
 ## Development
 
-**Running locally:** Serve the `src/` directory with any static file server (e.g., `python3 -m http.server -d src`). The nginx config in `etc/nginx/` shows the production setup with document root at `src/`.
+**Running locally:** Serve the `www/` directory with any static file server (e.g., `python3 -m http.server -d www`). The nginx config in `etc/nginx/` shows the production setup with document root at `www/`.
 
 **Tests:** `npm test` (Node's built-in test runner; also runs in CI on push). Coverage: utility functions, Matrix and FlatMatrix, rule functions (Life family, cyclic, tree, brain, serviettes), Board integration (next/reset/diff/updateValue/setStartPattern, pattern export/import, elementary CA rule numbers, rule tables), Ant, and 3D (neighborhoods, Bays rules, lifeTable fast-path equivalence against the raw rule function). Drawer/rendering is not tested.
 
-**Benchmarks:** `npm run bench` (`src/tests/bench.js`) — tracks engine throughput; a 960×540 Life grid should run at roughly 140 gens/sec.
+**Benchmarks:** `npm run bench` (`www/tests/bench.js`) — tracks engine throughput; a 960×540 Life grid should run at roughly 140 gens/sec.
 
 ## Architecture
 
-### Core Engine (`src/js/automata.js`)
+### Core Engine (`www/js/automata.js`)
 
 ES module exporting: `Board`, `Ant`, `Matrix`, `FlatMatrix`, `neighborhoods`, `rules`, and utility functions (`makeArray`, `canonicalStart`, `blankStart`, `getIndexes`, `entropy`, `flatten`, `sum`, `hammingDistance`, `encodeRLE`, `decodeRLE`).
 
@@ -34,7 +34,7 @@ ES module exporting: `Board`, `Ant`, `Matrix`, `FlatMatrix`, `neighborhoods`, `r
 
 Rule functions receive an array of neighbor states (first element is the cell itself) and return the new state.
 
-### Renderer (`src/js/draw.js`)
+### Renderer (`www/js/draw.js`)
 
 ES module exporting: `Drawer`, `getURLHash`.
 
@@ -42,9 +42,9 @@ ES module exporting: `Drawer`, `getURLHash`.
 
 - **`Drawer3d(context, board, scale, rate)`** — Isometric voxel renderer for 3D boards (`rate` is generations/sec). Live cells are drawn as screen-aligned translucent cube sprites (`alpha`, default 0.5) shaded from `board.colorMap`, painter-sorted back-to-front inside a wireframe of the domain's bounding box; the cloud rotates about the vertical axis (drag to rotate, auto-spins otherwise). `.draw3dBoard()` renders every frame and ticks generations while `.running` is true.
 
-### Example Pages (`src/examples/`, `src/index.html`, `src/about.html`)
+### Example Pages (`www/examples/`, `www/index.html`, `www/about.html`)
 
-Each HTML file is a standalone demo that imports from `automata.js` and `draw.js` via `<script type="module">`. No external dependencies. `src/index.html` is the multi-automaton dashboard: sidebar rule menu, play/pause/step/reset, click-to-draw, and URL sharing. `src/about.html` explains CA with live embedded demos.
+Each HTML file is a standalone demo that imports from `automata.js` and `draw.js` via `<script type="module">`. No external dependencies. `www/index.html` is the multi-automaton dashboard: sidebar rule menu, play/pause/step/reset, click-to-draw, and URL sharing. `www/about.html` explains CA with live embedded demos.
 
 ## Git
 
