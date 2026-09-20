@@ -8,7 +8,7 @@ A vanilla JavaScript framework for simulating cellular automata (Game of Life, e
 
 ## Development
 
-**Running locally:** Serve the `www/` directory with any static file server (e.g., `python3 -m http.server -d www`). The nginx config in `etc/nginx/` shows the production setup with document root at `www/`.
+**Running locally:** Serve the `www/` directory with any static file server (e.g., `python3 -m http.server -d www`).
 
 **Tests:** `npm test` (Node's built-in test runner; also runs in CI on push). Coverage: utility functions, Matrix and FlatMatrix, rule functions (Life family, cyclic, tree, brain, serviettes), Board integration (next/reset/diff/updateValue/setStartPattern, pattern export/import, elementary CA rule numbers, rule tables), Ant, and 3D (neighborhoods, Bays rules, lifeTable fast-path equivalence against the raw rule function). Drawer/rendering is not tested.
 
