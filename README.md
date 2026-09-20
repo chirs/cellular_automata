@@ -1,5 +1,5 @@
 
-# [ca](https://ca.edgemon.org)
+# [ca](https://ca.edgemony.org)
 
 A framework for simulating [cellular automata](http://en.wikipedia.org/wiki/Cellular_automaton) in vanilla JavaScript — no build step, no dependencies.
 
