@@ -904,6 +904,36 @@ describe('Ant', () => {
       assert.notDeepEqual(ant.position, [2, 2]);
     });
   });
+
+  describe('turmites (setTurns)', () => {
+    const blank = (states) => { const b = new Board([41, 41], states, neighborhoods.moore, [1, 0]); b.matrix.cells.fill(0); return b; };
+
+    it('"RL" walks exactly like the default Langton ant', () => {
+      const a = new Ant([20, 20], rules.langtonsAnt, blank(2));
+      const t = new Ant([20, 20], rules.langtonsAnt, blank(2)).setTurns("RL");
+      a.move(500); t.move(500);
+      assert.deepEqual(t.position, a.position);
+      assert.deepEqual(t.board.matrix.cells, a.board.matrix.cells);
+    });
+
+    it("N goes straight and U reverses", () => {
+      const b = blank(3);
+      const ant = new Ant([20, 20], rules.langtonsAnt, b).setTurns("NUR");
+      ant.moveOne(); // on 0: no turn, still facing state 0
+      assert.equal(ant.internalState, 0);
+      b.matrix.set(ant.position, 1);
+      ant.moveOne(); // on 1: reverse
+      assert.equal(ant.internalState, 2);
+    });
+
+    it("cycles cells through all the rule's colors", () => {
+      const b = blank(4);
+      const ant = new Ant([20, 20], rules.langtonsAnt, b).setTurns("RRLL");
+      ant.move(2000);
+      const seen = new Set(b.matrix.cells);
+      assert.deepEqual([...seen].sort(), [0, 1, 2, 3]);
+    });
+  });
 });
 
 

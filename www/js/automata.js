@@ -238,9 +238,20 @@ var Ant = function(position, rule, board){
   this.internalState = 0;
 };
 
-// The standard turmite rule?
+// Turmite turn string: one letter per cell state. R and L turn (R matches
+// Langton's ant on state 0, so "RL" is the classic ant), N goes straight,
+// U reverses. Without one, the ant follows the 2-state Langton rule.
+var TURNS = { R: 1, L: 3, N: 0, U: 2 };
+
+Ant.prototype.setTurns = function(turns){
+  this.turns = turns.toUpperCase().split("").map(function(c){ return TURNS[c]; });
+  return this;
+};
+
 Ant.prototype.updateInternalState = function(cellState){
-  if (cellState === 0){
+  if (this.turns){
+    this.internalState = (this.internalState + this.turns[cellState]) % 4;
+  } else if (cellState === 0){
     this.internalState = (this.internalState + 1) % 4;
   } else {
     this.internalState = (this.internalState + 3) % 4;
