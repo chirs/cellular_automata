@@ -11,6 +11,7 @@
   <script type="module">
     import { Board, neighborhoods, rules, makeLifeFamilyRule } from '/js/automata.js';
     import { Drawer, getURLHash } from '/js/draw.js';
+    import { setupPanel, bindKeys, bindSpeed, setPlayButton } from '/js/ui.js';
 
 	var SCALE = 6;
 	var RATE = .25;
@@ -126,22 +127,16 @@
 	var play = function() {
 	    playing = true;
 	    d.draw2dBoard();
-	    var btn = document.getElementById("play");
-	    btn.textContent = 'Pause';
-	    btn.classList.add('playing');
+	    setPlayButton(true);
 	};
 
 	var pause = function() {
 	    playing = false;
 	    d.stop();
-	    var btn = document.getElementById("play");
-	    btn.textContent = 'Play';
-	    btn.classList.remove('playing');
+	    setPlayButton(false);
 	};
 
-	document.getElementById("play").addEventListener('click', function() {
-	    playing ? pause() : play();
-	});
+	document.getElementById("play").addEventListener('click', function() { togglePlay(); });
 
 	var step = function() {
 	    if (playing) pause();
@@ -157,21 +152,13 @@
 	document.getElementById("forward").addEventListener('click', step);
 
 	// Slider is generations/sec; Drawer rate is generations per 60fps frame.
-	var speed = document.getElementById("speed");
-	var speedValue = document.getElementById("speed-value");
-	speed.addEventListener('input', function() {
-	    RATE = speed.value / 60;
+	bindSpeed(function(gps) {
+	    RATE = gps / 60;
 	    d.setRate(RATE);
-	    speedValue.textContent = speed.value + '/s';
 	});
 
-	document.addEventListener('keydown', function(e) {
-	    if (e.metaKey || e.ctrlKey || e.altKey || e.target.tagName === 'INPUT') { return; }
-	    if (e.key === ' ') { e.preventDefault(); playing ? pause() : play(); }
-	    else if (e.key === 'n' || e.key === 'ArrowRight') { step(); }
-	    else if (e.key === 'r') { reset(); }
-	});
-
+	var togglePlay = function() { playing ? pause() : play(); };
+	bindKeys({ ' ': togglePlay, n: step, ArrowRight: step, r: reset });
 	canvas.addEventListener('click', function(e) { d.changeSquare(e); });
 
 	window.addEventListener('resize', function() {
@@ -224,11 +211,7 @@
 	});
 
 
-	document.getElementById("collapse").addEventListener('click', function(){
-	    var collapsed = document.getElementById("menu").classList.toggle("collapsed");
-	    this.textContent = collapsed ? '+' : '–';
-	    this.title = collapsed ? 'expand' : 'minimize';
-	});
+	setupPanel();
 
 
 	Object.keys(map).forEach(function(name){
@@ -389,7 +372,7 @@
 
     <footer>
       <p class="keys">space play · n step · r reset</p>
-      <a href="about.html">about</a> · <a href="examples/life3d.html">3d life</a> · <a href="http://github.com/chirs/cellular_automata">github</a>
+      <a href="about.html">about</a> · <a href="examples/life3d.html">3d life</a> · <a href="examples/ant.html">ant</a> · <a href="examples/elementary.html">elementary</a> · <a href="http://github.com/chirs/cellular_automata">github</a>
     </footer>
   </div>
 

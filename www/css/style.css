@@ -28,7 +28,7 @@ body.home {
 
 #menu li a {
     display: block;
-    padding: 5px 10px;
+    padding: 4px 10px;
     cursor: pointer;
 }
 
@@ -117,7 +117,7 @@ body.home {
 }
 
 #menu h2 {
-    margin: 20px 0 6px;
+    margin: 16px 0 4px;
     font-size: 10px;
     font-weight: bold;
     text-transform: uppercase;
@@ -132,12 +132,13 @@ body.home {
 
 #menu footer {
     margin-top: auto;
-    padding-top: 16px;
+    padding-top: 12px;
     font-size: 11px;
     color: #888;
 }
 
 #menu footer a {
+    white-space: nowrap;
     text-decoration: underline;
     text-decoration-color: #ccc;
 }
@@ -229,6 +230,77 @@ body.home {
     text-align: right;
 }
 
+#menu .stat {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#menu .hint {
+    min-height: 1em;
+    margin: 6px 0 0;
+    font-size: 11px;
+    color: #777;
+}
+
+#menu button.wide,
+#rule-row button {
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    color: #222;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+#menu button.wide {
+    width: 100%;
+}
+
+#menu button.wide:hover,
+#rule-row button:hover {
+    background-color: #e8e8e8;
+    border-color: #aaa;
+}
+
+#rule-row {
+    display: flex;
+    gap: 6px;
+}
+
+#rule-row #rule {
+    width: 0;
+    flex: 1;
+    padding: 4px 6px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+#menu label.check {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #555;
+    cursor: pointer;
+}
+
+#menu label.check input {
+    margin: 1px 0 0;
+    accent-color: #2a7a4a;
+}
+
+body.all-mode .single-only {
+    display: none;
+}
+
 #menu footer .keys {
     margin: 0 0 6px;
 }
@@ -238,7 +310,7 @@ body.home {
 }
 
 #editor h2 {
-    margin-top: 20px;
+    margin-top: 16px;
 }
 
 #editor .hint {
