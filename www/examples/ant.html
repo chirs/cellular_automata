@@ -11,56 +11,133 @@
   <script type="module">
     import { Board, Ant, neighborhoods, rules } from '/js/automata.js';
     import { Drawer } from '/js/draw.js';
+    import { setupPanel, bindKeys, bindSpeed, setPlayButton } from '/js/ui.js';
 
-    // Something is wrong with ant...
-    var lifeCanvas = document.getElementById("lifeBoard");
-    var ctx = lifeCanvas.getContext("2d");
+    var SCALE = 4;
 
-    var board = new Board([900, 400], 2, neighborhoods.moore, false)
-    var a1 = new Ant([450,200], rules.langtonsAnt, board)
-    var d = new Drawer(ctx, board, 2)
+    var canvas = document.getElementById("board");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    var ctx = canvas.getContext("2d");
 
-    d.drawTable()
+    // [1, 0]: every cell starts dead. The ant's famous highway (around
+    // step 10,000) only emerges from a blank grid.
+    var board = new Board([canvas.width / SCALE, canvas.height / SCALE], 2, neighborhoods.moore, [1, 0]);
+    board.colorMap = ["#ffffff", "#222222"];
+    var center = board.dimensions.map(e => Math.floor(e / 2));
+    var ant = new Ant(center.slice(), rules.langtonsAnt, board);
+    var d = new Drawer(ctx, board, SCALE);
 
-    var playing = true;
+    var stepsPerSec = 600;
+    var steps = 0;
+    var stepsEl = document.getElementById("steps");
+
+    var draw = function() {
+      d.drawTable();
+      d.fillCoord(ant.position, "#e0402a");
+      stepsEl.textContent = steps.toLocaleString();
+    };
+
+    var advance = function(n) {
+      ant.move(n);
+      steps += n;
+    };
+
+    var playing = false;
     var lastTime = 0;
-    function loop(timestamp) {
-      if (!playing) return;
+    var debt = 0;
+    var loop = function(timestamp) {
+      if (!playing) { return; }
       requestAnimationFrame(loop);
-      if (timestamp - lastTime >= 100) {
-        lastTime = timestamp;
-        a1.move(100);
-        d.drawTable();
-        d.fillCoord(a1.position, "red");
+      // Accumulate fractional steps so slow speeds still advance.
+      debt += stepsPerSec * Math.min(timestamp - lastTime, 100) / 1000;
+      lastTime = timestamp;
+      var n = Math.floor(debt);
+      if (n > 0) {
+        debt -= n;
+        advance(n);
+        draw();
       }
-    }
-    requestAnimationFrame(loop);
+    };
 
-    document.getElementById("next").addEventListener('click', function() {
-      a1.move(1);
-      d.drawTable();
-      d.fillCoord(a1.position, "red");
-    });
+    var play = function() {
+      playing = true;
+      setPlayButton(true);
+      requestAnimationFrame(function(t) { lastTime = t; loop(t); });
+    };
 
-    document.getElementById("reset").addEventListener('click', function() {
+    var pause = function() {
+      playing = false;
+      setPlayButton(false);
+    };
+
+    var togglePlay = function() { playing ? pause() : play(); };
+
+    var step = function() {
+      if (playing) { pause(); }
+      advance(1);
+      draw();
+    };
+
+    var reset = function() {
       board.reset();
-      a1.position = [450, 200];
-      a1.internalState = 0;
-      d.drawTable();
-    });
+      ant.position = center.slice();
+      ant.internalState = 0;
+      steps = 0;
+      draw();
+    };
+
+    document.getElementById("play").addEventListener('click', togglePlay);
+    document.getElementById("forward").addEventListener('click', step);
+    document.getElementById("reset").addEventListener('click', reset);
+    bindSpeed(function(v) { stepsPerSec = v; });
+    bindKeys({ ' ': togglePlay, n: step, ArrowRight: step, r: reset });
+    setupPanel();
+
+    draw();
+    play();
   </script>
 
 </head>
+
+
 <body class="home">
 
-<canvas id="lifeBoard" width="1800" height="800"></canvas>
+<canvas id="board"></canvas>
 
-<div id="controls">
-<div id="next">next</div>
-<div id="reset">reset</div>
+<div id="menu">
+
+  <header>
+    <h1>langton's ant</h1>
+    <button id="collapse" title="minimize">&ndash;</button>
+  </header>
+
+  <div class="toggled">
+
+    <p class="tagline">turn right on white, left on black, flip the cell, step forward. chaos for ~10,000 steps, then a highway.</p>
+
+    <div id="controls">
+      <button id="play" class="primary" title="space">Play</button>
+      <div class="secondary">
+        <button id="forward" title="n or &rarr;">Step</button>
+        <button id="reset" title="r">Reset</button>
+      </div>
+      <label id="speed-row">speed
+        <input id="speed" type="range" min="1" max="2000" value="600">
+        <span id="speed-value">600/s</span>
+      </label>
+    </div>
+
+    <h2>steps</h2>
+    <p class="stat" id="steps">0</p>
+
+    <footer>
+      <p class="keys">space play &middot; n step &middot; r reset</p>
+      <a href="/">&larr; dashboard</a> &middot; <a href="elementary.html">elementary</a> &middot; <a href="life3d.html">3d life</a>
+    </footer>
+  </div>
+
 </div>
 
-
-
-
 </body>
+</html>
