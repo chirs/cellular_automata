@@ -167,17 +167,21 @@
       }
     };
 
+    // Two live views of the same running board: the rotating cube, or the
+    // sections grid redrawn every generation.
     var setSections = function(on){
       showingSections = on;
-      if (on){
-        if (drawer.running){ togglePlay(); }
-        drawer.highlight = null;
-        drawSections();
-      }
+      drawer.visible = !on;
+      if (on){ drawSections(); }
       sectionsCanvas.hidden = !on;
       document.getElementById("download").hidden = !on;
-      document.getElementById("toggle-sections").textContent = on ? "back to 3d" : "show sections";
-      sectionsHint.textContent = on ? "hover a slice; click to see it in 3d" : "";
+      document.querySelectorAll("#view button").forEach((b, i) => b.classList.toggle("active", i === (on ? 1 : 0)));
+      sectionsHint.textContent = on ? "hover a slice; click to see it in 3d" : highlightText();
+    };
+
+    var highlightText = function(){
+      var h = drawer.highlight;
+      return h ? AXES[h.axis] + " = " + (h.index + 1) + " highlighted \u2014 esc to clear" : "";
     };
 
     var setAxis = function(a){
@@ -199,9 +203,8 @@
     sectionsCanvas.addEventListener('click', function(e){
       var t = tileAt(e);
       if (!t){ return; }
-      setSections(false);
       drawer.highlight = { axis: axis, index: t.index };
-      sectionsHint.textContent = AXES[axis] + " = " + (t.index + 1) + " highlighted \u2014 esc to clear";
+      setSections(false);
     });
 
     var clearHighlight = function(){
@@ -211,8 +214,9 @@
     };
 
     var refresh = function(){ if (showingSections){ drawSections(); } };
+    drawer.onGeneration = refresh;
 
-    document.getElementById("toggle-sections").addEventListener('click', () => setSections(!showingSections));
+    document.querySelectorAll("#view button").forEach((b, i) => b.addEventListener('click', () => setSections(i === 1)));
     document.querySelectorAll("#axis button").forEach((b, i) => b.addEventListener('click', () => setAxis(i)));
     document.getElementById("download").addEventListener('click', function(){
       var a = document.createElement("a");
@@ -227,10 +231,6 @@
     var togglePlay = function(){
       drawer.running = !drawer.running;
       setPlayButton(drawer.running);
-      if (drawer.running){
-        if (showingSections){ setSections(false); }
-        clearHighlight();
-      }
     };
     var step = function(){
       if (drawer.running) { togglePlay(); }
@@ -261,11 +261,12 @@
     #board3d { touch-action: none; cursor: grab; }
     #board3d:active { cursor: grabbing; }
     #sections { position: fixed; inset: 0; }
-    #axis { display: flex; gap: 6px; margin-bottom: 6px; }
-    #axis button { flex: 1; }
-    #axis button.active { color: #fff; background-color: #333; border-color: #222; }
+    .seg { display: flex; gap: 6px; margin-bottom: 6px; }
+    .seg button { flex: 1; }
+    #menu .seg button.active, #menu .seg button.active:hover { color: #fff; background-color: #333; border-color: #222; }
     #download { margin-top: 6px; }
     #rules li a { padding-top: 2px; padding-bottom: 2px; }
+    #rules ul.cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 4px; }
     #menu h2 { margin-top: 12px; }
   </style>
 
@@ -302,32 +303,35 @@
 
     <div id="rules">
       <h2>life-like</h2>
-      <ul>
-        <li><a id="4555">bays 4555 (b5/s45)</a></li>
-        <li><a id="5766">bays 5766 (b6/s567)</a></li>
-        <li><a id="clouds">clouds</a></li>
+      <ul class="cols">
+        <li><a id="4555" title="bays 4555: b5/s45">bays 4555</a></li>
+        <li><a id="5766" title="bays 5766: b6/s567">bays 5766</a></li>
+        <li><a id="clouds" title="b13,14,17-19/s13-26">clouds</a></li>
         <li><a id="b67s567">b67/s567</a></li>
         <li><a id="b45s5">b45/s5</a></li>
         <li><a id="b4s4">b4/s4</a></li>
         <li><a id="b678s345">b678/s345</a></li>
-        <li><a id="b2s">3d seeds (b2/s)</a></li>
-        <li><a id="b4s3456">crystal (b4/s3456)</a></li>
+        <li><a id="b2s" title="b2/s">3d seeds</a></li>
+        <li><a id="b4s3456" title="b4/s3456">crystal</a></li>
       </ul>
       <h2>with decay</h2>
       <p class="hint">8 states: cells that stop surviving fade through 6 colors before dying</p>
-      <ul>
-        <li><a id="b56s567c8">pulse (b56/s567)</a></li>
-        <li><a id="b67s4567c8">b67/s4567</a></li>
+      <ul class="cols">
+        <li><a id="b56s567c8" title="b56/s567, 8 states">pulse</a></li>
+        <li><a id="b67s4567c8" title="b67/s4567, 8 states">b67/s4567</a></li>
       </ul>
     </div>
 
-    <h2>sections</h2>
-    <div id="axis">
-      <button class="wide" title="x">x</button>
-      <button class="wide" title="y">y</button>
-      <button class="wide active" title="z">z</button>
+    <h2>view</h2>
+    <div id="view" class="seg">
+      <button class="wide active">3d</button>
+      <button class="wide" title="s">sections</button>
     </div>
-    <button id="toggle-sections" class="wide" title="s">show sections</button>
+    <div id="axis" class="seg">
+      <button class="wide" title="slice along x">x</button>
+      <button class="wide" title="slice along y">y</button>
+      <button class="wide active" title="slice along z">z</button>
+    </div>
     <button id="download" class="wide" hidden>download png</button>
     <p class="hint" id="section-hint"></p>
 

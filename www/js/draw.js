@@ -206,6 +206,8 @@ var Drawer3d = function(context, board, scale, rate){
   this.running = true;
   this.dragging = false;
   this.highlight = null; // {axis, index}: emphasize one slice, fade the rest
+  this.visible = true;    // false: keep ticking generations but skip rendering
+  this.onGeneration = null;
   this.faceColors = this.makeFaceColors();
   this.bindPointer();
 };
@@ -413,7 +415,9 @@ var Drawer3d = function(context, board, scale, rate){
       if (d.running && timestamp - lastGen >= 1000 / d.rate){
         lastGen = timestamp;
         d.board.next();
+        if (d.onGeneration){ d.onGeneration(); }
       }
+      if (!d.visible){ return; }
       if (!d.dragging){ d.theta += d.spin; }
       d.render();
     }
