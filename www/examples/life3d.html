@@ -88,27 +88,167 @@
       board.colorMap = colors;
       drawer.board = board;
       drawer.faceColors = drawer.makeFaceColors();
+      drawer.highlight = null;
+      currentRule = name;
+      refresh();
       document.querySelectorAll('#rules li').forEach(li => li.classList.toggle('active', li.firstElementChild.id === name));
     };
 
     document.querySelectorAll('#rules a').forEach(a =>
       a.addEventListener('click', () => setRule(a.id)));
 
+    // --- sections: every slice of the frozen board along one axis ---
+
+    var sectionsCanvas = document.getElementById("sections");
+    var sctx = sectionsCanvas.getContext("2d");
+    var sectionsHint = document.getElementById("section-hint");
+    var showingSections = false;
+    var axis = 2;
+    var AXES = ["x", "y", "z"];
+    var tiles = [];       // [{x, y, size, index}] for hit-testing
+    var currentRule = null;
+
+    // Slice `index` along `axis` as image columns/rows. Slicing along z gives
+    // a top-down (x, y) view; along x or y the image is a vertical slab with
+    // z pointing up.
+    var sliceCell = function(index, col, row){
+      var n = SIZE, p = [0, 0, 0];
+      if (axis === 2){ p = [col, row, index]; }
+      else if (axis === 0){ p = [index, col, n - 1 - row]; }
+      else { p = [col, index, n - 1 - row]; }
+      return board.matrix.get(p);
+    };
+
+    var drawSections = function(){
+      var W = sectionsCanvas.width = window.innerWidth;
+      var H = sectionsCanvas.height = window.innerHeight;
+      var panel = document.getElementById("menu").getBoundingClientRect();
+      var areaW = panel.left - 32, areaH = H - 48;
+      var gap = 14, label = 16, n = SIZE;
+
+      // Pick the column count that gives the largest whole-pixel cell size.
+      var best = { px: 0 };
+      for (var cols = 1; cols <= n; cols++){
+        var rows = Math.ceil(n / cols);
+        var px = Math.floor(Math.min((areaW - gap * (cols - 1)) / cols, (areaH - (gap + label) * rows) / rows) / n);
+        if (px > best.px){ best = { px: px, cols: cols, rows: rows }; }
+      }
+      var px = Math.max(1, best.px), tile = px * n;
+      var gridW = best.cols * tile + (best.cols - 1) * gap;
+      var gridH = best.rows * (tile + label) + (best.rows - 1) * gap;
+      var x0 = Math.floor(16 + (areaW - gridW) / 2), y0 = Math.floor((H - gridH) / 2);
+
+      sctx.fillStyle = "#fff";
+      sctx.fillRect(0, 0, W, H);
+      sctx.font = "11px 'Courier New', monospace";
+      sctx.textBaseline = "top";
+      tiles = [];
+      var colors = board.colorMap;
+      for (var i = 0; i < n; i++){
+        var tx = x0 + (i % best.cols) * (tile + gap);
+        var ty = y0 + Math.floor(i / best.cols) * (tile + label + gap);
+        sctx.fillStyle = "#777";
+        sctx.fillText(AXES[axis] + " " + (i + 1), tx, ty);
+        var by = ty + label;
+        sctx.fillStyle = "#f3f4f7";
+        sctx.fillRect(tx, by, tile, tile);
+        for (var c = 0; c < n; c++){
+          for (var r = 0; r < n; r++){
+            var state = sliceCell(i, c, r);
+            if (state){
+              sctx.fillStyle = colors[state];
+              sctx.fillRect(tx + c * px, by + r * px, px, px);
+            }
+          }
+        }
+        sctx.strokeStyle = "rgba(70, 80, 110, 0.25)";
+        sctx.strokeRect(tx + 0.5, by + 0.5, tile - 1, tile - 1);
+        tiles.push({ x: tx, y: by, size: tile, index: i });
+      }
+    };
+
+    var setSections = function(on){
+      showingSections = on;
+      if (on){
+        if (drawer.running){ togglePlay(); }
+        drawer.highlight = null;
+        drawSections();
+      }
+      sectionsCanvas.hidden = !on;
+      document.getElementById("download").hidden = !on;
+      document.getElementById("toggle-sections").textContent = on ? "back to 3d" : "show sections";
+      sectionsHint.textContent = on ? "hover a slice; click to see it in 3d" : "";
+    };
+
+    var setAxis = function(a){
+      axis = a;
+      document.querySelectorAll("#axis button").forEach((b, i) => b.classList.toggle("active", i === a));
+      if (showingSections){ drawSections(); }
+    };
+
+    var tileAt = function(e){
+      return tiles.find(t => e.offsetX >= t.x && e.offsetX < t.x + t.size && e.offsetY >= t.y && e.offsetY < t.y + t.size);
+    };
+
+    sectionsCanvas.addEventListener('mousemove', function(e){
+      var t = tileAt(e);
+      sectionsCanvas.style.cursor = t ? "pointer" : "";
+      sectionsHint.textContent = t ? AXES[axis] + " = " + (t.index + 1) + " of " + SIZE + " \u2014 click to see it in 3d" : "hover a slice; click to see it in 3d";
+    });
+
+    sectionsCanvas.addEventListener('click', function(e){
+      var t = tileAt(e);
+      if (!t){ return; }
+      setSections(false);
+      drawer.highlight = { axis: axis, index: t.index };
+      sectionsHint.textContent = AXES[axis] + " = " + (t.index + 1) + " highlighted \u2014 esc to clear";
+    });
+
+    var clearHighlight = function(){
+      if (showingSections){ setSections(false); return; }
+      drawer.highlight = null;
+      sectionsHint.textContent = "";
+    };
+
+    var refresh = function(){ if (showingSections){ drawSections(); } };
+
+    document.getElementById("toggle-sections").addEventListener('click', () => setSections(!showingSections));
+    document.querySelectorAll("#axis button").forEach((b, i) => b.addEventListener('click', () => setAxis(i)));
+    document.getElementById("download").addEventListener('click', function(){
+      var a = document.createElement("a");
+      a.download = "life3d-" + currentRule + "-" + AXES[axis] + "-sections.png";
+      a.href = sectionsCanvas.toDataURL("image/png");
+      a.click();
+    });
+    window.addEventListener('resize', refresh);
+
+    // --- playback ---
+
     var togglePlay = function(){
       drawer.running = !drawer.running;
       setPlayButton(drawer.running);
+      if (drawer.running){
+        if (showingSections){ setSections(false); }
+        clearHighlight();
+      }
     };
     var step = function(){
       if (drawer.running) { togglePlay(); }
       board.next();
+      refresh();
     };
-    var reset = () => board.reset();
+    var reset = () => { board.reset(); refresh(); };
 
     document.getElementById("play").addEventListener('click', togglePlay);
     document.getElementById("forward").addEventListener('click', step);
     document.getElementById("reset").addEventListener('click', reset);
     bindSpeed(v => drawer.setRate(v));
-    bindKeys({ ' ': togglePlay, n: step, ArrowRight: step, r: reset });
+    bindKeys({
+      ' ': togglePlay, n: step, ArrowRight: step, r: reset,
+      s: () => setSections(!showingSections),
+      x: () => setAxis(0), y: () => setAxis(1), z: () => setAxis(2),
+      Escape: clearHighlight,
+    });
     setupPanel();
 
     setRule("b56s567c8");
@@ -120,6 +260,13 @@
   <style>
     #board3d { touch-action: none; cursor: grab; }
     #board3d:active { cursor: grabbing; }
+    #sections { position: fixed; inset: 0; }
+    #axis { display: flex; gap: 6px; margin-bottom: 6px; }
+    #axis button { flex: 1; }
+    #axis button.active { color: #fff; background-color: #333; border-color: #222; }
+    #download { margin-top: 6px; }
+    #rules li a { padding-top: 2px; padding-bottom: 2px; }
+    #menu h2 { margin-top: 12px; }
   </style>
 
 </head>
@@ -128,6 +275,7 @@
 <body class="home">
 
 <canvas id="board3d"></canvas>
+<canvas id="sections" hidden></canvas>
 
 <div id="menu">
 
@@ -166,15 +314,25 @@
         <li><a id="b4s3456">crystal (b4/s3456)</a></li>
       </ul>
       <h2>with decay</h2>
-      <p class="hint">cells that stop surviving fade through 6 colors before dying</p>
+      <p class="hint">8 states: cells that stop surviving fade through 6 colors before dying</p>
       <ul>
-        <li><a id="b56s567c8">pulse (b56/s567, 8 states)</a></li>
-        <li><a id="b67s4567c8">b67/s4567, 8 states</a></li>
+        <li><a id="b56s567c8">pulse (b56/s567)</a></li>
+        <li><a id="b67s4567c8">b67/s4567</a></li>
       </ul>
     </div>
 
+    <h2>sections</h2>
+    <div id="axis">
+      <button class="wide" title="x">x</button>
+      <button class="wide" title="y">y</button>
+      <button class="wide active" title="z">z</button>
+    </div>
+    <button id="toggle-sections" class="wide" title="s">show sections</button>
+    <button id="download" class="wide" hidden>download png</button>
+    <p class="hint" id="section-hint"></p>
+
     <footer>
-      <p class="keys">space play &middot; n step &middot; r reset</p>
+      <p class="keys">space play &middot; n step &middot; r reset &middot; s sections &middot; x y z axis</p>
       <a href="/">&larr; dashboard</a> &middot; <a href="ant.html">ant</a> &middot; <a href="elementary.html">elementary</a>
     </footer>
   </div>

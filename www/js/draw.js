@@ -205,6 +205,7 @@ var Drawer3d = function(context, board, scale, rate){
   this.alpha = 0.5;     // cube face opacity; overlaps build up toward opaque
   this.running = true;
   this.dragging = false;
+  this.highlight = null; // {axis, index}: emphasize one slice, fade the rest
   this.faceColors = this.makeFaceColors();
   this.bindPointer();
 };
@@ -333,6 +334,7 @@ var Drawer3d = function(context, board, scale, rate){
     // Rotate about the vertical axis, then project isometrically. Depth is
     // rx+ry (viewer distance) with z as a tie-break so stacked cubes paint
     // bottom-up within a column.
+    var hl = this.highlight;
     var live = [];
     for (var i=0, l=cells.length; i < l; i++){
       var state = cells[i];
@@ -346,13 +348,41 @@ var Drawer3d = function(context, board, scale, rate){
       live.push([(rx + ry) + dz*1e-3,
                  ox + (rx - ry) * w,
                  oy + (rx + ry) * w/2 - dz * h - h,
-                 state]);
+                 state,
+                 !hl || p[hl.axis] === hl.index]);
     }
     live.sort(function(a, b){ return a[0] - b[0]; });
     for (var i=0, l=live.length; i < l; i++){
+      ctx.globalAlpha = live[i][4] ? 1 : 0.08;
       this.drawCube(live[i][1], live[i][2], this.faceColors[live[i][3]]);
     }
+    ctx.globalAlpha = 1;
     this.drawFrame(cos, sin, true);
+    if (this.highlight){ this.drawSlicePlane(cos, sin); }
+  };
+
+  // Outline the highlighted slice's plane through its cell centers.
+  Drawer3d.prototype.drawSlicePlane = function(cos, sin){
+    var dims = this.board.matrix.dimensions;
+    var a = this.highlight.axis;
+    var half = dims.map(d => d/2);
+    var at = this.highlight.index - (dims[a]-1)/2;
+    var u = (a + 1) % 3, v = (a + 2) % 3;
+    var corners = [[-1,-1], [1,-1], [1,1], [-1,1]].map(c => {
+      var p = [0, 0, 0];
+      p[a] = at; p[u] = c[0] * half[u]; p[v] = c[1] * half[v];
+      return this.project(p[0], p[1], p[2], cos, sin);
+    });
+    var ctx = this.context;
+    ctx.beginPath();
+    corners.forEach((c, i) => i ? ctx.lineTo(c[0], c[1]) : ctx.moveTo(c[0], c[1]));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(42, 122, 74, 0.08)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(42, 122, 74, 0.8)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.lineWidth = 1;
   };
 
   Drawer3d.prototype.bindPointer = function(){
