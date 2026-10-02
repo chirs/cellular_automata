@@ -30,7 +30,7 @@ ES module exporting: `Board`, `Ant`, `Matrix`, `FlatMatrix`, `neighborhoods`, `r
 
 - **`neighborhoods`** — Predefined offset arrays: `elementary` (1D), `vonNeumann` (4+self), `moore` (8+self), `vonNeumann3d` (6+self), `moore3d` (26+self). Self is always first.
 
-- **`rules`** — Predefined rule functions: `gameOfLife`, `highLife`, `dayAndNight`, `seeds`, `maze`, `serviettes` (B234/S — "persian rugs", grow it from a seed), `brain` (Brian's Brain, 3 states), `makeCyclic(mod)`, `makeTree(growProb, burnProb)`, and others. Life-family variants are built with `makeLifeFamilyRule(birthStates, survivalStates)` — note the order: birth first. 3D rules for `moore3d`: `bays4555` (B5/S45), `bays5766` (B6/S567), `clouds` (B13,14,17-19/S13-26; needs a full-grid soup or it erodes away).
+- **`rules`** — Predefined rule functions: `gameOfLife`, `highLife`, `dayAndNight`, `seeds`, `maze`, `serviettes` (B234/S — "persian rugs", grow it from a seed), `brain` (Brian's Brain, 3 states), `makeCyclic(mod)`, `makeTree(growProb, burnProb)`, and others. Life-family variants are built with `makeLifeFamilyRule(birthStates, survivalStates)` — note the order: birth first. The returned function carries `.birth` and `.survival` (the dashboard rule editor reads these) and `.lifeTable`. 3D rules for `moore3d`: `bays4555` (B5/S45), `bays5766` (B6/S567), `clouds` (B13,14,17-19/S13-26; needs a full-grid soup or it erodes away).
 
 Rule functions receive an array of neighbor states (first element is the cell itself) and return the new state.
 

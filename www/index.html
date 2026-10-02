@@ -200,15 +200,14 @@
 	    editorEl.appendChild(row);
 	});
 
-	// Reflect the active rule's B/S sets (readable off the lifeTable that
-	// makeLifeFamilyRule attaches); disable for multi-state rules.
+	// Reflect the active rule's B/S sets; disable for multi-state rules.
 	var syncEditor = function(){
-	    var lt = d.board.rule && d.board.rule.lifeTable;
-	    var usable = !!lt && d.board.cellStates === 2;
+	    var rule = d.board.rule;
+	    var usable = !!(rule && rule.birth) && d.board.cellStates === 2;
 	    editorEl.classList.toggle("disabled", !usable);
 	    for (var n = 0; n <= 8; n++){
-		editorBoxes.b[n].checked = usable && !!lt[n];
-		editorBoxes.s[n].checked = usable && !!lt[32 + n];
+		editorBoxes.b[n].checked = usable && rule.birth.includes(n);
+		editorBoxes.s[n].checked = usable && rule.survival.includes(n);
 	    }
 	};
 

@@ -244,6 +244,11 @@ function mooreInput(cellState, liveNeighborCount) {
 describe('gameOfLife (B3/S23)', () => {
   const rule = rules.gameOfLife;
 
+  it("exposes its birth/survival sets", () => {
+    assert.deepEqual(rule.birth, [3]);
+    assert.deepEqual(rule.survival, [2, 3]);
+  });
+
   it("dead cell with 3 neighbors is born", () => {
     assert.equal(rule(mooreInput(0, 3)), 1);
   });

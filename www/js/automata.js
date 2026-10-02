@@ -133,6 +133,9 @@ var makeLifeFamilyRule = function(deadStates, liveStates){
     return 0;
   };
 
+  rule.birth = deadStates;
+  rule.survival = liveStates;
+
   // Lookup table indexed [state << 5 | neighborSum], letting Board.next()
   // skip the per-cell function call for 2-state life-family rules.
   // 5 bits covers sums up to 31, enough for a 3D Moore neighborhood (26).
