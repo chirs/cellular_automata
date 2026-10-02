@@ -7,7 +7,7 @@ Any discrete cellular automaton can be simulated by passing a rule function: Gam
 
 ### Features
 
-* **Dashboard** ([index.html](www/index.html)) — ten rules (including Wireworld) with play/pause/step/reset, a speed slider, keyboard shortcuts, a birth/survival rule editor, and click-to-draw.
+* **Dashboard** ([index.html](www/index.html)) — twelve rules (including Wireworld and Greenberg–Hastings spirals) with play/pause/step/reset, a speed slider, keyboard shortcuts, a birth/survival rule editor, and click-to-draw.
 * **Shareable URLs** — `#cyclic` links to a rule; the Share button encodes the entire grid state in the URL (run-length encoded), so a drawing can be sent as a link.
 * **Fast engine** — typed-array storage, precomputed neighbor indexes, and an allocation-free update loop; a 960×540 Game of Life grid runs at ~140 generations/sec (`npm run bench`).
 * **Toroidal grids** with configurable neighborhoods (von Neumann, Moore, 1D elementary, and their 3D counterparts).

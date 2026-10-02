@@ -32,6 +32,24 @@
 	var brainBoard = new Board([width/SCALE, height/SCALE], 3, neighborhoods.moore, [0.85, 0.15, 0]).setRule(rules.brain);
 	brainBoard.colorMap = ["#000000", "#ffffff", "#5588ff"];
 
+	// Greenberg-Hastings spirals: rest -> excited -> refractory -> rest.
+	// Spiral cores only form from a uniformly random start over all states;
+	// sparse excitation just annihilates. Palette: dark rest, bright wave
+	// front, refractory tail cooling from orange to deep purple.
+	var spiralColors = function(states){
+	    var colors = ["#14142a", "#fff6c8"];
+	    for (var s = 2; s < states; s++){
+		var f = (s - 2) / (states - 2);
+		colors.push("hsl(" + Math.round(25 - 60 * f) + ", 85%, " + Math.round(60 - 42 * f) + "%)");
+	    }
+	    return colors;
+	};
+	var spiralBoard = function(neighborhood, states, threshold){
+	    var board = new Board([width/SCALE, height/SCALE], states, neighborhood, Array(states).fill(1 / states)).setRule(rules.makeGreenbergHastings(states, threshold));
+	    board.colorMap = spiralColors(states);
+	    return board;
+	};
+
 	// Wireworld circuit as ASCII art: '#' wire, 'H' electron head, 't' tail.
 	// Two clocks (periods 14 and 28) feed diodes into an OR junction, then
 	// fan out. Clock periods are commensurate on purpose: with arbitrary
@@ -80,6 +98,9 @@
             brain: { scale: SCALE, board: brainBoard },
 
             wireworld: { scale: WIREWORLD_SCALE, board: wireworldBoard },
+
+            spirals: { scale: SCALE, board: spiralBoard(neighborhoods.disc3, 8, 4) },
+            spiralMaze: { scale: SCALE, board: spiralBoard(neighborhoods.disc2, 6, 3) },
 
             cyclic: {
 		scale: SCALE,
@@ -356,6 +377,8 @@
       <li><a id="life">life</a></li>
       <li><a id="brain">brian's brain</a></li>
       <li><a id="wireworld">wireworld</a></li>
+      <li><a id="spirals">spirals</a></li>
+      <li><a id="spiralMaze">spiral maze</a></li>
       <li><a id="cyclic">cyclic</a></li>
       <li><a id="fire">forest fire</a></li>
       <li><a id="dayAndNight">day and night</a></li>

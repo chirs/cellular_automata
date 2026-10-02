@@ -20,7 +20,6 @@ Open work only; completed items are removed as they land (see git history).
 
 - [ ] Expanded Langton's Ant — multi-color turmites, multiple ants
 - [ ] Hexagonal grids — 6-neighbor topology
-- [ ] Greenberg-Hastings cellular automaton
 - [ ] Asynchronous / stochastic update modes
 - [ ] Continuous-state automata
 
