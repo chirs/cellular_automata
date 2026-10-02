@@ -264,6 +264,36 @@ describe('wireworld', () => {
   });
 });
 
+describe('makeGreenbergHastings', () => {
+  const rule = rules.makeGreenbergHastings(4, 2);
+  const input = (self, excited) => [self, ...Array(8).fill(0).map((_, i) => i < excited ? 1 : 3)];
+
+  it("a resting cell fires at the threshold, not below", () => {
+    assert.equal(rule(input(0, 1)), 0);
+    assert.equal(rule(input(0, 2)), 1);
+  });
+
+  it("excited and refractory cells cycle back to rest regardless of neighbors", () => {
+    assert.equal(rule(input(1, 0)), 2);
+    assert.equal(rule(input(2, 8)), 3);
+    assert.equal(rule(input(3, 8)), 0);
+  });
+});
+
+describe('disc neighborhoods', () => {
+  it("put self first and contain no duplicates", () => {
+    for (const nb of [neighborhoods.disc2, neighborhoods.disc3]) {
+      assert.deepEqual(nb[0], [0, 0]);
+      assert.equal(new Set(nb.map(String)).size, nb.length);
+    }
+  });
+
+  it("have the expected sizes", () => {
+    assert.equal(neighborhoods.disc2.length, 21);
+    assert.equal(neighborhoods.disc3.length, 37);
+  });
+});
+
 describe('makeGenerationsRule', () => {
   const rule = makeGenerationsRule([3], [2, 3], 4);
   // self + 8 neighbors: `live` of them in state 1, `decaying` in state 2.

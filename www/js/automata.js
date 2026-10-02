@@ -158,6 +158,23 @@ var makeGenerationsRule = function(birth, survival, states){
 };
 
 
+// Greenberg-Hastings excitable medium: 0 = resting, 1 = excited,
+// 2..states-1 = refractory. A resting cell fires when at least `threshold`
+// neighbors are excited; excited and refractory cells step forward
+// regardless, wrapping back to rest.
+var makeGreenbergHastingsRule = function(states, threshold){
+  return function(cells){
+    var state = cells[0];
+    if (state > 0){ return state + 1 < states ? state + 1 : 0; }
+    var excited = 0;
+    for (var i=1, l=cells.length; i < l; i++){
+      if (cells[i] === 1){ excited += 1; }
+    }
+    return excited >= threshold ? 1 : 0;
+  };
+};
+
+
 // Family: Life
 var makeLifeFamilyRule = function(deadStates, liveStates){
 
@@ -832,6 +849,19 @@ var moore3d = (function(){
   return offsets;
 })();
 
+// Roughly circular 2D neighborhood of radius r (self first). The r*r + r
+// bound rounds the disc out a little, which keeps excitable-media waves
+// from turning visibly square.
+var discNeighborhood = function(r){
+  var offsets = [[0,0]];
+  for (var x=-r; x <= r; x++){
+    for (var y=-r; y <= r; y++){
+      if ((x !== 0 || y !== 0) && x*x + y*y <= r*r + r){ offsets.push([x,y]); }
+    }
+  }
+  return offsets;
+};
+
 var neighborhoods = {
     elementary: [[0], [-1], [1]],
     elementary2: [[-2],[-1], [0], [1],[2]],
@@ -839,13 +869,16 @@ var neighborhoods = {
     vonNeumann: [[0,0], [0,1], [-1,0], [0,-1], [1,0]],
     moore: [[0,0], [0,1], [-1,0], [0,-1], [1,0],[1,1],[1,-1],[-1,1],[-1,-1]],
     vonNeumann3d: [[0,0,0], [1,0,0], [-1,0,0], [0,1,0], [0,-1,0], [0,0,1], [0,0,-1]],
-    moore3d: moore3d
+    moore3d: moore3d,
+    disc2: discNeighborhood(2),
+    disc3: discNeighborhood(3),
     // margolis...
 };
 
 var rules = {
     makeCyclic: makeCyclicRule,
     makeTree: makeTreeRule,
+    makeGreenbergHastings: makeGreenbergHastingsRule,
     langtonsAnt: langtonsAntRule,
     brain: brainRule,
     wireworld: wireworldRule,
