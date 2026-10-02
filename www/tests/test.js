@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   rules, Matrix, FlatMatrix, Board, Ant, neighborhoods, makeArray, blankStart, canonicalStart,
-  getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE
+  getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE, makeGenerationsRule
 } from '../js/automata.js';
 
 
@@ -261,6 +261,36 @@ describe('wireworld', () => {
     board.next();
     board.next();
     assert.deepEqual([0, 1, 2, 3, 4, 5].map(x => board.matrix.get([x, 1])), [3, 3, 2, 1, 3, 0]);
+  });
+});
+
+describe('makeGenerationsRule', () => {
+  const rule = makeGenerationsRule([3], [2, 3], 4);
+  // self + 8 neighbors: `live` of them in state 1, `decaying` in state 2.
+  const input = (self, live, decaying = 0) =>
+    [self, ...Array(8).fill(0).map((_, i) => i < live ? 1 : i < live + decaying ? 2 : 0)];
+
+  it("births and survives on live neighbors like Life", () => {
+    assert.equal(rule(input(0, 3)), 1);
+    assert.equal(rule(input(1, 2)), 1);
+  });
+
+  it("ignores decaying neighbors when counting", () => {
+    assert.equal(rule(input(0, 2, 1)), 0);
+  });
+
+  it("a live cell that fails to survive starts decaying", () => {
+    assert.equal(rule(input(1, 5)), 2);
+  });
+
+  it("decaying cells step through states regardless of neighbors, then die", () => {
+    assert.equal(rule(input(2, 3)), 3);
+    assert.equal(rule(input(3, 3)), 0);
+  });
+
+  it("with 2 states it behaves like a life-family rule", () => {
+    const two = makeGenerationsRule([3], [2, 3], 2);
+    assert.equal(two(input(1, 5)), 0);
   });
 });
 

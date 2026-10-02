@@ -137,6 +137,27 @@ var wireworldRule = function(states){
 };
 
 
+// "Generations" family: Life-like birth/survival on live (state 1)
+// neighbors, but a live cell that fails to survive decays through states
+// 2..states-1 before dying. Decaying cells neither count as live nor can
+// be reborn until they reach 0.
+var makeGenerationsRule = function(birth, survival, states){
+  var rule = function(cells){
+    var state = cells[0];
+    if (state > 1){ return state + 1 < states ? state + 1 : 0; }
+    var live = 0;
+    for (var i=1, l=cells.length; i < l; i++){
+      if (cells[i] === 1){ live += 1; }
+    }
+    if (state === 0){ return birth.includes(live) ? 1 : 0; }
+    return survival.includes(live) ? 1 : (states > 2 ? 2 : 0);
+  };
+  rule.birth = birth;
+  rule.survival = survival;
+  return rule;
+};
+
+
 // Family: Life
 var makeLifeFamilyRule = function(deadStates, liveStates){
 
@@ -848,4 +869,4 @@ var rules = {
     clouds: makeLifeFamilyRule([13,14,17,18,19], range(13, 27)),
 };
 
-export { Board, Ant, Matrix, FlatMatrix, neighborhoods, rules, makeLifeFamilyRule, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };
+export { Board, Ant, Matrix, FlatMatrix, neighborhoods, rules, makeLifeFamilyRule, makeGenerationsRule, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };
