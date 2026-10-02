@@ -18,10 +18,10 @@
     canvas.height = window.innerHeight;
     var context = canvas.getContext("2d");
 
-    var SIZE = 20;
+    var SIZE = 28;
     // Cube half-width in px: the domain's isometric footprint is roughly
     // 2 * SIZE cube widths across, so fit that to the smaller viewport side.
-    var CUBE = Math.max(6, Math.floor(Math.min(canvas.width, canvas.height) / (2.6 * SIZE)));
+    var CUBE = Math.max(6, Math.floor(Math.min(canvas.width, canvas.height) / (2.25 * SIZE)));
 
     var randomBlob = function(radius, fill){
       var points = [];
@@ -111,7 +111,7 @@
     bindKeys({ ' ': togglePlay, n: step, ArrowRight: step, r: reset });
     setupPanel();
 
-    setRule("4555");
+    setRule("b56s567c8");
     drawer.running = true;
     setPlayButton(true);
     drawer.draw3dBoard();
@@ -138,7 +138,7 @@
 
   <div class="toggled">
 
-    <p class="tagline">life on a 20&times;20&times;20 torus with 26 neighbors. drag to rotate.</p>
+    <p class="tagline">life on a 28&times;28&times;28 torus with 26 neighbors. drag to rotate.</p>
 
     <div id="controls">
       <button id="play" class="primary" title="space">Play</button>
