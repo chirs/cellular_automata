@@ -26,7 +26,7 @@ ES module exporting: `Board`, `Ant`, `Matrix`, `FlatMatrix`, `neighborhoods`, `r
 
 - **`Matrix(array)`** — Legacy wrapper around an n-dimensional nested array, same interface. Still exported and tested; no longer used by Board.
 
-- **`Ant(position, rule, board)`** — Turmite/Langton's Ant agent that walks on a Board, tracking internal state and updating cells.
+- **`Ant(position, rule, board)`** — Turmite/Langton's Ant agent that walks on a Board, tracking internal state (heading) and updating cells. `.setTurns("RRLL")` makes it a multi-color turmite: one letter per cell state (R/L turn, N straight, U reverse; `"RL"` is Langton's ant), and the board needs that many states.
 
 - **`neighborhoods`** — Predefined offset arrays: `elementary` (1D), `vonNeumann` (4+self), `moore` (8+self), `vonNeumann3d` (6+self), `moore3d` (26+self), `disc2`/`disc3` (roughly circular radius-2/3 2D neighborhoods, 20/36+self). Self is always first.
 
@@ -44,7 +44,7 @@ ES module exporting: `Drawer`, `getURLHash`.
 
 ### Example Pages (`www/examples/`, `www/index.html`, `www/about.html`)
 
-Each HTML file is a standalone demo that imports from `automata.js` and `draw.js` via `<script type="module">`. No external dependencies. `www/index.html` is the multi-automaton dashboard: sidebar rule menu, play/pause/step/reset, speed slider, B/S rule editor, click-to-draw, URL sharing, and standard RLE import/export (RLE dialog, paste anywhere, or drop a .rle file; the header's rule maps to a menu entry, a custom b/s rule, `WireWorld`, or `B2/S/C3` for Brian's Brain). `www/about.html` explains CA with live embedded demos. `www/examples/` holds the demos the dashboard can't host: `life3d.html` (3D), `ant.html` (Langton's Ant), and `elementary.html` (1D rules by Wolfram number, plus an all-256 view).
+Each HTML file is a standalone demo that imports from `automata.js` and `draw.js` via `<script type="module">`. No external dependencies. `www/index.html` is the multi-automaton dashboard: sidebar rule menu, play/pause/step/reset, speed slider, B/S rule editor, click-to-draw, URL sharing, and standard RLE import/export (RLE dialog, paste anywhere, or drop a .rle file; the header's rule maps to a menu entry, a custom b/s rule, `WireWorld`, or `B2/S/C3` for Brian's Brain). `www/about.html` explains CA with live embedded demos. `www/examples/` holds the demos the dashboard can't host: `life3d.html` (3D), `ant.html` (turmites: preset and custom turn strings, 1/2/4 ants, rule in the URL hash), and `elementary.html` (1D rules by Wolfram number, plus an all-256 view).
 
 The dashboard and example pages share one control panel: `#menu` markup styled in `style.css`, wired by `www/js/ui.js` (`setupPanel` for collapse, `bindKeys`, `bindSpeed`, `setPlayButton`).
 

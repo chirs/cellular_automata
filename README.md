@@ -12,7 +12,7 @@ Any discrete cellular automaton can be simulated by passing a rule function: Gam
 * **Standard RLE import/export** — paste a pattern from [LifeWiki](https://conwaylife.com/wiki/) or Golly anywhere on the dashboard (or drop a `.rle` file); the RLE button copies the current grid back out.
 * **Fast engine** — typed-array storage, precomputed neighbor indexes, and an allocation-free update loop; a 960×540 Game of Life grid runs at ~140 generations/sec (`npm run bench`).
 * **Toroidal grids** with configurable neighborhoods (von Neumann, Moore, 1D elementary, and their 3D counterparts).
-* **Langton's Ant** ([ant.html](www/examples/ant.html)) — from a blank grid to the highway at ~10,000 steps.
+* **Turmites** ([ant.html](www/examples/ant.html)) — Langton's Ant (blank grid to highway at ~10,000 steps) and multi-color turmites like `LLRR` and `RRLLLRLLLRRR`, with up to four ants.
 * **3D automata** ([life3d.html](www/examples/life3d.html)) — Bays' 3D Life rules and clouds, rendered as rotating voxels on a plain 2D canvas.
 * **[About page](www/about.html)** with live embedded demos explaining how it all works.
 

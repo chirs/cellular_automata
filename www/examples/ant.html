@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Langton's Ant</title>
+  <title>Langton's Ant &amp; Turmites</title>
 
   <meta charset="utf-8">
-  <meta name="description" content="Langton's Ant">
+  <meta name="description" content="Langton's Ant and multi-color turmites">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
 
   <script type="module">
     import { Board, Ant, neighborhoods, rules } from '/js/automata.js';
-    import { Drawer } from '/js/draw.js';
+    import { Drawer, getURLHash } from '/js/draw.js';
     import { setupPanel, bindKeys, bindSpeed, setPlayButton } from '/js/ui.js';
 
     var SCALE = 4;
@@ -20,27 +20,76 @@
     canvas.height = window.innerHeight;
     var ctx = canvas.getContext("2d");
 
-    // [1, 0]: every cell starts dead. The ant's famous highway (around
-    // step 10,000) only emerges from a blank grid.
-    var board = new Board([canvas.width / SCALE, canvas.height / SCALE], 2, neighborhoods.moore, [1, 0]);
-    board.colorMap = ["#ffffff", "#222222"];
-    var center = board.dimensions.map(e => Math.floor(e / 2));
-    var ant = new Ant(center.slice(), rules.langtonsAnt, board);
-    var d = new Drawer(ctx, board, SCALE);
+    var dims = [canvas.width / SCALE, canvas.height / SCALE].map(Math.ceil);
+    var center = dims.map(e => Math.floor(e / 2));
 
-    var stepsPerSec = 600;
+    // Each letter is what the ant does on that cell color: turn Right or
+    // Left, go straight (N), or reverse (U); then it bumps the cell to the
+    // next color and steps forward. "RL" is Langton's ant.
+    var validRule = /^[LRNU]{2,16}$/i;
+
+    // Ant starting spots (offsets from center) and headings, per ant count.
+    // Fixed rather than random so Reset replays the same run.
+    var starts = {
+      1: [[0, 0, 0]],
+      2: [[-12, 0, 0], [12, 0, 2]],
+      4: [[-12, -12, 0], [12, -12, 1], [12, 12, 2], [-12, 12, 3]],
+    };
+
+    var palette = function(n){
+      var colors = ["#ffffff"];
+      for (var s = 1; s < n; s++){
+        colors.push(n === 2 ? "#222222" : "hsl(" + Math.round((s - 1) * 360 / (n - 1)) + ", 65%, 50%)");
+      }
+      return colors;
+    };
+
+    var ruleStr = "RL", antCount = 1;
+    var board, ants, d = null;
     var steps = 0;
     var stepsEl = document.getElementById("steps");
+    var customEl = document.getElementById("custom");
+
+    var build = function(){
+      var n = ruleStr.length;
+      // Distribution [1, 0, ...]: every cell starts at color 0. Patterns
+      // like the RL highway only emerge from a blank grid.
+      board = new Board(dims, n, neighborhoods.moore, [1].concat(Array(n - 1).fill(0)));
+      board.colorMap = palette(n);
+      ants = starts[antCount].map(function(s){
+        var a = new Ant([center[0] + s[0], center[1] + s[1]], rules.langtonsAnt, board).setTurns(ruleStr);
+        a.internalState = s[2];
+        return a;
+      });
+      if (d) { d.board = board; } else { d = new Drawer(ctx, board, SCALE); }
+      steps = 0;
+      customEl.value = ruleStr;
+      document.querySelectorAll("#presets li").forEach(li => li.classList.toggle("active", li.firstElementChild.dataset.rule === ruleStr));
+      document.querySelectorAll("#ants button").forEach(b => b.classList.toggle("active", Number(b.textContent) === antCount));
+      var hash = ruleStr + (antCount > 1 ? ";" + antCount : "");
+      if (getURLHash(window, "") !== hash) { history.replaceState(null, "", "#" + hash); }
+      draw();
+    };
 
     var draw = function() {
       d.drawTable();
-      d.fillCoord(ant.position, "#e0402a");
+      ants.forEach(a => d.fillCoord(a.position, "#000"));
       stepsEl.textContent = steps.toLocaleString();
     };
 
     var advance = function(n) {
-      ant.move(n);
+      for (var i = 0; i < n; i++){
+        for (var k = 0; k < ants.length; k++){ ants[k].moveOne(); }
+      }
       steps += n;
+    };
+
+    // Speed slider is logarithmic: 0..100 maps to 1..100,000 steps/sec.
+    var speedToSteps = v => Math.round(Math.pow(10, v / 20));
+    var stepsPerSec = speedToSteps(60);
+    var speedLabel = document.getElementById("speed-value");
+    var showSpeed = function(){
+      speedLabel.textContent = stepsPerSec >= 1000 ? Math.round(stepsPerSec / 1000) + "k/s" : stepsPerSec + "/s";
     };
 
     var playing = false;
@@ -79,24 +128,60 @@
       draw();
     };
 
-    var reset = function() {
-      board.reset();
-      ant.position = center.slice();
-      ant.internalState = 0;
-      steps = 0;
-      draw();
+    var setRule = function(r){
+      if (!validRule.test(r)) { customEl.classList.add("invalid"); return; }
+      customEl.classList.remove("invalid");
+      ruleStr = r.toUpperCase();
+      build();
+      if (!playing) { play(); }
     };
+
+    var fromHash = function(){
+      var parts = getURLHash(window, "RL").split(";");
+      if (validRule.test(parts[0])) { ruleStr = parts[0].toUpperCase(); }
+      if (starts[parts[1]]) { antCount = Number(parts[1]); }
+    };
+
+    document.querySelectorAll("#presets a").forEach(a => a.addEventListener('click', () => setRule(a.dataset.rule)));
+    customEl.addEventListener('change', () => setRule(customEl.value.trim()));
+    customEl.addEventListener('input', () => customEl.classList.toggle("invalid", !validRule.test(customEl.value.trim())));
+    document.querySelectorAll("#ants button").forEach(b => b.addEventListener('click', function(){
+      antCount = Number(b.textContent);
+      build();
+    }));
 
     document.getElementById("play").addEventListener('click', togglePlay);
     document.getElementById("forward").addEventListener('click', step);
-    document.getElementById("reset").addEventListener('click', reset);
-    bindSpeed(function(v) { stepsPerSec = v; });
-    bindKeys({ ' ': togglePlay, n: step, ArrowRight: step, r: reset });
+    document.getElementById("reset").addEventListener('click', build);
+    bindSpeed(function(v) { stepsPerSec = speedToSteps(v); showSpeed(); });
+    bindKeys({ ' ': togglePlay, n: step, ArrowRight: step, r: build });
     setupPanel();
 
-    draw();
+    fromHash();
+    build();
+    showSpeed();
     play();
   </script>
+
+  <style>
+    #presets a { display: flex; justify-content: space-between; }
+    #presets a span { color: #999; font-size: 11px; }
+    #custom {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 5px 8px;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    #custom.invalid { border-color: #d05050; background: #fff4f4; }
+    .seg { display: flex; gap: 6px; }
+    .seg button { flex: 1; }
+    #menu .seg button.active, #menu .seg button.active:hover { color: #fff; background-color: #333; border-color: #222; }
+  </style>
 
 </head>
 
@@ -108,13 +193,13 @@
 <div id="menu">
 
   <header>
-    <h1>langton's ant</h1>
+    <h1>turmites</h1>
     <button id="collapse" title="minimize">&ndash;</button>
   </header>
 
   <div class="toggled">
 
-    <p class="tagline">turn right on white, left on black, flip the cell, step forward. chaos for ~10,000 steps, then a highway.</p>
+    <p class="tagline">an ant turns by the color it's on, bumps the cell to the next color, and steps forward.</p>
 
     <div id="controls">
       <button id="play" class="primary" title="space">Play</button>
@@ -123,9 +208,31 @@
         <button id="reset" title="r">Reset</button>
       </div>
       <label id="speed-row">speed
-        <input id="speed" type="range" min="1" max="2000" value="600">
-        <span id="speed-value">600/s</span>
+        <input id="speed" type="range" min="0" max="100" value="60">
+        <span id="speed-value"></span>
       </label>
+    </div>
+
+    <h2>rules</h2>
+    <ul id="presets">
+      <li><a data-rule="RL">langton's ant <span>RL</span></a></li>
+      <li><a data-rule="RLR">chaos <span>RLR</span></a></li>
+      <li><a data-rule="LLRR">symmetric <span>LLRR</span></a></li>
+      <li><a data-rule="RLLR">box <span>RLLR</span></a></li>
+      <li><a data-rule="LRRRRRLLR">square <span>LRRRRRLLR</span></a></li>
+      <li><a data-rule="LRRRRLLLRRR">diamonds <span>LRRRRLLLRRR</span></a></li>
+      <li><a data-rule="RRLLLRLLLRRR">triangle <span>RRLLLRLLLRRR</span></a></li>
+      <li><a data-rule="LLRRRLRLRLLR">wiggle <span>LLRRRLRLRLLR</span></a></li>
+    </ul>
+
+    <h2>custom</h2>
+    <input id="custom" type="text" spellcheck="false" maxlength="16" title="2-16 of L, R, N (straight), U (u-turn); enter to apply">
+
+    <h2>ants</h2>
+    <div id="ants" class="seg">
+      <button class="wide">1</button>
+      <button class="wide">2</button>
+      <button class="wide">4</button>
     </div>
 
     <h2>steps</h2>

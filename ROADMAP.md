@@ -14,7 +14,6 @@ Open work only; completed items are removed as they land (see git history).
 
 ## New Automata
 
-- [ ] Expanded Langton's Ant — multi-color turmites, multiple ants
 - [ ] Hexagonal grids — 6-neighbor topology
 - [ ] Asynchronous / stochastic update modes
 - [ ] Continuous-state automata
