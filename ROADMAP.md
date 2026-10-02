@@ -4,10 +4,6 @@ Open work only; completed items are removed as they land (see git history).
 
 ---
 
-## UI Improvements
-
-- [ ] Responsive canvas — resize canvas on viewport change
-
 ## URL State Sharing
 
 - [ ] Golly RLE interop for pattern import/export (current format is a custom RLE in the URL hash)
@@ -39,3 +35,4 @@ Open work only; completed items are removed as they land (see git history).
 ## Deferred
 
 - Web Workers for large grid computation — after the typed-array rewrite a 960×540 grid runs at ~140 gens/sec single-threaded; not worth the message-passing complexity
+- Responsive canvas (resize boards when the window resizes) — boards are sized at page load; only matters if the window changes mid-session, and a reload fixes it. Would need a pad/crop-or-restart policy and re-centering of seeded patterns
