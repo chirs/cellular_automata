@@ -773,6 +773,98 @@ var array2integer = function(arr){
 // with the count omitted when 1 and the state encoded as a letter ('a' + state).
 // Alphabet is [0-9a-z], so the result is URL-safe without escaping.
 
+// Standard (Golly / LifeWiki) RLE for 2D patterns:
+//   #N name
+//   x = 3, y = 3, rule = B3/S23
+//   bo$2bo$3o!
+// Runs are <count><tag>: b/. dead, o live, A-X states 1-24 (p-y prefix
+// for 25+), $ ends a row, ! ends the pattern.
+var parseGollyRLE = function(text){
+  var name = null, rule = null, width = 0, height = 0, body = "";
+  text.split(/\r?\n/).forEach(function(line){
+    var t = line.trim();
+    if (t.startsWith("#N")){ name = t.slice(2).trim(); }
+    else if (t.startsWith("#")){ return; }
+    else if (/^x\s*=/.test(t)){
+      var x = /x\s*=\s*(\d+)/.exec(t), y = /y\s*=\s*(\d+)/.exec(t), r = /rule\s*=\s*(.+)$/i.exec(t);
+      width = x ? Number(x[1]) : 0;
+      height = y ? Number(y[1]) : 0;
+      rule = r ? r[1].trim() : null; // last field; may itself contain commas
+    }
+    else { body += t; }
+  });
+
+  var cells = [], x = 0, y = 0, count = "", prefix = 0;
+  for (var i=0; i < body.length; i++){
+    var c = body[i];
+    if (c === "!"){ break; }
+    if (c >= "0" && c <= "9"){ count += c; continue; }
+    var n = count ? Number(count) : 1;
+    if (c === "$"){ y += n; x = 0; count = ""; continue; }
+    if (c >= "p" && c <= "y"){ prefix = c.charCodeAt(0) - 111; continue; } // p = 1
+    var state;
+    if (c === "b" || c === "."){ state = 0; }
+    else if (c >= "A" && c <= "X"){ state = prefix * 24 + c.charCodeAt(0) - 64; }
+    else if (/[a-z]/.test(c)){ state = 1; } // 2-state RLE treats any other letter as live
+    else { continue; }
+    if (state){ for (var k=0; k < n; k++){ cells.push([x + k, y, state]); } }
+    x += n;
+    count = "";
+    prefix = 0;
+  }
+  if (!width || !height){
+    cells.forEach(function(p){ width = Math.max(width, p[0] + 1); height = Math.max(height, p[1] + 1); });
+  }
+  return { name: name, rule: rule, width: width, height: height, cells: cells };
+};
+
+// Inverse of parseGollyRLE for a 2D board, cropped to its live cells.
+// Uses b/o for 2-state boards and ./A-X otherwise; lines wrap at 70 chars.
+Board.prototype.toGollyRLE = function(rule){
+  var m = this.matrix, dims = m.dimensions;
+  var x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1;
+  for (var x=0; x < dims[0]; x++){
+    for (var y=0; y < dims[1]; y++){
+      if (m.get([x, y])){ x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    }
+  }
+  var header = "x = " + (x1 < 0 ? 0 : x1 - x0 + 1) + ", y = " + (y1 < 0 ? 0 : y1 - y0 + 1) + (rule ? ", rule = " + rule : "");
+  if (x1 < 0){ return header + "\n!\n"; }
+
+  var multi = this.cellStates > 2;
+  var tag = function(s){
+    if (!s){ return multi ? "." : "b"; }
+    if (!multi){ return "o"; }
+    var hi = Math.floor((s - 1) / 24), lo = (s - 1) % 24;
+    return (hi ? String.fromCharCode(111 + hi) : "") + String.fromCharCode(65 + lo);
+  };
+  var tokens = [], blank = 0;
+  var run = function(n, t){ tokens.push((n > 1 ? n : "") + t); };
+  for (var y=y0; y <= y1; y++){
+    var row = [], prev = null, n = 0;
+    for (var x=x0; x <= x1; x++){
+      var s = m.get([x, y]);
+      if (s === prev){ n++; continue; }
+      if (prev !== null){ row.push([n, prev]); }
+      prev = s; n = 1;
+    }
+    row.push([n, prev]);
+    while (row.length && row[row.length - 1][1] === 0){ row.pop(); }
+    if (y > y0){ blank++; }
+    if (!row.length){ continue; }
+    if (blank){ run(blank, "$"); blank = 0; }
+    row.forEach(function(r){ run(r[0], tag(r[1])); });
+  }
+  tokens.push("!");
+
+  var lines = [""];
+  tokens.forEach(function(t){
+    if (lines[lines.length - 1].length + t.length > 70){ lines.push(""); }
+    lines[lines.length - 1] += t;
+  });
+  return header + "\n" + lines.join("\n") + "\n";
+};
+
 var encodeRLE = function(arr){
   var s = "";
   var i = 0;
@@ -902,4 +994,4 @@ var rules = {
     clouds: makeLifeFamilyRule([13,14,17,18,19], range(13, 27)),
 };
 
-export { Board, Ant, Matrix, FlatMatrix, neighborhoods, rules, makeLifeFamilyRule, makeGenerationsRule, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };
+export { Board, Ant, Matrix, FlatMatrix, neighborhoods, rules, makeLifeFamilyRule, makeGenerationsRule, parseGollyRLE, makeArray, canonicalStart, blankStart, getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE };

@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   rules, Matrix, FlatMatrix, Board, Ant, neighborhoods, makeArray, blankStart, canonicalStart,
-  getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE, makeGenerationsRule
+  getIndexes, entropy, flatten, sum, hammingDistance, encodeRLE, decodeRLE, makeGenerationsRule, parseGollyRLE
 } from '../js/automata.js';
 
 
@@ -1061,5 +1061,84 @@ describe('lifeTable fast path equivalence', () => {
 
   it("matches the rule function on a random 2D moore board", () => {
     check([8, 8], neighborhoods.moore, rules.gameOfLife);
+  });
+});
+
+
+describe('parseGollyRLE()', () => {
+  it("reads a glider with header and name", () => {
+    const p = parseGollyRLE("#N Glider\n#C a comment\nx = 3, y = 3, rule = B3/S23\nbo$2bo$3o!");
+    assert.equal(p.name, "Glider");
+    assert.equal(p.rule, "B3/S23");
+    assert.equal(p.width, 3);
+    assert.equal(p.height, 3);
+    assert.deepEqual(p.cells, [[1, 0, 1], [2, 1, 1], [0, 2, 1], [1, 2, 1], [2, 2, 1]]);
+  });
+
+  it("handles blank-row runs, line breaks in the body, and stops at !", () => {
+    const p = parseGollyRLE("x = 2, y = 4\no$\n2$bo!3o");
+    assert.deepEqual(p.cells, [[0, 0, 1], [1, 3, 1]]);
+  });
+
+  it("reads multi-state tags including the p-y prefix", () => {
+    const p = parseGollyRLE("x = 4, y = 1, rule = WireWorld\n.ABpA!");
+    assert.equal(p.rule, "WireWorld");
+    assert.deepEqual(p.cells, [[1, 0, 1], [2, 0, 2], [3, 0, 25]]);
+  });
+
+  it("keeps a rule that contains commas (Larger than Life)", () => {
+    assert.equal(parseGollyRLE("x = 2, y = 1, rule = R2,C0,M1,S2..3,B3..3,NM\n2o!").rule, "R2,C0,M1,S2..3,B3..3,NM");
+  });
+
+  it("infers size when there is no header", () => {
+    const p = parseGollyRLE("3o$o!");
+    assert.equal(p.width, 3);
+    assert.equal(p.height, 2);
+  });
+});
+
+describe('Board.toGollyRLE()', () => {
+  const boardWith = (states, w, h, cells) => {
+    const b = new Board([w, h], states, neighborhoods.moore, [1, 0]);
+    b.matrix.cells.fill(0);
+    cells.forEach(([x, y, s]) => b.matrix.set([x, y], s));
+    return b;
+  };
+
+  it("writes a cropped glider", () => {
+    const b = boardWith(2, 10, 10, [[4, 3, 1], [5, 4, 1], [3, 5, 1], [4, 5, 1], [5, 5, 1]]);
+    assert.equal(b.toGollyRLE("B3/S23"), "x = 3, y = 3, rule = B3/S23\nbo$2bo$3o!\n");
+  });
+
+  it("collapses blank rows and drops trailing dead cells", () => {
+    const b = boardWith(2, 10, 10, [[2, 2, 1], [4, 5, 1]]);
+    assert.equal(b.toGollyRLE(), "x = 3, y = 4\no3$2bo!\n");
+  });
+
+  it("uses ./A-X for multi-state boards", () => {
+    const b = boardWith(4, 10, 10, [[1, 1, 3], [3, 1, 1], [4, 1, 2]]);
+    assert.equal(b.toGollyRLE("WireWorld"), "x = 4, y = 1, rule = WireWorld\nC.AB!\n");
+  });
+
+  it("wraps long bodies at 70 characters", () => {
+    const cells = [];
+    for (let x = 0; x < 100; x += 2) cells.push([x, 0, 1]);
+    const out = new Board([100, 1], 2, neighborhoods.moore, [1, 0]);
+    out.matrix.cells.fill(0);
+    cells.forEach(([x, y, s]) => out.matrix.set([x, y], s));
+    const body = out.toGollyRLE().split("\n").slice(1, -1);
+    assert.ok(body.length > 1);
+    assert.ok(body.every(l => l.length <= 70));
+  });
+
+  it("round-trips through parseGollyRLE", () => {
+    const b = boardWith(4, 12, 12, [[2, 2, 1], [3, 2, 3], [7, 9, 2], [8, 9, 3]]);
+    const p = parseGollyRLE(b.toGollyRLE());
+    const c = boardWith(4, 12, 12, p.cells.map(([x, y, s]) => [x + 2, y + 2, s]));
+    assert.deepEqual(c.matrix.cells, b.matrix.cells);
+  });
+
+  it("writes an empty board as an empty pattern", () => {
+    assert.equal(boardWith(2, 5, 5, []).toGollyRLE(), "x = 0, y = 0\n!\n");
   });
 });
