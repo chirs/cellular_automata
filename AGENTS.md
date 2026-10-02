@@ -18,7 +18,7 @@ A vanilla JavaScript framework for simulating cellular automata (Game of Life, e
 
 ### Core Engine (`www/js/automata.js`)
 
-ES module exporting: `Board`, `Ant`, `Matrix`, `FlatMatrix`, `neighborhoods`, `rules`, and utility functions (`makeArray`, `canonicalStart`, `blankStart`, `getIndexes`, `entropy`, `flatten`, `sum`, `hammingDistance`, `encodeRLE`, `decodeRLE`).
+ES module exporting: `Board`, `Ant`, `Matrix`, `FlatMatrix`, `neighborhoods`, `rules`, `makeLifeFamilyRule`, `makeGenerationsRule`, and utility functions (`makeArray`, `canonicalStart`, `blankStart`, `getIndexes`, `entropy`, `flatten`, `sum`, `hammingDistance`, `encodeRLE`, `decodeRLE`).
 
 - **`Board(dimensions, cellStates, neighbors, initial_distribution)`** — The main simulation object. `dimensions` is an array (e.g., `[50, 50]` for 2D; fractional values are ceil'd), `cellStates` is the number of states, `neighbors` defines the neighborhood topology, and `initial_distribution` sets random start probabilities (`false` = single live center cell). Setters chain: `.setRule(fn)`, `.setRuleByNumber(n)`, `.setStartPattern(points)` (seed from `[dx, dy]` offsets around center, optionally `[dx, dy, state]`; `reset()` restores the seed). `.next()` advances one generation with an allocation-free loop: neighbor states are gathered via a precomputed `Int32Array` of flat indexes (`neighborFlat`) into a reusable `scratch` buffer; Life-family rules skip the per-cell function call entirely via a `lifeTable` lookup attached by `makeLifeFamilyRule`. `.exportPattern()` / `.importPattern(str)` serialize the grid as `"<w>x<h>;<rle>"` for URL sharing (import centers and clips).
 
