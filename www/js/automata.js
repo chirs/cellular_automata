@@ -121,6 +121,22 @@ var brainRule = function(states){
 };
 
 
+// Wireworld: 0 = empty, 1 = electron head, 2 = electron tail,
+// 3 = conductor. Heads decay to tails, tails to conductor; a conductor
+// becomes a head when one or two neighbors are heads.
+var wireworldRule = function(states){
+  var currentState = states[0];
+  if (currentState === 0){ return 0; }
+  if (currentState === 1){ return 2; }
+  if (currentState === 2){ return 3; }
+  var heads = 0;
+  for (var i=1, l=states.length; i < l; i++){
+    if (states[i] === 1){ heads += 1; }
+  }
+  return heads === 1 || heads === 2 ? 1 : 3;
+};
+
+
 // Family: Life
 var makeLifeFamilyRule = function(deadStates, liveStates){
 
@@ -409,8 +425,11 @@ Board.prototype.setStartPattern = function(points){
   var center = this.dimensions.map(e => Math.floor((e-1)/2));
   this.startFunc = () => {
     var m = new FlatMatrix(this.dimensions);
+    // Points are offsets, optionally followed by a state (default 1).
     for (var i=0, l=points.length; i < l; i++){
-      m.set(m.move(center, points[i]), 1);
+      var p = points[i];
+      var state = p.length > center.length ? p[center.length] : 1;
+      m.set(m.move(center, p.slice(0, center.length)), state);
     }
     return m;
   };
@@ -793,6 +812,7 @@ var rules = {
     makeTree: makeTreeRule,
     langtonsAnt: langtonsAntRule,
     brain: brainRule,
+    wireworld: wireworldRule,
     gnarl: makeLifeFamilyRule([1], [1]),
     gameOfLife: makeLifeFamilyRule([3], [2,3]),
     highLife: makeLifeFamilyRule([3,6], [2,3]),

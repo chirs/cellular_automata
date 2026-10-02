@@ -241,6 +241,29 @@ function mooreInput(cellState, liveNeighborCount) {
   return [cellState, ...neighbors];
 }
 
+describe('wireworld', () => {
+  const rule = rules.wireworld;
+  const input = (self, heads) => [self, ...Array(8).fill(3).map((s, i) => i < heads ? 1 : s)];
+
+  it("empty stays empty", () => assert.equal(rule([0, 1, 1, 0, 0, 0, 0, 0, 0]), 0));
+  it("head becomes tail", () => assert.equal(rule(input(1, 0)), 2));
+  it("tail becomes conductor", () => assert.equal(rule(input(2, 1)), 3));
+  it("conductor fires with 1 or 2 head neighbors", () => {
+    assert.equal(rule(input(3, 0)), 3);
+    assert.equal(rule(input(3, 1)), 1);
+    assert.equal(rule(input(3, 2)), 1);
+    assert.equal(rule(input(3, 3)), 3);
+  });
+
+  it("an electron travels along a wire", () => {
+    const board = new Board([10, 3], 4, neighborhoods.moore, false).setRule(rule);
+    board.setStartPattern([[-4, 0, 2], [-3, 0, 1], [-2, 0, 3], [-1, 0, 3], [0, 0, 3]]);
+    board.next();
+    board.next();
+    assert.deepEqual([0, 1, 2, 3, 4, 5].map(x => board.matrix.get([x, 1])), [3, 3, 2, 1, 3, 0]);
+  });
+});
+
 describe('gameOfLife (B3/S23)', () => {
   const rule = rules.gameOfLife;
 
@@ -600,6 +623,16 @@ describe('Board: setStartPattern()', () => {
     board.setRule(rules.gameOfLife).setStartPattern([[3, 0]]);
     // center [1,1] + [3,0] wraps to [0,1]
     assert.equal(board.matrix.get([0, 1]), 1);
+  });
+});
+
+describe('Board: setStartPattern() with states', () => {
+  it("places an optional trailing state, defaulting to 1", () => {
+    const board = new Board([5, 5], 4, neighborhoods.moore, false);
+    board.setRule(rules.wireworld).setStartPattern([[0, 0, 3], [1, 0, 2], [-1, 0]]);
+    assert.equal(board.matrix.get([2, 2]), 3);
+    assert.equal(board.matrix.get([3, 2]), 2);
+    assert.equal(board.matrix.get([1, 2]), 1);
   });
 });
 
