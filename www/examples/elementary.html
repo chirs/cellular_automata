@@ -4,38 +4,179 @@
   <title>Elementary Cellular Automata</title>
 
   <meta charset="utf-8">
-  <meta name="description" content="Elementary cellular automata">
+  <meta name="description" content="Elementary (1D) cellular automata">
 
   <link rel="stylesheet" type="text/css" href="/css/style.css">
 
   <script type="module">
     import { Board, neighborhoods } from '/js/automata.js';
-    import { Drawer } from '/js/draw.js';
+    import { setupPanel, bindKeys, bindSpeed, setPlayButton } from '/js/ui.js';
 
-    var elemCanvas = document.getElementById("elemBoard");
-    var ctx = elemCanvas.getContext("2d");
-    var reset = function(){
-      var SCALE = 2
-      var cellCount = elemCanvas.width / SCALE
-      var board = new Board([cellCount], 2, neighborhoods.elementary, false)
-      board.setRuleByNumber(145)
+    var SCALE = 3;
+    var ALL_SCALE = Math.max(1, Math.min(3, Math.floor(window.innerHeight / 256)));
 
-      var rowIndex = 0;
+    var canvas = document.getElementById("board");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    var ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
 
-      var rd = new Drawer(ctx, board, SCALE, (elemCanvas.height / SCALE))
-      function animate() {
-        requestAnimationFrame(animate);
-        rd.drawRow(rowIndex);
-        board.next();
-        rowIndex = (rowIndex + 1) % 500;
-        if (rowIndex == 0){
-          board.setRandomRule();
-        }
+    var cols = Math.ceil(canvas.width / SCALE);
+    var rows = Math.ceil(canvas.height / SCALE);
+
+    var ruleInput = document.getElementById("rule");
+    var randomStart = document.getElementById("random-start");
+    var cycle = document.getElementById("cycle");
+    var modeBtn = document.getElementById("mode");
+
+    var mode = 'single';
+    var rule = 30;
+    var board, row;
+    var rowsPerSec = 60;
+
+    // One row of cells, painted through a 1px-high ImageData and scaled up.
+    var rowImage = ctx.createImageData(cols, 1);
+    var rowCanvas = document.createElement('canvas');
+    rowCanvas.width = cols;
+    rowCanvas.height = 1;
+    var rowCtx = rowCanvas.getContext('2d');
+
+    var paintRow = function(cells, y, scale, x0) {
+      var data = rowImage.data;
+      for (var i = 0; i < cells.length; i++) {
+        var v = cells[i] ? 0 : 255;
+        data[i*4] = data[i*4+1] = data[i*4+2] = v;
+        data[i*4+3] = 255;
       }
-      requestAnimationFrame(animate);
-    }
+      rowCtx.putImageData(rowImage, 0, 0);
+      ctx.drawImage(rowCanvas, 0, 0, cells.length, 1, x0, y * scale, cells.length * scale, scale);
+    };
 
-    reset();
+    // --- single rule: one row per generation, top to bottom ---
+
+    var startSingle = function() {
+      board = new Board([cols], 2, neighborhoods.elementary, randomStart.checked ? [.5, .5] : false).setWolframRule(rule);
+      row = 0;
+      ruleInput.value = rule;
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
+
+    var tickSingle = function() {
+      if (row >= rows) {
+        if (!cycle.checked) { pause(); return; }
+        rule = Math.floor(Math.random() * 256);
+        startSingle();
+      }
+      paintRow(board.matrix.cells, row, SCALE, 0);
+      board.next();
+      row++;
+    };
+
+    // --- all 256: row n of the image is rule n's current state ---
+
+    var ALL_WIDTH = 256;
+    var allBoards = [];
+    for (var n = 0; n < 256; n++) {
+      allBoards.push(new Board([ALL_WIDTH], 2, neighborhoods.elementary, [.5, .5]).setWolframRule(n));
+    }
+    var allX0 = function() { return Math.floor((canvas.width - ALL_WIDTH * ALL_SCALE) / 2); };
+
+    var tickAll = function() {
+      var x0 = allX0();
+      for (var n = 0; n < 256; n++) {
+        paintRow(allBoards[n].matrix.cells, n, ALL_SCALE, x0);
+        allBoards[n].next();
+      }
+    };
+
+    var startAll = function() {
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      allBoards.forEach(function(b) { b.reset(); });
+      tickAll();
+    };
+
+    // --- shared loop and controls ---
+
+    var tick = function() { mode === 'single' ? tickSingle() : tickAll(); };
+
+    var playing = false;
+    var lastTime = 0;
+    var debt = 0;
+    var loop = function(timestamp) {
+      if (!playing) { return; }
+      requestAnimationFrame(loop);
+      debt += rowsPerSec * Math.min(timestamp - lastTime, 100) / 1000;
+      lastTime = timestamp;
+      while (debt >= 1 && playing) { debt -= 1; tick(); }
+    };
+
+    var play = function() {
+      playing = true;
+      setPlayButton(true);
+      requestAnimationFrame(function(t) { lastTime = t; loop(t); });
+    };
+
+    var pause = function() {
+      playing = false;
+      setPlayButton(false);
+    };
+
+    var togglePlay = function() { playing ? pause() : play(); };
+    var step = function() { if (playing) { pause(); } tick(); };
+    var reset = function() { mode === 'single' ? startSingle() : startAll(); };
+
+    var setRule = function(n) {
+      rule = ((n % 256) + 256) % 256;
+      if (mode !== 'single') { setMode('single'); return; }
+      startSingle();
+      if (!playing) { play(); }
+    };
+
+    var setMode = function(m) {
+      mode = m;
+      document.body.classList.toggle('all-mode', m === 'all');
+      modeBtn.textContent = m === 'all' ? 'single rule' : 'all 256 rules';
+      reset();
+      if (!playing) { play(); }
+    };
+
+    ruleInput.addEventListener('change', function() { setRule(Number(ruleInput.value) || 0); });
+    document.getElementById("prev").addEventListener('click', function() { setRule(rule - 1); });
+    document.getElementById("next").addEventListener('click', function() { setRule(rule + 1); });
+    document.getElementById("random").addEventListener('click', function() { setRule(Math.floor(Math.random() * 256)); });
+    randomStart.addEventListener('change', function() { if (mode === 'single') { reset(); } });
+    modeBtn.addEventListener('click', function() { setMode(mode === 'single' ? 'all' : 'single'); });
+
+    // In all-256 mode, hovering names the row's rule and clicking opens it.
+    var hint = document.getElementById("hover-rule");
+    var rowAt = function(e) {
+      var n = Math.floor(e.offsetY / ALL_SCALE), x = e.offsetX - allX0();
+      return (n < 256 && x >= 0 && x < ALL_WIDTH * ALL_SCALE) ? n : -1;
+    };
+    canvas.addEventListener('mousemove', function(e) {
+      var n = mode === 'all' ? rowAt(e) : -1;
+      hint.textContent = n === -1 ? '' : 'rule ' + n + ' — click to open';
+      canvas.style.cursor = n === -1 ? '' : 'pointer';
+    });
+    canvas.addEventListener('click', function(e) {
+      var n = mode === 'all' ? rowAt(e) : -1;
+      if (n !== -1) { setRule(n); }
+    });
+
+    document.getElementById("play").addEventListener('click', togglePlay);
+    document.getElementById("forward").addEventListener('click', step);
+    document.getElementById("reset").addEventListener('click', reset);
+    bindSpeed(function(v) { rowsPerSec = v; });
+    bindKeys({
+      ' ': togglePlay, n: step, r: reset,
+      ArrowRight: function() { setRule(rule + 1); },
+      ArrowLeft: function() { setRule(rule - 1); },
+    });
+    setupPanel();
+
+    setMode('single');
   </script>
 
 </head>
@@ -43,8 +184,54 @@
 
 <body class="home">
 
-<canvas id="elemBoard" width="1000" height="800"></canvas>
+<canvas id="board"></canvas>
 
+<div id="menu">
 
+  <header>
+    <h1>elementary</h1>
+    <button id="collapse" title="minimize">&ndash;</button>
+  </header>
+
+  <div class="toggled">
+
+    <p class="tagline">one-dimensional automata: each row is the next generation of the row above.</p>
+
+    <div id="controls">
+      <button id="play" class="primary" title="space">Play</button>
+      <div class="secondary">
+        <button id="forward" title="n">Step</button>
+        <button id="reset" title="r">Reset</button>
+      </div>
+      <label id="speed-row">speed
+        <input id="speed" type="range" min="1" max="240" value="60">
+        <span id="speed-value">60/s</span>
+      </label>
+    </div>
+
+    <div class="single-only">
+      <h2>rule</h2>
+      <div id="rule-row">
+        <button id="prev" title="&larr;">&lsaquo;</button>
+        <input id="rule" type="number" min="0" max="255" value="30">
+        <button id="next" title="&rarr;">&rsaquo;</button>
+        <button id="random">random</button>
+      </div>
+      <label class="check"><input id="random-start" type="checkbox"> random start row</label>
+      <label class="check"><input id="cycle" type="checkbox" checked> new random rule when the screen fills</label>
+    </div>
+
+    <h2>view</h2>
+    <button id="mode" class="wide">all 256 rules</button>
+    <p class="hint" id="hover-rule"></p>
+
+    <footer>
+      <p class="keys">space play &middot; n step &middot; r reset &middot; &larr;&rarr; rule</p>
+      <a href="/">&larr; dashboard</a> &middot; <a href="ant.html">ant</a> &middot; <a href="life3d.html">3d life</a>
+    </footer>
+  </div>
+
+</div>
 
 </body>
+</html>
