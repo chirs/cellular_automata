@@ -9,7 +9,7 @@
   <link rel="stylesheet" type="text/css" href="/css/style.css">
 
   <script type="module">
-    import { Board, neighborhoods, rules, makeLifeFamilyRule } from '/js/automata.js';
+    import { Board, neighborhoods, rules, makeLifeFamilyRule, makeGenerationsRule } from '/js/automata.js';
     import { Drawer3d } from '/js/draw.js';
     import { setupPanel, bindKeys, bindSpeed, setPlayButton } from '/js/ui.js';
 
@@ -53,21 +53,40 @@
     // boundaryless soup, so it gets the whole grid at 50%. The Bays rules are
     // transient by nature (a burst of structure, then death); b67s567 and
     // b45s5 sustain thousands of active cells indefinitely.
+    var blob = () => randomBlob(3, 0.4);
+
+    // Decay rules: a live cell that stops surviving fades through the
+    // remaining states before dying, so the palette runs bright to dark.
+    var decayColors = ["#fff", "#ffe066", "#ffb347", "#ff7f50", "#f25c54", "#d6336c", "#9c36b5", "#5f3dc4"];
+
+    // b4s4, b678s345, b2s and b4s3456 came from population sweeps: the first
+    // three boil indefinitely, b4s3456 grows to ~30% fill then freezes.
+    // The decay rules were picked the same way, for staying active from a
+    // small blob (b56s567 pulses between roughly 800 and 3000 cells).
     var ruleSpecs = {
-      "4555": { rule: rules.bays4555, color: "#4a90d9", seed: () => randomBlob(3, 0.4) },
-      "5766": { rule: rules.bays5766, color: "#5cb85c", seed: () => randomBlob(3, 0.4) },
+      "4555": { rule: rules.bays4555, color: "#4a90d9", seed: blob },
+      "5766": { rule: rules.bays5766, color: "#5cb85c", seed: blob },
       "clouds": { rule: rules.clouds, color: "#9370db", seed: () => fullSoup(0.5) },
-      "b67s567": { rule: makeLifeFamilyRule([6,7], [5,6,7]), color: "#e0a030", seed: () => randomBlob(3, 0.4) },
-      "b45s5": { rule: makeLifeFamilyRule([4,5], [5]), color: "#d05050", seed: () => randomBlob(3, 0.4) },
+      "b67s567": { rule: makeLifeFamilyRule([6,7], [5,6,7]), color: "#e0a030", seed: blob },
+      "b45s5": { rule: makeLifeFamilyRule([4,5], [5]), color: "#d05050", seed: blob },
+      "b4s4": { rule: makeLifeFamilyRule([4], [4]), color: "#20a4a4", seed: blob },
+      "b678s345": { rule: makeLifeFamilyRule([6,7,8], [3,4,5]), color: "#7a8c2e", seed: blob },
+      "b2s": { rule: makeLifeFamilyRule([2], []), color: "#e05a9a", seed: blob },
+      "b4s3456": { rule: makeLifeFamilyRule([4], [3,4,5,6]), color: "#5a7fc0", seed: blob },
+      "b56s567c8": { rule: makeGenerationsRule([5,6], [5,6,7], 8), colors: decayColors, seed: blob },
+      "b67s4567c8": { rule: makeGenerationsRule([6,7], [4,5,6,7], 8), colors: decayColors, seed: blob },
     };
 
-    var board = new Board([SIZE, SIZE, SIZE], 2, neighborhoods.moore3d, false);
-    var drawer = new Drawer3d(context, board, CUBE, 6);
+    var drawer = new Drawer3d(context, new Board([SIZE, SIZE, SIZE], 2, neighborhoods.moore3d, false), CUBE, 6);
+    var board;
 
     var setRule = function(name){
       var spec = ruleSpecs[name];
-      board.setRule(spec.rule).setStartPattern(spec.seed());
-      board.colorMap = ["#fff", spec.color];
+      var colors = spec.colors || ["#fff", spec.color];
+      board = new Board([SIZE, SIZE, SIZE], colors.length, neighborhoods.moore3d, false)
+        .setRule(spec.rule).setStartPattern(spec.seed());
+      board.colorMap = colors;
+      drawer.board = board;
       drawer.faceColors = drawer.makeFaceColors();
       document.querySelectorAll('#rules li').forEach(li => li.classList.toggle('active', li.firstElementChild.id === name));
     };
@@ -133,14 +152,26 @@
       </label>
     </div>
 
-    <h2>rules</h2>
-    <ul id="rules">
-      <li><a id="4555">bays 4555 (b5/s45)</a></li>
-      <li><a id="5766">bays 5766 (b6/s567)</a></li>
-      <li><a id="clouds">clouds</a></li>
-      <li><a id="b67s567">b67/s567</a></li>
-      <li><a id="b45s5">b45/s5</a></li>
-    </ul>
+    <div id="rules">
+      <h2>life-like</h2>
+      <ul>
+        <li><a id="4555">bays 4555 (b5/s45)</a></li>
+        <li><a id="5766">bays 5766 (b6/s567)</a></li>
+        <li><a id="clouds">clouds</a></li>
+        <li><a id="b67s567">b67/s567</a></li>
+        <li><a id="b45s5">b45/s5</a></li>
+        <li><a id="b4s4">b4/s4</a></li>
+        <li><a id="b678s345">b678/s345</a></li>
+        <li><a id="b2s">3d seeds (b2/s)</a></li>
+        <li><a id="b4s3456">crystal (b4/s3456)</a></li>
+      </ul>
+      <h2>with decay</h2>
+      <p class="hint">cells that stop surviving fade through 6 colors before dying</p>
+      <ul>
+        <li><a id="b56s567c8">pulse (b56/s567, 8 states)</a></li>
+        <li><a id="b67s4567c8">b67/s4567, 8 states</a></li>
+      </ul>
+    </div>
 
     <footer>
       <p class="keys">space play &middot; n step &middot; r reset</p>
