@@ -13,7 +13,7 @@ export function setupPanel(){
 // form field or holding a modifier, so browser shortcuts still work.
 export function bindKeys(keys){
   document.addEventListener('keydown', function(e){
-    if (e.metaKey || e.ctrlKey || e.altKey || e.target.tagName === 'INPUT') { return; }
+    if (e.metaKey || e.ctrlKey || e.altKey || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') { return; }
     var handler = keys[e.key];
     if (handler) { e.preventDefault(); handler(); }
   });

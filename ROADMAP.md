@@ -4,10 +4,6 @@ Open work only; completed items are removed as they land (see git history).
 
 ---
 
-## URL State Sharing
-
-- [ ] Golly RLE interop for pattern import/export (current format is a custom RLE in the URL hash)
-
 ## Project Organization
 
 - [ ] Add JSDoc comments to public API

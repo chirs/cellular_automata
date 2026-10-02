@@ -9,7 +9,7 @@
   <link rel="stylesheet" type="text/css" href="/css/style.css">
 
   <script type="module">
-    import { Board, neighborhoods, rules, makeLifeFamilyRule } from '/js/automata.js';
+    import { Board, neighborhoods, rules, makeLifeFamilyRule, parseGollyRLE } from '/js/automata.js';
     import { Drawer, getURLHash } from '/js/draw.js';
     import { setupPanel, bindKeys, bindSpeed, setPlayButton } from '/js/ui.js';
 
@@ -191,7 +191,9 @@
 	var currentRule = null;
 
 	var setRule = function(name){
-	    if (name === currentRule) { return; }
+	    // An imported pattern runs on its own board, so re-selecting the
+	    // same rule still swaps back to the menu's board.
+	    if (name === currentRule && d.board === map[name].board) { return; }
 	    currentRule = name;
 	    var rule = map[name];
 
@@ -311,21 +313,23 @@
 	    if (!playing) { d.drawTable(); }
 	};
 
+	// Make sure map has an entry for a custom b/s rule name like "b36s23".
+	var ensureRule = function(name){
+	    if (map[name]) { return true; }
+	    var m = bsName.exec(name);
+	    if (!m) { return false; }
+	    map[name] = {
+		scale: SCALE,
+		board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, [.7,.3]).setRule(makeLifeFamilyRule(digits(m[1]), digits(m[2])))
+	    };
+	    return true;
+	};
+
 	var ruleFromHash = function(){
 	    var hash = getURLHash(window, 'life');
 	    var sep = hash.indexOf(';');
 	    var name = sep === -1 ? hash : hash.slice(0, sep);
-	    if (!map[name]){
-		var m = bsName.exec(name);
-		if (m) {
-		    map[name] = {
-			scale: SCALE,
-			board: new Board([width/SCALE, height/SCALE], 2, neighborhoods.moore, [.7,.3]).setRule(makeLifeFamilyRule(digits(m[1]), digits(m[2])))
-		    };
-		} else {
-		    name = 'life';
-		}
-	    }
+	    if (!ensureRule(name)) { name = 'life'; }
 	    setRule(name);
 	    if (sep !== -1){
 		// Load the shared pattern paused so it's visible before evolving.
@@ -334,6 +338,117 @@
 		d.drawTable();
 	    }
 	};
+
+	// --- Standard RLE import/export (Golly, LifeWiki) ---
+
+	var notice = document.getElementById("notice");
+	var noticeTimer;
+	var showNotice = function(msg){
+	    notice.textContent = msg;
+	    notice.classList.add("shown");
+	    clearTimeout(noticeTimer);
+	    noticeTimer = setTimeout(function(){ notice.classList.remove("shown"); }, 3500);
+	};
+
+	var sameDigits = function(a, b){ return a.slice().sort().join('') === b.slice().sort().join(''); };
+
+	// RLE rule string -> dashboard rule name, or null if unsupported.
+	// Accepts B/S (any case), Golly's S/B, and Generations B/S/C or S/B/C.
+	var ruleFromGolly = function(str){
+	    if (/^wireworld$/i.test(str)) { return 'wireworld'; }
+	    var birth, survival, states = 2, m;
+	    if ((m = /^B(\d*)\/S(\d*)(?:\/C?(\d+))?$/i.exec(str))) { birth = m[1]; survival = m[2]; states = Number(m[3] || 2); }
+	    else if ((m = /^(\d*)\/(\d*)(?:\/(\d+))?$/.exec(str))) { survival = m[1]; birth = m[2]; states = Number(m[3] || 2); }
+	    else { return null; }
+	    birth = digits(birth); survival = digits(survival);
+	    if (states === 3 && sameDigits(birth, [2]) && survival.length === 0) { return 'brain'; }
+	    if (states !== 2) { return null; }
+	    var named = Object.keys(map).find(function(name){
+		var b = map[name].board;
+		return b.cellStates === 2 && b.neighbors === neighborhoods.moore && b.rule.birth &&
+		    sameDigits(b.rule.birth, birth) && sameDigits(b.rule.survival, survival);
+	    });
+	    var name = named || "b" + birth.join("") + "s" + survival.join("");
+	    return ensureRule(name) ? name : null;
+	};
+
+	var ruleToGolly = function(name, board){
+	    if (name === 'wireworld') { return 'WireWorld'; }
+	    if (name === 'brain') { return 'B2/S/C3'; }
+	    var r = board.rule;
+	    if (r.birth && board.cellStates === 2) { return "B" + r.birth.join("") + "/S" + r.survival.join(""); }
+	    return null;
+	};
+
+	var looksLikeRLE = function(text){
+	    return /^\s*(#.*\n\s*)*x\s*=/.test(text) || /^[\d\sbo$]+!\s*$/.test(text);
+	};
+
+	var importRLE = function(text){
+	    var p = parseGollyRLE(text);
+	    var name = currentRule, ruleNote = "";
+	    if (p.rule) {
+		var matched = ruleFromGolly(p.rule);
+		if (matched) { name = matched; }
+		else { ruleNote = " (rule " + p.rule + " isn't supported; using " + currentRule + ")"; }
+	    }
+	    if (!p.cells.length) { showNotice("no live cells in that RLE"); return false; }
+
+	    setRule(name);
+	    pause();
+	    // A fresh board seeded with the pattern, so Reset restores it and the
+	    // menu's own board for this rule is left alone.
+	    var base = map[name].board;
+	    var board = new Board(base.dimensions, base.cellStates, base.neighbors, false).setRule(base.rule);
+	    board.colorMap = base.colorMap;
+	    var ox = Math.floor(p.width / 2), oy = Math.floor(p.height / 2);
+	    var cx = Math.floor((base.dimensions[0] - 1) / 2), cy = Math.floor((base.dimensions[1] - 1) / 2);
+	    var points = [], clipped = 0;
+	    p.cells.forEach(function(c){
+		var x = c[0] - ox, y = c[1] - oy;
+		var inside = cx + x >= 0 && cx + x < base.dimensions[0] && cy + y >= 0 && cy + y < base.dimensions[1];
+		if (inside && c[2] < base.cellStates) { points.push([x, y, c[2]]); } else { clipped++; }
+	    });
+	    d.board = board.setStartPattern(points);
+	    d.drawTable();
+	    syncEditor();
+	    showNotice("loaded " + (p.name || "pattern") + " (" + p.width + "\u00d7" + p.height + ") as " + name +
+		(clipped ? ", " + clipped + " cells clipped" : "") + ruleNote);
+	    return true;
+	};
+
+	var rleDialog = document.getElementById("rle-dialog");
+	var rleText = document.getElementById("rle-text");
+	document.getElementById("rle").addEventListener('click', function(){
+	    rleDialog.hidden = !rleDialog.hidden;
+	    if (!rleDialog.hidden) { rleText.focus(); }
+	});
+	document.getElementById("rle-close").addEventListener('click', function(){ rleDialog.hidden = true; });
+	document.getElementById("rle-load").addEventListener('click', function(){
+	    if (importRLE(rleText.value)) { rleDialog.hidden = true; }
+	});
+	document.getElementById("rle-copy").addEventListener('click', function(){
+	    if (playing) { pause(); }
+	    var text = d.board.toGollyRLE(ruleToGolly(currentRule, d.board));
+	    rleText.value = text;
+	    rleText.select();
+	    if (navigator.clipboard) {
+		navigator.clipboard.writeText(text).then(function(){ showNotice("RLE copied to clipboard"); }, function(){});
+	    }
+	});
+
+	// Paste RLE anywhere outside a text field, or drop a .rle file.
+	document.addEventListener('paste', function(e){
+	    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') { return; }
+	    var text = e.clipboardData.getData('text');
+	    if (looksLikeRLE(text)) { e.preventDefault(); importRLE(text); }
+	});
+	document.addEventListener('dragover', function(e){ e.preventDefault(); });
+	document.addEventListener('drop', function(e){
+	    e.preventDefault();
+	    var file = e.dataTransfer.files[0];
+	    if (file) { file.text().then(importRLE); }
+	});
 
 	window.addEventListener('hashchange', ruleFromHash);
 	ruleFromHash();
@@ -346,6 +461,19 @@
 
 <div class="box">
   <canvas id="board"></canvas>
+</div>
+
+<div id="notice" aria-live="polite"></div>
+
+<div id="rle-dialog" hidden>
+  <h2>RLE pattern</h2>
+  <p class="hint">paste standard RLE (Golly, LifeWiki) and load it, or copy the current grid. you can also paste RLE anywhere on the page or drop a .rle file.</p>
+  <textarea id="rle-text" spellcheck="false" placeholder="x = 3, y = 3, rule = B3/S23&#10;bo$2bo$3o!"></textarea>
+  <div class="row">
+    <button id="rle-load" class="primary-small">load</button>
+    <button id="rle-copy">copy current</button>
+    <button id="rle-close">close</button>
+  </div>
 </div>
 
 <div id="menu">
@@ -365,6 +493,7 @@
         <button id="forward" title="n or →">Step</button>
         <button id="reset" title="r">Reset</button>
         <button id="share">Share</button>
+        <button id="rle" title="import / export standard RLE">RLE</button>
       </div>
       <label id="speed-row">speed
         <input id="speed" type="range" min="1" max="60" value="15">
