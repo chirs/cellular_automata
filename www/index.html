@@ -99,10 +99,33 @@
 	    playing ? pause() : play();
 	});
 
-	document.getElementById("forward").addEventListener('click', function() {
+	var step = function() {
 	    if (playing) pause();
 	    d.board.next();
 	    d.drawTableDiff();
+	};
+
+	var reset = function() {
+	    d.board.reset();
+	    d.drawTable();
+	};
+
+	document.getElementById("forward").addEventListener('click', step);
+
+	// Slider is generations/sec; Drawer rate is generations per 60fps frame.
+	var speed = document.getElementById("speed");
+	var speedValue = document.getElementById("speed-value");
+	speed.addEventListener('input', function() {
+	    RATE = speed.value / 60;
+	    d.setRate(RATE);
+	    speedValue.textContent = speed.value + '/s';
+	});
+
+	document.addEventListener('keydown', function(e) {
+	    if (e.metaKey || e.ctrlKey || e.altKey || e.target.tagName === 'INPUT') { return; }
+	    if (e.key === ' ') { e.preventDefault(); playing ? pause() : play(); }
+	    else if (e.key === 'n' || e.key === 'ArrowRight') { step(); }
+	    else if (e.key === 'r') { reset(); }
 	});
 
 	canvas.addEventListener('click', function(e) { d.changeSquare(e); });
@@ -138,10 +161,7 @@
 	    syncEditor();
 	};
 
-	document.getElementById("reset").addEventListener('click', function(){
-	    d.board.reset();
-	    d.drawTable();
-	});
+	document.getElementById("reset").addEventListener('click', reset);
 
 	document.getElementById("share").addEventListener('click', function(){
 	    if (playing) { pause(); }
@@ -292,12 +312,16 @@
     <p class="tagline">a generic cellular automata simulator in js</p>
 
     <div id="controls">
-      <button id="play" class="primary">Play</button>
+      <button id="play" class="primary" title="space">Play</button>
       <div class="secondary">
-        <button id="forward">Step</button>
-        <button id="reset">Reset</button>
+        <button id="forward" title="n or →">Step</button>
+        <button id="reset" title="r">Reset</button>
         <button id="share">Share</button>
       </div>
+      <label id="speed-row">speed
+        <input id="speed" type="range" min="1" max="60" value="15">
+        <span id="speed-value">15/s</span>
+      </label>
     </div>
 
     <h2>examples</h2>
@@ -319,6 +343,7 @@
     </div>
 
     <footer>
+      <p class="keys">space play · n step · r reset</p>
       <a href="about.html">about</a> · <a href="examples/life3d.html">3d life</a> · <a href="http://github.com/chirs/cellular_automata">github</a>
     </footer>
   </div>

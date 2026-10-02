@@ -209,6 +209,30 @@ body.home {
     background-color: #444;
 }
 
+#speed-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: #777;
+}
+
+#speed {
+    flex: 1;
+    min-width: 0;
+    accent-color: #2a7a4a;
+}
+
+#speed-value {
+    width: 32px;
+    text-align: right;
+}
+
+#menu footer .keys {
+    margin: 0 0 6px;
+}
+
 #editor {
     transition: opacity 0.2s;
 }

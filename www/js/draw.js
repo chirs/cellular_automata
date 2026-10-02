@@ -172,12 +172,12 @@ var Drawer = function(context, board, scale, rate){
   Drawer.prototype.draw2dBoard = function(){
     this.stop();
     var d = this;
-    var interval = (1000 / 60) / this.rate;
     var lastTime = 0;
     this.drawTable(this.board.getState())
     function loop(timestamp) {
       d._animFrameId = requestAnimationFrame(loop);
-      if (timestamp - lastTime >= interval) {
+      // Read rate each frame so setRate() takes effect mid-animation.
+      if (timestamp - lastTime >= (1000 / 60) / d.rate) {
         lastTime = timestamp;
         d.board.next();
         d.drawTableDiff();
