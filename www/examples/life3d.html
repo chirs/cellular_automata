@@ -11,11 +11,17 @@
   <script type="module">
     import { Board, neighborhoods, rules, makeLifeFamilyRule } from '/js/automata.js';
     import { Drawer3d } from '/js/draw.js';
+    import { setupPanel, bindKeys, bindSpeed, setPlayButton } from '/js/ui.js';
 
     var canvas = document.getElementById("board3d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     var context = canvas.getContext("2d");
 
     var SIZE = 20;
+    // Cube half-width in px: the domain's isometric footprint is roughly
+    // 2 * SIZE cube widths across, so fit that to the smaller viewport side.
+    var CUBE = Math.max(6, Math.floor(Math.min(canvas.width, canvas.height) / (2.6 * SIZE)));
 
     var randomBlob = function(radius, fill){
       var points = [];
@@ -56,35 +62,45 @@
     };
 
     var board = new Board([SIZE, SIZE, SIZE], 2, neighborhoods.moore3d, false);
-    var drawer = new Drawer3d(context, board, 20, 6);
+    var drawer = new Drawer3d(context, board, CUBE, 6);
 
     var setRule = function(name){
       var spec = ruleSpecs[name];
       board.setRule(spec.rule).setStartPattern(spec.seed());
       board.colorMap = ["#fff", spec.color];
       drawer.faceColors = drawer.makeFaceColors();
-      document.querySelectorAll('#rules a').forEach(a => a.classList.toggle('selected', a.id === name));
+      document.querySelectorAll('#rules li').forEach(li => li.classList.toggle('active', li.firstElementChild.id === name));
     };
 
     document.querySelectorAll('#rules a').forEach(a =>
       a.addEventListener('click', () => setRule(a.id)));
 
-    var playButton = document.getElementById("play");
-    playButton.addEventListener('click', function(){
+    var togglePlay = function(){
       drawer.running = !drawer.running;
-      playButton.textContent = drawer.running ? "pause" : "play";
-    });
-    document.getElementById("next").addEventListener('click', () => board.next());
-    document.getElementById("reset").addEventListener('click', () => board.reset());
+      setPlayButton(drawer.running);
+    };
+    var step = function(){
+      if (drawer.running) { togglePlay(); }
+      board.next();
+    };
+    var reset = () => board.reset();
+
+    document.getElementById("play").addEventListener('click', togglePlay);
+    document.getElementById("forward").addEventListener('click', step);
+    document.getElementById("reset").addEventListener('click', reset);
+    bindSpeed(v => drawer.setRate(v));
+    bindKeys({ ' ': togglePlay, n: step, ArrowRight: step, r: reset });
+    setupPanel();
 
     setRule("4555");
+    drawer.running = true;
+    setPlayButton(true);
     drawer.draw3dBoard();
   </script>
 
   <style>
-    #rules a.selected { font-weight: bold; text-decoration: underline; }
-    #rules a { cursor: pointer; margin-right: 1em; }
-    #board3d { touch-action: none; }
+    #board3d { touch-action: none; cursor: grab; }
+    #board3d:active { cursor: grabbing; }
   </style>
 
 </head>
@@ -92,23 +108,47 @@
 
 <body class="home">
 
-<div id="rules">
-  <a id="4555">4555</a>
-  <a id="5766">5766</a>
-  <a id="clouds">clouds</a>
-  <a id="b67s567">b67/s567</a>
-  <a id="b45s5">b45/s5</a>
+<canvas id="board3d"></canvas>
+
+<div id="menu">
+
+  <header>
+    <h1>3d life</h1>
+    <button id="collapse" title="minimize">&ndash;</button>
+  </header>
+
+  <div class="toggled">
+
+    <p class="tagline">life on a 20&times;20&times;20 torus with 26 neighbors. drag to rotate.</p>
+
+    <div id="controls">
+      <button id="play" class="primary" title="space">Play</button>
+      <div class="secondary">
+        <button id="forward" title="n or &rarr;">Step</button>
+        <button id="reset" title="r">Reset</button>
+      </div>
+      <label id="speed-row">speed
+        <input id="speed" type="range" min="1" max="30" value="6">
+        <span id="speed-value">6/s</span>
+      </label>
+    </div>
+
+    <h2>rules</h2>
+    <ul id="rules">
+      <li><a id="4555">bays 4555 (b5/s45)</a></li>
+      <li><a id="5766">bays 5766 (b6/s567)</a></li>
+      <li><a id="clouds">clouds</a></li>
+      <li><a id="b67s567">b67/s567</a></li>
+      <li><a id="b45s5">b45/s5</a></li>
+    </ul>
+
+    <footer>
+      <p class="keys">space play &middot; n step &middot; r reset</p>
+      <a href="/">&larr; dashboard</a> &middot; <a href="ant.html">ant</a> &middot; <a href="elementary.html">elementary</a>
+    </footer>
+  </div>
+
 </div>
-
-<div id="controls">
-  <div id="next">next</div>
-  <div id="play">pause</div>
-  <div id="reset">reset</div>
-</div>
-
-<p>drag to rotate</p>
-
-<canvas id="board3d" width="900" height="880"></canvas>
 
 </body>
 </html>
