@@ -207,6 +207,7 @@ var Drawer3d = function(context, board, scale, rate){
   this.dragging = false;
   this.highlight = null; // {axis, index}: emphasize one slice, fade the rest
   this.visible = true;    // false: keep ticking generations but skip rendering
+  this.maxState = Infinity; // states above this aren't drawn (e.g. long refractory tails)
   this.onGeneration = null;
   this.faceColors = this.makeFaceColors();
   this.bindPointer();
@@ -340,7 +341,7 @@ var Drawer3d = function(context, board, scale, rate){
     var live = [];
     for (var i=0, l=cells.length; i < l; i++){
       var state = cells[i];
-      if (state === 0){ continue; }
+      if (state === 0 || state > this.maxState){ continue; }
       var p = m.point(i);
       var dx = p[0]-cx, dy = p[1]-cy, dz = p[2]-cz;
       var rx = dx*cos - dy*sin;
