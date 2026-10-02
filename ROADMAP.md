@@ -14,7 +14,6 @@ Open work only; completed items are removed as they land (see git history).
 
 ## Project Organization
 
-- [ ] Consolidate examples into fewer pages or a unified demo (partial: removed duplicate `life2.html`)
 - [ ] Add JSDoc comments to public API
 
 ## 3D Visualization

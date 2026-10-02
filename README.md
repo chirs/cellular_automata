@@ -7,22 +7,23 @@ Any discrete cellular automaton can be simulated by passing a rule function: Gam
 
 ### Features
 
-* **Dashboard** ([index.html](src/index.html)) — nine rules with play/pause/step/reset controls and click-to-draw.
+* **Dashboard** ([index.html](www/index.html)) — ten rules (including Wireworld) with play/pause/step/reset, a speed slider, keyboard shortcuts, a birth/survival rule editor, and click-to-draw.
 * **Shareable URLs** — `#cyclic` links to a rule; the Share button encodes the entire grid state in the URL (run-length encoded), so a drawing can be sent as a link.
 * **Fast engine** — typed-array storage, precomputed neighbor indexes, and an allocation-free update loop; a 960×540 Game of Life grid runs at ~140 generations/sec (`npm run bench`).
 * **Toroidal grids** with configurable neighborhoods (von Neumann, Moore, 1D elementary, and their 3D counterparts).
-* **3D automata** ([life3d.html](src/examples/life3d.html)) — Bays' 3D Life rules and clouds, rendered as rotating voxels on a plain 2D canvas.
-* **[About page](src/about.html)** with live embedded demos explaining how it all works.
+* **Langton's Ant** ([ant.html](www/examples/ant.html)) — from a blank grid to the highway at ~10,000 steps.
+* **3D automata** ([life3d.html](www/examples/life3d.html)) — Bays' 3D Life rules and clouds, rendered as rotating voxels on a plain 2D canvas.
+* **[About page](www/about.html)** with live embedded demos explaining how it all works.
 
 ### Elementary cellular automata
 
-1-dimensional automata where each cell sees only itself and its two neighbors — small enough that all 256 rules can be enumerated. The famous chaotic Rule 30 is on display on the about page. (Note: this engine's rule tables are indexed `[self, left, right]`, so Wolfram rule numbers don't map over directly.)
+1-dimensional automata where each cell sees only itself and its two neighbors — small enough that all 256 rules can be enumerated. [elementary.html](www/examples/elementary.html) steps through them by Wolfram number, or shows all 256 at once. (The engine's rule tables are indexed `[self, left, right]`; `Board.setWolframRule(n)` converts from Wolfram numbering.)
 
 ### Development
 
-Serve the `src/` directory with any static file server:
+Serve the `www/` directory with any static file server:
 
-    python3 -m http.server -d src
+    python3 -m http.server -d www
 
 Run tests (Node's built-in runner, also run in CI on push):
 

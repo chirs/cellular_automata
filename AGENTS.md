@@ -44,7 +44,9 @@ ES module exporting: `Drawer`, `getURLHash`.
 
 ### Example Pages (`www/examples/`, `www/index.html`, `www/about.html`)
 
-Each HTML file is a standalone demo that imports from `automata.js` and `draw.js` via `<script type="module">`. No external dependencies. `www/index.html` is the multi-automaton dashboard: sidebar rule menu, play/pause/step/reset, click-to-draw, and URL sharing. `www/about.html` explains CA with live embedded demos.
+Each HTML file is a standalone demo that imports from `automata.js` and `draw.js` via `<script type="module">`. No external dependencies. `www/index.html` is the multi-automaton dashboard: sidebar rule menu, play/pause/step/reset, speed slider, B/S rule editor, click-to-draw, and URL sharing. `www/about.html` explains CA with live embedded demos. `www/examples/` holds the demos the dashboard can't host: `life3d.html` (3D), `ant.html` (Langton's Ant), and `elementary.html` (1D rules by Wolfram number, plus an all-256 view).
+
+The dashboard and example pages share one control panel: `#menu` markup styled in `style.css`, wired by `www/js/ui.js` (`setupPanel` for collapse, `bindKeys`, `bindSpeed`, `setPlayButton`).
 
 ## Git
 
@@ -56,6 +58,6 @@ Do not add a Co-Authored-By line to commit messages.
 - Boards are toroidal (edges wrap) via `move()`.
 - Double-buffering in `Board.next()`: computes new state into `otherMatrix`, then swaps.
 - URL hash grammar on the dashboard: `#<rule>` or `#<rule>;<w>x<h>;<rle data>` (rule-only autoplays; a pattern hash loads paused). `<rule>` is a menu name or a custom B/S rule like `b36s23` (from the panel's rule editor). RLE alphabet is `[0-9a-z]`: `<count><stateChar>` with count omitted when 1 and state = `'a' + state`.
-- Elementary CA rule tables are indexed by `[self, left, right]` (self is the high bit), so Wolfram rule numbers do NOT map over directly — e.g., true Wolfram rule 30 is the table `[0,1,1,0,1,1,0,0]` via `setRuleTable`, not `setRuleByNumber(30)`.
+- Elementary CA rule tables are indexed by `[self, left, right]` (self is the high bit), so Wolfram rule numbers do NOT map over directly: use `setWolframRule(n)`, not `setRuleByNumber(n)`.
 - `Board.diff()` sets `static` when a generation changes nothing, short-circuiting `next()`; anything that mutates cells directly (`updateValue`, `importPattern`) must clear it.
 - Color generation uses golden-ratio-based HSV distribution for >3 states; boards can override `colorMap` with any CSS colors (the Drawer normalizes them).
