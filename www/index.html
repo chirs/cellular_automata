@@ -160,16 +160,10 @@
 	});
 
 
-	document.querySelectorAll(".hide-show").forEach(function(el){
-	    el.addEventListener('click', function(){
-		if (this.textContent == '-'){
-		    this.textContent = '+ expand';
-		    document.querySelectorAll(".toggled").forEach(function(t){ t.style.display = 'none'; });
-		} else {
-		    this.textContent = '- minimize';
-		    document.querySelectorAll(".toggled").forEach(function(t){ t.style.display = ''; });
-		}
-	    });
+	document.getElementById("collapse").addEventListener('click', function(){
+	    var collapsed = document.getElementById("menu").classList.toggle("collapsed");
+	    this.textContent = collapsed ? '+' : '–';
+	    this.title = collapsed ? 'expand' : 'minimize';
 	});
 
 
@@ -214,7 +208,7 @@
 	    editorEl.classList.toggle("disabled", !usable);
 	    for (var n = 0; n <= 8; n++){
 		editorBoxes.b[n].checked = usable && !!lt[n];
-		editorBoxes.s[n].checked = usable && !!lt[16 + n];
+		editorBoxes.s[n].checked = usable && !!lt[32 + n];
 	    }
 	};
 
@@ -289,14 +283,25 @@
 
 <div id="menu">
 
-  <div class="hide-show">- minimize</div>
+  <header>
+    <h1>cellular automata</h1>
+    <button id="collapse" title="minimize">–</button>
+  </header>
 
   <div class="toggled">
 
-    <p>a generic cellular automata simulator in js (<a href="about.html">¿huh?</a>)</p>
-    <p><a href="http://github.com/chirs/cellular_automata">on github</a> · <a href="examples/life3d.html">3d life</a></p>
-    <p><em>examples</em></p>
+    <p class="tagline">a generic cellular automata simulator in js</p>
 
+    <div id="controls">
+      <button id="play" class="primary">Play</button>
+      <div class="secondary">
+        <button id="forward">Step</button>
+        <button id="reset">Reset</button>
+        <button id="share">Share</button>
+      </div>
+    </div>
+
+    <h2>examples</h2>
     <ul>
       <li><a id="life">life</a></li>
       <li><a id="brain">brian's brain</a></li>
@@ -308,17 +313,15 @@
       <li><a id="amoeba">amoeba</a></li>
       <li><a id="coral">coral</a></li>
     </ul>
-    
-    <div id="controls">
-      <button id="reset">Reset</button>
-      <button id="play">Play</button>
-      <button id="forward">Step</button>
-      <button id="share">Share</button>
-    </div>
 
     <div id="editor">
-      <p><em>rule editor</em> — neighbors to be <strong>B</strong>orn / <strong>S</strong>urvive</p>
+      <h2>rule editor</h2>
+      <p class="hint">neighbors to be <strong>B</strong>orn / <strong>S</strong>urvive</p>
     </div>
+
+    <footer>
+      <a href="about.html">about</a> · <a href="examples/life3d.html">3d life</a> · <a href="http://github.com/chirs/cellular_automata">github</a>
+    </footer>
   </div>
 
 </div>
