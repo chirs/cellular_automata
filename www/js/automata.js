@@ -296,6 +296,21 @@ Board.prototype.setRuleTable = function(t){
   return this;
 };
 
+// Wolfram numbering: bit (left*4 + self*2 + right) of n is the next state.
+// The table here is indexed [self, left, right], so reorder the bits.
+Board.prototype.setWolframRule = function(n){
+  var t = [];
+  for (var self=0; self < 2; self++){
+    for (var left=0; left < 2; left++){
+      for (var right=0; right < 2; right++){
+        t[self*4 + left*2 + right] = (n >> (left*4 + self*2 + right)) & 1;
+      }
+    }
+  }
+  this.wolframRule = n;
+  return this.setRuleTable(t);
+};
+
 Board.prototype.setRandomRule = function(){
   return this.setRuleTable(randomStart([this.neighborStates], this.cellStates));
   };

@@ -901,6 +901,27 @@ describe('Board: setRuleTable()', () => {
   });
 });
 
+describe('Board: setWolframRule()', () => {
+  const run = (n, gens) => {
+    const board = new Board([9], 2, neighborhoods.elementary, false).setWolframRule(n);
+    for (let i = 0; i < gens; i++) board.next();
+    return board.matrix.state().join('');
+  };
+
+  it("rule 30 grows its familiar left edge", () => {
+    assert.equal(run(30, 0), '000010000');
+    assert.equal(run(30, 1), '000111000');
+    assert.equal(run(30, 2), '001100100');
+    assert.equal(run(30, 3), '011011110');
+  });
+
+  it("rule 90 draws a Sierpinski triangle", () => {
+    assert.equal(run(90, 1), '000101000');
+    assert.equal(run(90, 2), '001000100');
+    assert.equal(run(90, 3), '010101010');
+  });
+});
+
 describe('Board: setRandomRule()', () => {
   it("sets a rule and can advance without error", () => {
     const board = new Board([7], 2, neighborhoods.elementary, false);
