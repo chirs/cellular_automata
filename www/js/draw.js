@@ -257,31 +257,63 @@ var Drawer3d = function(context, board, scale, rate){
     ctx.fill();
   };
 
-  // Wireframe of the (toroidal) domain's bounding box, drawn behind the
-  // cells as a spatial reference.
-  Drawer3d.prototype.drawFrame = function(cos, sin){
+  // Project a point given as offsets from the domain center.
+  Drawer3d.prototype.project = function(dx, dy, dz, cos, sin){
+    var canvas = this.context.canvas;
+    var w = this.scale;
+    var rx = dx*cos - dy*sin;
+    var ry = dx*sin + dy*cos;
+    return [canvas.width/2 + (rx - ry) * w, canvas.height/2 + (rx + ry) * w/2 - dz * w, rx + ry];
+  };
+
+  Drawer3d.prototype.strokeLines = function(lines, style, width, dash){
     var ctx = this.context;
-    var canvas = ctx.canvas;
-    var dims = this.board.matrix.dimensions;
-    var w = this.scale, h = this.scale;
-    var ox = canvas.width / 2, oy = canvas.height / 2;
-    var hx = dims[0]/2, hy = dims[1]/2, hz = dims[2]/2;
-    var corners = [];
-    for (var i=0; i < 8; i++){
-      var dx = i & 1 ? hx : -hx, dy = i & 2 ? hy : -hy, dz = i & 4 ? hz : -hz;
-      var rx = dx*cos - dy*sin;
-      var ry = dx*sin + dy*cos;
-      corners.push([ox + (rx - ry) * w, oy + (rx + ry) * w/2 - dz * h]);
-    }
-    var edges = [[0,1],[0,2],[1,3],[2,3],[4,5],[4,6],[5,7],[6,7],[0,4],[1,5],[2,6],[3,7]];
-    ctx.strokeStyle = "#ccc";
+    ctx.strokeStyle = style;
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.setLineDash(dash || []);
     ctx.beginPath();
-    for (var i=0; i < edges.length; i++){
-      var a = corners[edges[i][0]], b = corners[edges[i][1]];
-      ctx.moveTo(a[0], a[1]);
-      ctx.lineTo(b[0], b[1]);
+    for (var i=0; i < lines.length; i++){
+      ctx.moveTo(lines[i][0][0], lines[i][0][1]);
+      ctx.lineTo(lines[i][1][0], lines[i][1][1]);
     }
     ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineWidth = 1;
+  };
+
+  // Bounding box of the (toroidal) domain as a spatial reference. Seen from
+  // above, the bottom corner farthest from the viewer is hidden: its three
+  // edges and the floor grid go behind the cells (front = false); the other
+  // nine edges lie on visible faces and are stroked over them (front = true).
+  Drawer3d.prototype.drawFrame = function(cos, sin, front){
+    var dims = this.board.matrix.dimensions;
+    var hx = dims[0]/2, hy = dims[1]/2, hz = dims[2]/2;
+    var corners = [], hidden = -1;
+    for (var i=0; i < 8; i++){
+      var c = this.project(i & 1 ? hx : -hx, i & 2 ? hy : -hy, i & 4 ? hz : -hz, cos, sin);
+      corners.push(c);
+      if (!(i & 4) && (hidden === -1 || c[2] < corners[hidden][2])){ hidden = i; }
+    }
+    var edges = [[0,1],[0,2],[1,3],[2,3],[4,5],[4,6],[5,7],[6,7],[0,4],[1,5],[2,6],[3,7]];
+    var lines = edges
+      .filter(e => (e[0] === hidden || e[1] === hidden) !== front)
+      .map(e => [corners[e[0]], corners[e[1]]]);
+
+    if (front){
+      this.strokeLines(lines, "rgba(70, 80, 110, 0.45)", 1.5);
+      return;
+    }
+
+    var grid = [], step = 4;
+    for (var x = -hx + step; x < hx; x += step){
+      grid.push([this.project(x, -hy, -hz, cos, sin), this.project(x, hy, -hz, cos, sin)]);
+    }
+    for (var y = -hy + step; y < hy; y += step){
+      grid.push([this.project(-hx, y, -hz, cos, sin), this.project(hx, y, -hz, cos, sin)]);
+    }
+    this.strokeLines(grid, "rgba(70, 80, 110, 0.1)", 1);
+    this.strokeLines(lines, "rgba(70, 80, 110, 0.3)", 1.25, [4, 4]);
   };
 
   Drawer3d.prototype.render = function(){
@@ -293,7 +325,7 @@ var Drawer3d = function(context, board, scale, rate){
     var dims = m.dimensions;
     var cells = m.cells;
     var cos = Math.cos(this.theta), sin = Math.sin(this.theta);
-    this.drawFrame(cos, sin);
+    this.drawFrame(cos, sin, false);
     var cx = (dims[0]-1)/2, cy = (dims[1]-1)/2, cz = (dims[2]-1)/2;
     var w = this.scale, h = this.scale;
     var ox = canvas.width / 2, oy = canvas.height / 2;
@@ -309,15 +341,18 @@ var Drawer3d = function(context, board, scale, rate){
       var dx = p[0]-cx, dy = p[1]-cy, dz = p[2]-cz;
       var rx = dx*cos - dy*sin;
       var ry = dx*sin + dy*cos;
+      // Sprites span y..y+2h from their top corner; shift up by h so the
+      // cube is centered on the cell and lines up with the frame.
       live.push([(rx + ry) + dz*1e-3,
                  ox + (rx - ry) * w,
-                 oy + (rx + ry) * w/2 - dz * h,
+                 oy + (rx + ry) * w/2 - dz * h - h,
                  state]);
     }
     live.sort(function(a, b){ return a[0] - b[0]; });
     for (var i=0, l=live.length; i < l; i++){
       this.drawCube(live[i][1], live[i][2], this.faceColors[live[i][3]]);
     }
+    this.drawFrame(cos, sin, true);
   };
 
   Drawer3d.prototype.bindPointer = function(){
